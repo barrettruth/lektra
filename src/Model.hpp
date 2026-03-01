@@ -35,11 +35,13 @@ class TextHighlightAnnotationCommand;
 class TextAnnotationCommand;
 class DocumentView;
 
+struct Config;
+
 class Model : public QObject
 {
     Q_OBJECT
 public:
-    Model(QObject *parent = nullptr) noexcept;
+    Model(const Config &config, QObject *parent = nullptr) noexcept;
     ~Model() noexcept;
 
     enum class FileType
@@ -173,10 +175,12 @@ public:
     {
         return supports_annotations();
     }
+
     inline bool supports_encryption()
     {
         return supports_annotations();
     }
+
     inline bool supports_decryption()
     {
         return supports_annotations();
@@ -274,11 +278,7 @@ public:
     inline bool hasUnsavedChanges() const noexcept
     {
         // If the undo stack says we are at the 'save point', it's clean.
-        if (m_undo_stack && !m_undo_stack->isClean())
-            return true;
-
-        // Fallback: Ask MuPDF if the bitstream is dirty
-        return pdf_has_unsaved_changes(m_ctx, m_pdf_doc);
+        return !m_undo_stack->isClean();
     }
 
     // This is the "Logical" scale for the UI
@@ -431,6 +431,11 @@ public:
     std::vector<HighlightText> collectHighlightTexts(bool groupByLine
                                                      = true) noexcept;
     void annotChangeColor(int pageno, int index, const QColor &color) noexcept;
+    void removeAnnotComment(const int pageno, const int objNum) noexcept;
+    void addAnnotComment(const int pageno, const int objNum,
+                         const QString &comment) noexcept;
+    const char *getAnnotComment(const int pageno, const int objNum) noexcept;
+    int get_obj_num_at_rect(int pageno, fz_rect targetRect) noexcept;
 
 signals:
     void undoStackCleanChanged(bool clean);
@@ -602,13 +607,13 @@ private:
 #ifdef HAS_DJVU
     void buildPageCache_djvu(int pageno) noexcept;
 #endif
-    int addRectAnnotation(const int pageno, const fz_rect &rect) noexcept;
+    int addRectAnnotation(const int pageno, const fz_rect &rect,
+                          const QString &content = {}) noexcept;
     int addHighlightAnnotation(const int pageno,
-                               const std::vector<fz_quad> &quads) noexcept;
+                               const std::vector<fz_quad> &quads,
+                               const QString &content = {}) noexcept;
     int addTextAnnotation(const int pageno, const fz_rect &rect,
                           const QString &text) noexcept;
-    void setTextAnnotationContents(const int pageno, const int objNum,
-                                   const QString &text) noexcept;
     void removeAnnotations(const int pageno,
                            const std::vector<int> &objNums) noexcept;
     void buildTextCacheForPages(const std::set<int> &pagenos) noexcept;
@@ -664,6 +669,7 @@ private:
     fz_colorspace *m_colorspace{nullptr};
     fz_outline *m_outline{nullptr};
 
+
 #ifdef HAS_DJVU
 
     // DJVU core objects
@@ -688,4 +694,6 @@ private:
     friend class TextAnnotationCommand;
     friend class DeleteAnnotationsCommand;
     friend class DocumentView;
+
+    const Config &m_config;
 };
