@@ -3408,46 +3408,32 @@ DocumentView::renderAnnotations(
 
     for (const auto &annot : annotations)
     {
-        Annotation *annot_item = nullptr;
+        Annotation *annot_item{nullptr};
         switch (annot.type)
         {
             case PDF_ANNOT_HIGHLIGHT:
-                annot_item = new HighlightAnnotation(annot.rect,
-                                                     annot.index); // no color
-                break;
-
-            case PDF_ANNOT_SQUARE:
-                annot_item
-                    = new RectAnnotation(annot.rect, annot.index, annot.color);
-                break;
-
-            case PDF_ANNOT_TEXT:
             {
-                auto *textAnnot = new TextAnnotation(annot.rect, annot.index,
-                                                     annot.color, annot.text);
-                annot_item      = textAnnot;
-
-                // Connect edit signal for text annotations
-                connect(textAnnot, &TextAnnotation::editRequested,
-                        [this, textAnnot, pageno]()
-                {
-                    bool ok;
-                    QString newText = QInputDialog::getMultiLineText(
-                        this, tr("Edit Note"), tr("Edit annotation text:"),
-                        textAnnot->text(), &ok);
-
-                    if (ok && !newText.isEmpty())
-                    {
-                        m_model->setTextAnnotationContents(
-                            pageno, textAnnot->index(), newText);
-                        // setModified(true);
-                    }
-                });
+                annot_item = new HighlightAnnotation(
+                    m_config.annotations.highlight, annot.rect, annot.index,
+                    annot.text);
             }
             break;
 
-            case PDF_ANNOT_POPUP:
-                break;
+            case PDF_ANNOT_SQUARE:
+            {
+                annot_item
+                    = new RectAnnotation(m_config.annotations.rect, annot.rect,
+                                         annot.index, annot.text, annot.color);
+            }
+            break;
+
+            case PDF_ANNOT_TEXT:
+            {
+                annot_item = new PopupAnnotation(m_config.annotations.popup,
+                                                 annot.rect, annot.index,
+                                                 annot.color, annot.text);
+            }
+            break;
 
             default:
                 break;
@@ -3458,25 +3444,45 @@ DocumentView::renderAnnotations(
 
         annot_item->setZValue(ZVALUE_ANNOTATION);
         annot_item->setPos(pageItem->pos());
-        m_gscene->addItem(annot_item);
 
-        connect(annot_item, &Annotation::annotDeleteRequested,
+        connect(annot_item, &Annotation::annotCommentRequested, this,
+                [this, annot_item, pageno]()
+        {
+            const QString oldComment = annot_item->comment();
+            bool ok;
+            const QString newComment = QInputDialog::getMultiLineText(
+                this, tr("Add Comment"), tr("Enter annotation comment:"),
+                oldComment, &ok);
+
+            if (!ok)
+                return;
+
+            // annot_item->setComment(newComment);
+
+            m_model->addAnnotComment(pageno, annot_item->index(), newComment);
+            // m_model->undoStack()->push(new AnnotCommentCommand(
+            //     m_model, pageno, annot_item->index(), oldComment,
+            //     newComment));
+        });
+
+        connect(annot_item, &Annotation::annotDeleteRequested, this,
                 [this, annot_item, pageno]()
         {
             m_model->undoStack()->push(new DeleteAnnotationsCommand(
                 m_model, pageno, {annot_item->index()}));
         });
 
-        connect(annot_item, &Annotation::annotColorChangeRequested,
+        connect(annot_item, &Annotation::annotColorChangeRequested, this,
                 [this, annot_item, pageno]()
         {
             auto color = QColorDialog::getColor(
                 annot_item->data(3).value<QColor>(), this, "Highlight Color",
                 QColorDialog::ColorDialogOption::ShowAlphaChannel);
             if (color.isValid())
-            {
                 m_model->annotChangeColor(pageno, annot_item->index(), color);
         });
+
+        m_gscene->addItem(annot_item);
 
         m_page_annotations_hash[pageno].push_back(annot_item);
     }
@@ -3485,7 +3491,10 @@ DocumentView::renderAnnotations(
 void
 DocumentView::setModified(bool modified) noexcept
 {
-    if (!m_model->supports_save() && m_is_modified == modified)
+    if (!m_model->supports_save())
+        return;
+
+    if (m_is_modified == modified)
         return;
 
     m_is_modified = modified;
@@ -3759,7 +3768,7 @@ DocumentView::handleAnnotSelectRequested(QRectF sceneRect) noexcept
         return;
 
     for (auto *annot : annotsInArea)
-        annot->select(Qt::black);
+        annot->setSelected(true);
 }
 
 void
@@ -3776,7 +3785,7 @@ DocumentView::handleAnnotSelectRequested(QPointF scenePos) noexcept
     if (!annotAtPoint)
         return;
 
-    annotAtPoint->select(Qt::black);
+    annotAtPoint->setSelected(true);
 }
 
 std::vector<Annotation *>
