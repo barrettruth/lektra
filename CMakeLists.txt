@@ -30,6 +30,8 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer -DNDEBUG")
 find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent) #OpenGLWidgets )
 find_package(PkgConfig REQUIRED)
 
+pkg_check_modules(DJVU ddjvuapi)
+
 # SyncTeX
 find_path(SYNCTEX_INCLUDE_DIR
     NAMES synctex_parser.h synctex/synctex_parser.h
@@ -39,16 +41,10 @@ find_library(SYNCTEX_LIBRARY
     NAMES synctex synctex_parser
 )
 
-find_library(DJVU_LIBRARY
-    NAMES djvulibre ddjvuapi
-)
-
-if(DJVU_LIBRARY)
+if(DJVU_FOUND)
     message(STATUS "Found DjVuLibre. Compiling with DJVU support.")
-    set(DJVU_FOUND TRUE)
 else()
     message(WARNING "DjVuLibre not found, disabling DjVu support")
-    set(DJVU_FOUND FALSE)
 endif()
 
 add_executable(${PROJECT_NAME}
@@ -103,14 +99,16 @@ add_executable(${PROJECT_NAME}
 
     # Annotations
     src/Annotations/RectAnnotation.hpp
-    src/Annotations/TextAnnotation.hpp
+    src/Annotations/PopupAnnotation.hpp
     src/Annotations/HighlightAnnotation.hpp
+    src/Annotations/CommentPopupButton.hpp
 
     # Commands
     src/Commands/RectAnnotationCommand.hpp
     src/Commands/TextAnnotationCommand.hpp
     src/Commands/TextHighlightAnnotationCommand.hpp
     src/Commands/DeleteAnnotationsCommand.hpp
+    src/Commands/AnnotCommentCommand.hpp
 )
 
 if (DJVU_FOUND)
