@@ -641,6 +641,38 @@ Lektra::initConfig() noexcept
                                     m_config.window.title_format);
     }
 
+    // Annotations
+    if (auto annots = toml["annotations"])
+    {
+        if (auto highlight = annots["highlight"])
+        {
+            set(highlight["hover_glow"],
+                m_config.annotations.highlight.hover_glow);
+            set(highlight["show_comment"],
+                m_config.annotations.highlight.show_comment);
+            set(highlight["show_comment_marker"],
+                m_config.annotations.highlight.show_comment_marker);
+            set(highlight["hover_glow"],
+                m_config.annotations.highlight.hover_glow);
+        }
+
+        if (auto rect = annots["rect"])
+        {
+            set(rect["hover_glow"], m_config.annotations.rect.hover_glow);
+            set(rect["show_comment"], m_config.annotations.rect.show_comment);
+            set(rect["show_comment_marker"],
+                m_config.annotations.rect.show_comment_marker);
+            set(rect["hover_glow"], m_config.annotations.rect.hover_glow);
+        }
+
+        if (auto popup = annots["popup"])
+        {
+            set(popup["hover_glow"], m_config.annotations.popup.hover_glow);
+            set(popup["show_comment"], m_config.annotations.popup.show_comment);
+            set(popup["hover_glow"], m_config.annotations.popup.hover_glow);
+        }
+    }
+
     // Statusbar
     if (auto statusbar = toml["statusbar"])
     {
