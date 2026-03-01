@@ -46,6 +46,7 @@ public:
         setFlags(QGraphicsItem::ItemIsSelectable
                  | QGraphicsItem::ItemIsFocusable);
         setData(0, "link");
+        setCursor(Qt::PointingHandCursor);
     }
 
     inline void setGotoPageNo(int pageno) noexcept
@@ -155,14 +156,12 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *e) override
     {
         setBrush(QBrush(QColor(1.0, 1.0, 0.0, 125)));
-        setCursor(Qt::PointingHandCursor);
         QGraphicsRectItem::hoverEnterEvent(e);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) override
     {
         setBrush(Qt::transparent);
-        unsetCursor();
         QGraphicsRectItem::hoverLeaveEvent(e);
     }
 
