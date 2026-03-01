@@ -7,6 +7,10 @@
 - Support for running shell scripts
 - Support for DJVU files (limited, only basic rendering and navigation, no text selection and searching)
 - New command line argument `--layout` to specify the default layout mode on file open (e.g. `--layout=book` to open in book layout mode)
+- Support for adding comments to annotations in LEKTRA. (After creating an annotation, you can add a note to it by right clicking on the annotation and selecting "Comment" from the context menu. This will open a dialog where you can enter your comment. Once added, the comment will be associated with the annotation.
+**Note: These comments do not exist in the undo/redo stack, which means that if you change comment of an annotation and then undo, the comment change will not be undone. This is to do with limitations in the way the annotation data is stored and handled in the current implementation, but it might be improved in the future by integrating note changes into the undo/redo stack.**
+- Annotations with comments _optionally_ can show a marker (e.g. an icon) to indicate that there's a note associated with the annotation, and hovering over the annotation will show the note as a tooltip (configurable in settings).
+- Annotations have an _optional_ hover glow effect to provide visual feedback when hovering over annotations, making it easier to identify and interact with them.
 
 ### Core Features
 
@@ -22,6 +26,25 @@
 ### `description` in `[command_palette]` - Show command description in the command palette if available
 ### New interaction mode `initial_mode="none"` in `[behavior]`, doesn't do anything.
 
+### `[annotations]` - annotation related settings (common for all supported annotation types)
+
+### `[annotations.highlight]` - highlight annotation related settings
+    - `hover_glow` (bool) to enable/disable hover glow effect on highlight annotation
+    - `show_comment` (bool) to show the comment of the highlight annotation as tooltip on hover (if the annotation has a comment)
+    - `show_comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
+    - `glow_width` (int) to set the width of the hover glow effect on highlight annotation
+
+### `[annotations.popup]` - popup annotation related settings
+    - `hover_glow` (bool) to enable/disable hover glow effect on popup annotation
+    - `glow_width` (int) to set the width of the hover glow effect on popup annotation
+
+### `[annotations.rect]` - rectangle annotation related settings
+    - `glow_width` (int) to set the width of the hover glow effect on rect annotation
+    - `hover_glow` (bool) to enable/disable hover glow effect on rect annotation
+    - `show_comment` (bool) to show the comment of the rect annotation as tooltip on hover (if the annotation has a comment)
+    - `show_comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
+
+- `enabled` option in `[links]` to enable/disable links
 
 ### Optimizations
 
