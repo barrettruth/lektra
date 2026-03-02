@@ -75,6 +75,7 @@ NOTE: This is just a convenience table to increase the readability of the config
 
 ### Bug Fix
 
+- Fix search results not clearing when searching for empty string
 - Fix `-p,--page` command line argument not working
 - Fix non-exsistent files trying to be opened
 - Fix document reload causing unnecessary popup of message box saying it couldn't reload document
