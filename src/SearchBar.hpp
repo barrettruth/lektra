@@ -20,7 +20,7 @@ public:
 
     inline void setRegexMode(bool state) noexcept
     {
-        m_regexButton->setChecked(true);
+        m_regexButton->setChecked(state);
     }
 
     inline bool regexMode() const noexcept
