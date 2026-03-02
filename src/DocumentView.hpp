@@ -2,7 +2,6 @@
 
 #include "AboutDialog.hpp"
 #include "GraphicsImageItem.hpp"
-#include "GraphicsPixmapItem.hpp"
 #include "GraphicsScene.hpp"
 #include "GraphicsView.hpp"
 #include "JumpMarker.hpp"
