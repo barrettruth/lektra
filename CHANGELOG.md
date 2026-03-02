@@ -27,24 +27,33 @@
 ### New interaction mode `initial_mode="none"` in `[behavior]`, doesn't do anything.
 
 ### `[annotations]` - annotation related settings (common for all supported annotation types)
+NOTE: This is just a convenience table to increase the readability of the config, it has no effect on its own, the actual annotation type tables (e.g. `[annotations.highlight]`, `[annotations.popup]`, etc.) still need to be configured separately for their respective annotation types.
 
 ### `[annotations.highlight]` - highlight annotation related settings
     - `hover_glow` (bool) to enable/disable hover glow effect on highlight annotation
-    - `show_comment` (bool) to show the comment of the highlight annotation as tooltip on hover (if the annotation has a comment)
-    - `show_comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
+    - `comment` (bool) to show the comment of the highlight annotation as tooltip on hover (if the annotation has a comment)
+    - `comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
     - `glow_width` (int) to set the width of the hover glow effect on highlight annotation
+    - `glow_color` (RGBA hex value) to set the color of the hover glow effect on highlight annotation
+    - `comment_font_size` (int) to set the font size of the comment tooltip for highlight annotations
 
 ### `[annotations.popup]` - popup annotation related settings
     - `hover_glow` (bool) to enable/disable hover glow effect on popup annotation
     - `glow_width` (int) to set the width of the hover glow effect on popup annotation
+    - `glow_color` (RGBA hex value) to set the color of the hover glow effect on popup annotation
 
 ### `[annotations.rect]` - rectangle annotation related settings
     - `glow_width` (int) to set the width of the hover glow effect on rect annotation
     - `hover_glow` (bool) to enable/disable hover glow effect on rect annotation
-    - `show_comment` (bool) to show the comment of the rect annotation as tooltip on hover (if the annotation has a comment)
-    - `show_comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
+    - `comment` (bool) to show the comment of the rect annotation as tooltip on hover (if the annotation has a comment)
+    - `comment_marker` (bool) to show a marker (e.g. an icon) on the annotation if it has a comment, to indicate that there's a comment associated with the annotation
+    - `glow_color` (RGBA hex value) to set the color of the hover glow effect on rect annotation
+    - `comment_font_size` (int) to set the font size of the comment tooltip for highlight annotations
 
 - `enabled` option in `[links]` to enable/disable links
+### `[search]` for search related settings
+    - `match_color` (RGBA hex value) to set the color of the search hit highlights
+    - `index_color` (RGBA hex value) to set the color of the current search hit highlight
 
 ### Optimizations
 
@@ -59,6 +68,8 @@
 - Rename `LEFT_TO_RIGHT` layout to `horizontal` and `TOP_TO_BOTTOM` layout to `vertical` for better clarity and intuitiveness.
 - Renamed `layout_left_to_right` command to `layout_horizontal` and `layout_top_to_bottom` command to `layout_vertical` to reflect the renamed layout modes.
 - Command palette is now opened with ":" key by default instead of "Ctrl + Shift + P" to stay close to the Vim way of opening command palette and also because it's more ergonomic to open with a single key press.
+- Renamed `[markers]` to `[jump_marker]`
+- Removed `[color]` section from config and moved all colors to thier respective sections (e.g. annotation colors are now in `[annotations]` section, search hit colors are now in `[search]` section, etc.) for better organization and maintainability of the config file.
 
 #### Renamed Commands:
 
