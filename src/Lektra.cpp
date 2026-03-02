@@ -652,8 +652,8 @@ Lektra::initConfig() noexcept
                 m_config.annotations.highlight.show_comment);
             set(highlight["show_comment_marker"],
                 m_config.annotations.highlight.show_comment_marker);
-            set(highlight["hover_glow"],
-                m_config.annotations.highlight.hover_glow);
+            set(highlight["glow_width"],
+                m_config.annotations.highlight.glow_width);
         }
 
         if (auto rect = annots["rect"])
@@ -662,14 +662,14 @@ Lektra::initConfig() noexcept
             set(rect["show_comment"], m_config.annotations.rect.show_comment);
             set(rect["show_comment_marker"],
                 m_config.annotations.rect.show_comment_marker);
-            set(rect["hover_glow"], m_config.annotations.rect.hover_glow);
+            set(rect["glow_width"], m_config.annotations.rect.glow_width);
         }
 
         if (auto popup = annots["popup"])
         {
             set(popup["hover_glow"], m_config.annotations.popup.hover_glow);
             set(popup["show_comment"], m_config.annotations.popup.show_comment);
-            set(popup["hover_glow"], m_config.annotations.popup.hover_glow);
+            set(popup["glow_width"], m_config.annotations.popup.glow_width);
         }
     }
 
