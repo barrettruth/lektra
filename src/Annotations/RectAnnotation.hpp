@@ -26,15 +26,20 @@ public:
         m_comment = comment;
         setGlowEnabled(m_config.hover_glow);
         setGlowWidth(m_config.glow_width);
+        setGlowColor(m_config.glow_color);
         setFlags(flags() | QGraphicsItem::ItemIsFocusable);
 
-        if (m_config.show_comment_marker)
+        if (m_config.comment_marker)
         {
             m_comment_marker = new CommentPopupButton(this);
             m_comment_marker->setAnnotationRect(m_rect);
             connect(m_comment_marker, &CommentPopupButton::clicked, this,
                     [this] { emit annotCommentRequested(); });
             updateButtonVisibility();
+        }
+
+        if (!m_comment.isEmpty()) {
+            setTooltipFontSize(m_config.comment_font_size);
         }
     }
 
