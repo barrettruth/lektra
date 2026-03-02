@@ -180,7 +180,7 @@ configure_file(
 
 # Generate .qm files immediately without creating target dependencies
 qt_add_translations(
-    TARGETS ${PROJECT_NAME}            # Target that will use the .qm files
+    TARGETS ${PROJECT_NAME}         # Target that will use the .qm files
     TS_FILES ${TRANSLATION_FILES}   # Explicit .ts files
     QM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/translations"
     QM_FILES_OUTPUT_VARIABLE QM_FILES
