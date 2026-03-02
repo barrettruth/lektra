@@ -155,7 +155,8 @@ DocumentView::initGui() noexcept
     m_model->setAnnotRectColor(
         rgbaToQColor(m_config.annotations.rect.color).toRgb());
     m_model->setSelectionColor(rgbaToQColor(m_config.selection.color));
-    m_model->setHighlightColor(rgbaToQColor(m_config.annotations.highlight.color));
+    m_model->setHighlightColor(
+        rgbaToQColor(m_config.annotations.highlight.color));
     // m_model->setAntialiasingBits(m_config.rendering.antialiasing_bits);
     m_model->undoStack()->setUndoLimit(m_config.behavior.undo_limit);
 
@@ -3994,12 +3995,10 @@ DocumentView::SaveRegionAsImage(QRectF area) noexcept
         return;
 
     QFileDialog fd(this);
-    const QString fileName
-        = fd.getSaveFileName(this, tr("Save Image"), "",
-                             tr("PNG Image") + " (*.png), " +
-                             tr("JPEG Image") + " (*.jpg *.jpeg), " +
-                             tr("BMP Image") + " (*.bmp);; All Files (*)"
-    );
+    const QString fileName = fd.getSaveFileName(
+        this, tr("Save Image"), "",
+        tr("PNG Image") + " (*.png), " + tr("JPEG Image") + " (*.jpg *.jpeg), "
+            + tr("BMP Image") + " (*.bmp);; All Files (*)");
     if (fileName.isEmpty())
         return;
     QString format;
