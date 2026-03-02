@@ -29,7 +29,7 @@ RecentFilesModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return {};
 
-    if (index.row() < 0 || index.row() >= m_entries.size())
+    if (index.row() < 0 || index.row() >= (int)m_entries.size())
         return {};
 
     const RecentFileEntry &entry = m_entries.at(index.row());
@@ -84,7 +84,7 @@ RecentFilesModel::setData(const QModelIndex &index, const QVariant &value,
     if (!index.isValid() || role != Qt::EditRole)
         return false;
 
-    if (index.row() < 0 || index.row() >= m_entries.size())
+    if (index.row() < 0 || index.row() >= (int)m_entries.size())
         return false;
 
     RecentFileEntry &entry = m_entries[index.row()];
@@ -136,7 +136,7 @@ RecentFilesModel::flags(const QModelIndex &index) const
 bool
 RecentFilesModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    if (row < 0 || count <= 0 || row + count > m_entries.size())
+    if (row < 0 || count <= 0 || row + count > (int)m_entries.size())
         return false;
 
     beginRemoveRows(parent, row, row + count - 1);
@@ -165,7 +165,7 @@ RecentFilesModel::entries() const noexcept
 RecentFileEntry
 RecentFilesModel::entryAt(int row) const
 {
-    if (row < 0 || row >= m_entries.size())
+    if (row < 0 || row >= (int)m_entries.size())
         return {};
     return m_entries.at(row);
 }
