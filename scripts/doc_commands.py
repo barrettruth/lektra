@@ -15,7 +15,7 @@ def extract_commands(path: str) -> list[tuple[str, str]]:
 
     # Match m_command_manager.reg("name", "description", ...)
     pattern = re.compile(
-        r'm_command_manager\.reg\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*,',
+            r'm_command_manager\.reg\(\s*"([^"]+)"\s*,\s*(?:tr\()?"([^"]*)"\)?\s*,',
         re.MULTILINE,
     )
 
