@@ -4920,7 +4920,6 @@ Lektra::create_portal(DocumentView *sourceView,
             pair->source->clear_portal();
             m_statusbar->setPortalMode(false);
         }
-        PPRINT("PORTAL CLOSED");
     }, Qt::SingleShotConnection);
 
     return newView;
