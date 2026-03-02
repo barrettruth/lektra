@@ -11,7 +11,7 @@
 
 struct Config
 {
-    QHash<QString, QString> shortcuts{};
+    QHash<QString, QString> keybinds{};
 
     // *NOTE*: Colors can be specified in hex format (e.g. #RRGGBBAA) or as a
     // color name
