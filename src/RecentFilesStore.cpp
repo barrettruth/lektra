@@ -183,7 +183,7 @@ RecentFilesStore::trim(int maxEntries) noexcept
     if (maxEntries < 0)
         return;
 
-    if (m_entries.size() > maxEntries)
+    if ((int)m_entries.size() > maxEntries)
         m_entries.resize(maxEntries);
 }
 
