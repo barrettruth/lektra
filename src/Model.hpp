@@ -435,6 +435,7 @@ public:
     void addAnnotComment(const int pageno, const int objNum,
                          const QString &comment) noexcept;
     const char *getAnnotComment(const int pageno, const int objNum) noexcept;
+    QColor getAnnotColor(const int pageno, const int index) noexcept;
     int get_obj_num_at_rect(int pageno, fz_rect targetRect) noexcept;
 
 signals:

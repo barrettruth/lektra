@@ -2712,6 +2712,52 @@ Model::annotChangeColor(int pageno, int index, const QColor &color) noexcept
     }
 }
 
+QColor
+Model::getAnnotColor(const int pageno, const int objNum) noexcept
+{
+    QColor color;
+
+    fz_try(m_ctx)
+    {
+        pdf_page *page = pdf_load_page(m_ctx, m_pdf_doc, pageno);
+        if (!page)
+            fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to load page");
+
+        for (pdf_annot *annot = pdf_first_annot(m_ctx, page); annot;
+             annot            = pdf_next_annot(m_ctx, annot))
+        {
+            if (pdf_to_num(m_ctx, pdf_annot_obj(m_ctx, annot)) != objNum)
+                continue;
+
+            int n{3};
+            float rgb[3];
+            switch (pdf_annot_type(m_ctx, annot))
+            {
+                case PDF_ANNOT_SQUARE:
+                case PDF_ANNOT_TEXT:
+                    pdf_annot_interior_color(m_ctx, annot, &n, rgb);
+                    break;
+                case PDF_ANNOT_HIGHLIGHT:
+                    pdf_annot_color(m_ctx, annot, &n, rgb);
+                    break;
+                default:
+                    break;
+            }
+            float alpha = pdf_annot_opacity(m_ctx, annot);
+            color.setRgbF(rgb[0], rgb[1], rgb[2], alpha);
+            break;
+        }
+
+        pdf_drop_page(m_ctx, page);
+    }
+    fz_catch(m_ctx)
+    {
+        qWarning() << "getAnnotColor failed:" << fz_caught_message(m_ctx);
+    }
+
+    return color;
+}
+
 std::string
 Model::getTextInArea(const int pageno, QPointF start, QPointF end) noexcept
 {
