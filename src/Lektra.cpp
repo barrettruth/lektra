@@ -131,10 +131,9 @@ Lektra::initMenubar() noexcept
 
     m_recentFilesMenu = fileMenu->addMenu(tr("Recent Files"));
 
-    m_actionFileProperties
-        = fileMenu->addAction(tr("File Properties\t%1")
-                                  .arg(m_config.shortcuts["file_properties"]),
-                              this, &Lektra::FileProperties);
+    m_actionFileProperties = fileMenu->addAction(
+        tr("File Properties\t%1").arg(m_config.shortcuts["file_properties"]),
+        this, &Lektra::FileProperties);
 
     m_actionOpenContainingFolder = fileMenu->addAction(
         tr("Open Containing Folder\t%1")
@@ -147,8 +146,8 @@ Lektra::initMenubar() noexcept
         &Lektra::SaveFile);
 
     m_actionSaveAsFile = fileMenu->addAction(
-        tr("Save As File\t%1").arg(m_config.shortcuts["file_save_as"]),
-        this, &Lektra::SaveAsFile);
+        tr("Save As File\t%1").arg(m_config.shortcuts["file_save_as"]), this,
+        &Lektra::SaveAsFile);
 
     QMenu *sessionMenu = fileMenu->addMenu(tr("Session"));
 
@@ -173,16 +172,14 @@ Lektra::initMenubar() noexcept
 
     QMenu *editMenu = m_menuBar->addMenu(tr("&Edit"));
     m_actionUndo    = editMenu->addAction(
-        tr("Undo\t%1").arg(m_config.shortcuts["undo"]), this,
-        &Lektra::Undo);
+        tr("Undo\t%1").arg(m_config.shortcuts["undo"]), this, &Lektra::Undo);
     m_actionRedo = editMenu->addAction(
-        tr("Redo\t%1").arg(m_config.shortcuts["redo"]), this,
-        &Lektra::Redo);
+        tr("Redo\t%1").arg(m_config.shortcuts["redo"]), this, &Lektra::Redo);
     m_actionUndo->setEnabled(false);
     m_actionRedo->setEnabled(false);
     editMenu->addAction(
-        tr("Last Pages\t%1").arg(m_config.shortcuts["edit_last_pages"]),
-        this, &Lektra::editLastPages);
+        tr("Last Pages\t%1").arg(m_config.shortcuts["edit_last_pages"]), this,
+        &Lektra::editLastPages);
 
     // --- View Menu ---
     m_viewMenu         = m_menuBar->addMenu(tr("&View"));
@@ -233,8 +230,8 @@ Lektra::initMenubar() noexcept
     layoutActionGroup->setExclusive(true);
 
     m_actionLayoutSingle = m_layoutMenu->addAction(
-        tr("Single Page\t%1").arg(m_config.shortcuts["layout_single"]),
-        this, [&]() { SetLayoutMode(DocumentView::LayoutMode::SINGLE); });
+        tr("Single Page\t%1").arg(m_config.shortcuts["layout_single"]), this,
+        [&]() { SetLayoutMode(DocumentView::LayoutMode::SINGLE); });
 
     m_actionLayoutLeftToRight = m_layoutMenu->addAction(
         tr("Left to Right Page\t%1")
@@ -242,8 +239,7 @@ Lektra::initMenubar() noexcept
         this, [&]() { SetLayoutMode(DocumentView::LayoutMode::HORIZONTAL); });
 
     m_actionLayoutTopToBottom = m_layoutMenu->addAction(
-        tr("Top to Bottom Page\t%1")
-            .arg(m_config.shortcuts["layout_vertical"]),
+        tr("Top to Bottom Page\t%1").arg(m_config.shortcuts["layout_vertical"]),
         this, [&]() { SetLayoutMode(DocumentView::LayoutMode::VERTICAL); });
 
     m_actionLayoutBook = m_layoutMenu->addAction(
@@ -320,8 +316,8 @@ Lektra::initMenubar() noexcept
     m_actionTogglePanel->setChecked(!m_statusbar->isHidden());
 
     m_actionInvertColor = m_viewMenu->addAction(
-        tr("Invert Color\t%1").arg(m_config.shortcuts["invert_color"]),
-        this, &Lektra::InvertColor);
+        tr("Invert Color\t%1").arg(m_config.shortcuts["invert_color"]), this,
+        &Lektra::InvertColor);
     m_actionInvertColor->setCheckable(true);
     m_actionInvertColor->setChecked(m_config.behavior.invert_mode);
 
@@ -342,8 +338,7 @@ Lektra::initMenubar() noexcept
     modeActionGroup->addAction(m_actionRegionSelect);
 
     m_actionTextSelect = m_modeMenu->addAction(
-        tr("Text Selection\t%1")
-            .arg(m_config.shortcuts["selection_mode_text"]),
+        tr("Text Selection\t%1").arg(m_config.shortcuts["selection_mode_text"]),
         this, &Lektra::ToggleTextSelection);
     m_actionTextSelect->setCheckable(true);
     modeActionGroup->addAction(m_actionTextSelect);
@@ -355,31 +350,27 @@ Lektra::initMenubar() noexcept
     m_actionTextHighlight->setCheckable(true);
     modeActionGroup->addAction(m_actionTextHighlight);
 
-    m_actionAnnotRect
-        = m_modeMenu->addAction(tr("Annotate Rectangle\t%1")
-                                    .arg(m_config.shortcuts["annot_rect_mode"]),
-                                this, &Lektra::ToggleAnnotRect);
+    m_actionAnnotRect = m_modeMenu->addAction(
+        tr("Annotate Rectangle\t%1").arg(m_config.shortcuts["annot_rect_mode"]),
+        this, &Lektra::ToggleAnnotRect);
     m_actionAnnotRect->setCheckable(true);
     modeActionGroup->addAction(m_actionAnnotRect);
 
-    m_actionAnnotEdit
-        = m_modeMenu->addAction(tr("Edit Annotations\t%1")
-                                    .arg(m_config.shortcuts["annot_edit_mode"]),
-                                this, &Lektra::ToggleAnnotSelect);
+    m_actionAnnotEdit = m_modeMenu->addAction(
+        tr("Edit Annotations\t%1").arg(m_config.shortcuts["annot_edit_mode"]),
+        this, &Lektra::ToggleAnnotSelect);
     m_actionAnnotEdit->setCheckable(true);
     modeActionGroup->addAction(m_actionAnnotEdit);
 
     m_actionAnnotPopup = m_modeMenu->addAction(
-        tr("Annotate Popup\t%1")
-            .arg(m_config.shortcuts["annot_popup_mode"]),
+        tr("Annotate Popup\t%1").arg(m_config.shortcuts["annot_popup_mode"]),
         this, &Lektra::ToggleAnnotPopup);
     m_actionAnnotPopup->setCheckable(true);
     modeActionGroup->addAction(m_actionAnnotPopup);
 
     // TODO: Store visual line mode state in config
     m_actionVisualLineMode = m_modeMenu->addAction(
-        tr("Visual Line Mode\t%1")
-            .arg(m_config.shortcuts["visual_line_mode"]),
+        tr("Visual Line Mode\t%1").arg(m_config.shortcuts["visual_line_mode"]),
         this, &Lektra::Toggle_visual_line_mode);
     m_actionVisualLineMode->setCheckable(true);
     modeActionGroup->addAction(m_actionVisualLineMode);
@@ -459,13 +450,12 @@ Lektra::initMenubar() noexcept
         tr("Last Page\t%1").arg(m_config.shortcuts["page_last"]), this,
         &Lektra::LastPage);
 
-    m_actionPrevLocation
-        = m_navMenu->addAction(tr("Previous Location\t%1")
-                                   .arg(m_config.shortcuts["location_prev"]),
-                               this, &Lektra::GoBackHistory);
+    m_actionPrevLocation = m_navMenu->addAction(
+        tr("Previous Location\t%1").arg(m_config.shortcuts["location_prev"]),
+        this, &Lektra::GoBackHistory);
     m_actionNextLocation = m_navMenu->addAction(
-        tr("Next Location\t%1").arg(m_config.shortcuts["location_next"]),
-        this, &Lektra::GoForwardHistory);
+        tr("Next Location\t%1").arg(m_config.shortcuts["location_next"]), this,
+        &Lektra::GoForwardHistory);
 
     QMenu *markMenu = m_navMenu->addMenu(tr("Marks"));
 
@@ -533,7 +523,7 @@ Lektra::initConfig() noexcept
         QMessageBox::critical(
             this, "Error in configuration file",
             tr("There are one or more error(s) in your config "
-                    "file:\n%1\n\nLoading default config.")
+               "file:\n%1\n\nLoading default config.")
                 .arg(e.what()));
         return;
     }
@@ -652,8 +642,7 @@ Lektra::initConfig() noexcept
             set_color(highlight["color"], m_config.annotations.highlight.color);
             set(highlight["hover_glow"],
                 m_config.annotations.highlight.hover_glow);
-            set(highlight["comment"],
-                m_config.annotations.highlight.comment);
+            set(highlight["comment"], m_config.annotations.highlight.comment);
             set(highlight["comment_marker"],
                 m_config.annotations.highlight.comment_marker);
             set(highlight["glow_width"],
@@ -1838,7 +1827,8 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
     {
         QFileDialog dialog(this);
         dialog.setFileMode(QFileDialog::ExistingFile);
-        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;" + tr("All Files") + " " + "(*)");
+        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;"
+                             + tr("All Files") + " " + "(*)");
         if (dialog.exec())
         {
             const QStringList selected = dialog.selectedFiles();
@@ -2009,7 +1999,8 @@ Lektra::OpenFileInNewTab(const QString &filename,
         // Show file picker
         QFileDialog dialog(this);
         dialog.setFileMode(QFileDialog::ExistingFile);
-        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;" + tr("All Files") + " " + "(*)");
+        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;"
+                             + tr("All Files") + " " + "(*)");
 
         if (dialog.exec())
         {
@@ -2127,7 +2118,8 @@ Lektra::openFileSplitHelper(const QString &filename,
         // Show file picker
         QFileDialog dialog(this);
         dialog.setFileMode(QFileDialog::ExistingFile);
-        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;" + tr("All Files") + " " + "(*)");
+        dialog.setNameFilter(tr("PDF Files") + " " + "(*.pdf)" + ";;"
+                             + tr("All Files") + " " + "(*)");
 
         if (dialog.exec())
         {
@@ -2217,8 +2209,10 @@ Lektra::OpenFileInNewWindow(const QString &filePath,
     if (filePath.isEmpty())
     {
         QStringList files;
-        files = QFileDialog::getOpenFileNames(
-            this, tr("Open File"), "", tr("PDF Files") + " " + "(*.pdf)" + ";;" + tr("All Files") + " " + "(*)");
+        files = QFileDialog::getOpenFileNames(this, tr("Open File"), "",
+                                              tr("PDF Files") + " " + "(*.pdf)"
+                                                  + ";;" + tr("All Files") + " "
+                                                  + "(*)");
         if (files.empty())
             return false;
         else
@@ -2801,7 +2795,7 @@ Lektra::closeEvent(QCloseEvent *e)
                 int ret = QMessageBox::warning(
                     this, "Unsaved Changes",
                     tr("File %1 has unsaved changes. Do you want to save "
-                            "them?")
+                       "them?")
                         .arg(m_tab_widget->tabText(i)),
                     QMessageBox::Save | QMessageBox::Discard
                         | QMessageBox::Cancel,
@@ -2823,7 +2817,8 @@ Lektra::closeEvent(QCloseEvent *e)
     if (m_config.behavior.confirm_on_quit)
     {
         int ret = QMessageBox::question(
-            this, tr("Confirm Quit"), tr("Are you sure you want to quit Lektra?"),
+            this, tr("Confirm Quit"),
+            tr("Are you sure you want to quit Lektra?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
         if (ret == QMessageBox::No)
@@ -3139,7 +3134,7 @@ Lektra::initTabConnections(DocumentView *docwidget) noexcept
             [this](const QString &name) { m_statusbar->setFileName(name); });
 
     connect(docwidget, &DocumentView::openFileFinished, this,
-            [this](DocumentView *doc, Model::FileType ft)
+            [this](DocumentView *doc, Model::FileType /* ft */)
     {
         // Only update the panel if this view is the currently active one.
         // If it's a background split, don't clobber the active view's info.
@@ -3303,7 +3298,8 @@ Lektra::LoadSession(QString sessionName) noexcept
     QStringList existingSessions = getSessionFiles();
     if (existingSessions.empty())
     {
-        QMessageBox::information(this, tr("Load Session"), tr("No sessions found"));
+        QMessageBox::information(this, tr("Load Session"),
+                                 tr("No sessions found"));
         return;
     }
 
@@ -3375,9 +3371,9 @@ Lektra::getSessionFiles() noexcept
     {
         if (!m_session_dir.mkpath("."))
         {
-            QMessageBox::warning(
-                this, tr("Session Directory"),
-                tr("Unable to create sessions directory due to an unknown error."));
+            QMessageBox::warning(this, tr("Session Directory"),
+                                 tr("Unable to create sessions directory due "
+                                    "to an unknown error."));
             return sessions;
         }
     }
@@ -3426,8 +3422,8 @@ Lektra::SaveSession() noexcept
                 auto choice = QMessageBox::warning(
                     this, tr("Overwrite Session"),
                     tr("Session named \"%1\" already exists. Do you "
-                            "want to "
-                            "overwrite it?")
+                       "want to "
+                       "overwrite it?")
                         .arg(sessionName),
                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
@@ -3489,8 +3485,7 @@ Lektra::SaveAsSession(const QString &sessionPath) noexcept
     {
         QMessageBox::information(
             this, tr("Save As Session"),
-            tr("Cannot save session as you are not currently in a session")
-        );
+            tr("Cannot save session as you are not currently in a session"));
         return;
     }
 
@@ -3498,7 +3493,8 @@ Lektra::SaveAsSession(const QString &sessionPath) noexcept
 
     QString selectedPath = QFileDialog::getSaveFileName(
         this, tr("Save As Session"), m_session_dir.absolutePath(),
-        tr("Lektra session files") + " " + "(*.json);" + tr("All Files") + " " + "(*.*)");
+        tr("Lektra session files") + " " + "(*.json);" + tr("All Files") + " "
+            + "(*.*)");
 
     if (selectedPath.isEmpty())
         return;
@@ -3508,7 +3504,7 @@ Lektra::SaveAsSession(const QString &sessionPath) noexcept
         auto choice = QMessageBox::warning(
             this, tr("Overwrite Session"),
             tr("Session named \"%1\" already exists. Do you want to "
-                    "overwrite it?")
+               "overwrite it?")
                 .arg(QFileInfo(selectedPath).fileName()),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
@@ -3597,9 +3593,9 @@ Lektra::initCommands() noexcept
     m_command_manager.reg("selection_cancel",
                           tr("Cancel and clear current selection"),
                           [this](const QStringList &) { Selection_cancel(); });
-    m_command_manager.reg("selection_last", tr("Reselect the last text selection"),
-                          [this](const QStringList &)
-    { ReselectLastTextSelection(); });
+    m_command_manager.reg(
+        "selection_last", tr("Reselect the last text selection"),
+        [this](const QStringList &) { ReselectLastTextSelection(); });
 
     // Toggles
     m_command_manager.reg("presentation_mode", tr("Toggle presentation mode"),
@@ -3628,9 +3624,11 @@ Lektra::initCommands() noexcept
 #endif
 
     // Link hints
-    m_command_manager.reg("link_hint_visit", tr("Open link using keyboard hint"),
+    m_command_manager.reg("link_hint_visit",
+                          tr("Open link using keyboard hint"),
                           [this](const QStringList &) { VisitLinkKB(); });
-    m_command_manager.reg("link_hint_copy", tr("Copy link URL using keyboard hint"),
+    m_command_manager.reg("link_hint_copy",
+                          tr("Copy link URL using keyboard hint"),
                           [this](const QStringList &) { CopyLinkKB(); });
 
     // Page navigation
@@ -3646,7 +3644,8 @@ Lektra::initCommands() noexcept
                           [this](const QStringList &) { Goto_page(); });
 
     // Marks
-    m_command_manager.reg("mark_set", tr("Set a named mark at current position"),
+    m_command_manager.reg("mark_set",
+                          tr("Set a named mark at current position"),
                           [this](const QStringList &) { SetMark(); });
     m_command_manager.reg("mark_delete", tr("Delete a named mark"),
                           [this](const QStringList &) { DeleteMark(); });
@@ -3666,7 +3665,8 @@ Lektra::initCommands() noexcept
     // Rotation
     m_command_manager.reg("rotate_clock", tr("Rotate page clockwise"),
                           [this](const QStringList &) { RotateClock(); });
-    m_command_manager.reg("rotate_anticlock", tr("Rotate page counter-clockwise"),
+    m_command_manager.reg("rotate_anticlock",
+                          tr("Rotate page counter-clockwise"),
                           [this](const QStringList &) { RotateAnticlock(); });
 
     // Location history
@@ -3714,7 +3714,8 @@ Lektra::initCommands() noexcept
                           [this](const QStringList &) { OpenFileInNewTab(); });
     m_command_manager.reg("file_open_vsplit", tr("Open file in vertical split"),
                           [this](const QStringList &) { OpenFileVSplit(); });
-    m_command_manager.reg("file_open_hsplit", tr("Open file in horizontal split"),
+    m_command_manager.reg("file_open_hsplit",
+                          tr("Open file in horizontal split"),
                           [this](const QStringList &) { OpenFileHSplit(); });
     m_command_manager.reg("file_open_dwim", tr("Open file (do what I mean)"),
                           [this](const QStringList &) { OpenFileDWIM(); });
@@ -3737,15 +3738,18 @@ Lektra::initCommands() noexcept
     { Show_recent_files_picker(); });
 
     // Annotation modes
-    m_command_manager.reg("annot_edit_mode", tr("Toggle annotation select mode"),
+    m_command_manager.reg("annot_edit_mode",
+                          tr("Toggle annotation select mode"),
                           [this](const QStringList &) { ToggleAnnotSelect(); });
-    m_command_manager.reg("annot_popup_mode", tr("Toggle annotation popup mode"),
+    m_command_manager.reg("annot_popup_mode",
+                          tr("Toggle annotation popup mode"),
                           [this](const QStringList &) { ToggleAnnotPopup(); });
-    m_command_manager.reg("annot_rect_mode", tr("Toggle rectangle annotation mode"),
+    m_command_manager.reg("annot_rect_mode",
+                          tr("Toggle rectangle annotation mode"),
                           [this](const QStringList &) { ToggleAnnotRect(); });
-    m_command_manager.reg("annot_highlight_mode", tr("Toggle text highlight mode"),
-                          [this](const QStringList &)
-    { ToggleTextHighlight(); });
+    m_command_manager.reg(
+        "annot_highlight_mode", tr("Toggle text highlight mode"),
+        [this](const QStringList &) { ToggleTextHighlight(); });
     m_command_manager.reg("none_mode", tr("Toggle none interaction mode"),
                           [this](const QStringList &) { Toggle_none_mode(); });
 
@@ -3781,7 +3785,8 @@ Lektra::initCommands() noexcept
                           [this](const QStringList &) { TabsCloseLeft(); });
     m_command_manager.reg("tabs_close_right", tr("Close all tabs to the right"),
                           [this](const QStringList &) { TabsCloseRight(); });
-    m_command_manager.reg("tabs_close_others", tr("Close all tabs except current"),
+    m_command_manager.reg("tabs_close_others",
+                          tr("Close all tabs except current"),
                           [this](const QStringList &) { TabsCloseOthers(); });
     m_command_manager.reg("tab_move_right", tr("Move current tab right"),
                           [this](const QStringList &) { TabMoveRight(); });
@@ -3821,9 +3826,9 @@ Lektra::initCommands() noexcept
     // Pickers
     m_command_manager.reg("picker_outline", tr("Open document outline picker"),
                           [this](const QStringList &) { Show_outline(); });
-    m_command_manager.reg("picker_highlight_search", tr("Search within highlights"),
-                          [this](const QStringList &)
-    { Show_highlight_search(); });
+    m_command_manager.reg(
+        "picker_highlight_search", tr("Search within highlights"),
+        [this](const QStringList &) { Show_highlight_search(); });
 
     // Search
     m_command_manager.reg("search", "Search document",
@@ -3834,9 +3839,9 @@ Lektra::initCommands() noexcept
                           [this](const QStringList &) { NextHit(); });
     m_command_manager.reg("search_prev", tr("Jump to previous search result"),
                           [this](const QStringList &) { PrevHit(); });
-    m_command_manager.reg("search_args", tr("Search with inline query argument"),
-                          [this](const QStringList &args)
-    { search(args.join(" ")); });
+    m_command_manager.reg(
+        "search_args", tr("Search with inline query argument"),
+        [this](const QStringList &args) { search(args.join(" ")); });
 
     // Layout modes
     m_command_manager.reg("layout_single", tr("Single page layout"),
@@ -3846,7 +3851,8 @@ Lektra::initCommands() noexcept
                           tr("Horizontal (left to right) layout"),
                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::HORIZONTAL); });
-    m_command_manager.reg("layout_vertical", tr("Vertical (top to bottom) layout"),
+    m_command_manager.reg("layout_vertical",
+                          tr("Vertical (top to bottom) layout"),
                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::VERTICAL); });
     m_command_manager.reg("layout_book", tr("Book (two page spread) layout"),
@@ -3866,14 +3872,15 @@ Lektra::initCommands() noexcept
     m_command_manager.reg(
         "highlight_selection", tr("Highlight current text selection"),
         [this](const QStringList &) { TextHighlightCurrentSelection(); });
-    m_command_manager.reg("invert_color", tr("Toggle inverted colour rendering"),
+    m_command_manager.reg("invert_color",
+                          tr("Toggle inverted colour rendering"),
                           [this](const QStringList &) { InvertColor(); });
-    m_command_manager.reg("reshow_jump_marker", tr("Re-show the last jump marker"),
-                          [this](const QStringList &)
-    { Reshow_jump_marker(); });
-    m_command_manager.reg("reopen_last_closed_file", tr("Reopen last closed file"),
-                          [this](const QStringList &)
-    { Reopen_last_closed_file(); });
+    m_command_manager.reg(
+        "reshow_jump_marker", tr("Re-show the last jump marker"),
+        [this](const QStringList &) { Reshow_jump_marker(); });
+    m_command_manager.reg(
+        "reopen_last_closed_file", tr("Reopen last closed file"),
+        [this](const QStringList &) { Reopen_last_closed_file(); });
     m_command_manager.reg("copy_page_image", tr("Copy current page as image"),
                           [this](const QStringList &) { Copy_page_image(); });
 #ifndef NDEBUG
@@ -3912,9 +3919,10 @@ Lektra::SetDPR() noexcept
     {
         QInputDialog id;
         bool ok;
-        float dpr = id.getDouble(
-            this, tr("Set DPR"), tr("Enter the Device Pixel Ratio (DPR) value: "), 1.0,
-            0.0, 10.0, 2, &ok);
+        float dpr
+            = id.getDouble(this, tr("Set DPR"),
+                           tr("Enter the Device Pixel Ratio (DPR) value: "),
+                           1.0, 0.0, 10.0, 2, &ok);
         if (ok)
             m_doc->setDPR(dpr);
         else
@@ -3982,8 +3990,9 @@ Lektra::Tab_goto(int index) noexcept
 {
     if (index == -1)
     {
-        index = QInputDialog::getInt(this, tr("Go to Tab"), tr("Enter tab number: "), 1,
-                                     1, m_tab_widget->count());
+        index = QInputDialog::getInt(this, tr("Go to Tab"),
+                                     tr("Enter tab number: "), 1, 1,
+                                     m_tab_widget->count());
     }
 
     if (index > 0 || index < m_tab_widget->count())
@@ -5056,11 +5065,13 @@ Lektra::SetMark() noexcept
         return;
 
     const QString key = QInputDialog::getText(
-        this, tr("Set Mark"), tr("Enter mark key (a-z for local, A-Z for global):"));
+        this, tr("Set Mark"),
+        tr("Enter mark key (a-z for local, A-Z for global):"));
 
     if (key.isEmpty())
     {
-        QMessageBox::critical(this, tr("Set Mark"), tr("Mark key cannot be empty"));
+        QMessageBox::critical(this, tr("Set Mark"),
+                              tr("Mark key cannot be empty"));
         return;
     }
 
@@ -5084,7 +5095,8 @@ Lektra::DeleteMark() noexcept
 
     if (key.isEmpty())
     {
-        QMessageBox::critical(this, tr("Delete Mark"), tr("Mark key cannot be empty"));
+        QMessageBox::critical(this, tr("Delete Mark"),
+                              tr("Mark key cannot be empty"));
         return;
     }
 
@@ -5110,7 +5122,8 @@ Lektra::GotoMark() noexcept
 
     if (key.isEmpty())
     {
-        QMessageBox::critical(this, tr("Goto Mark"), tr("Mark key cannot be empty"));
+        QMessageBox::critical(this, tr("Goto Mark"),
+                              tr("Mark key cannot be empty"));
         return;
     }
 
