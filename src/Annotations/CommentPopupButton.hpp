@@ -36,7 +36,7 @@ public:
     {
         // Anchor to top-right corner, shifted outward by a small gap.
         constexpr qreal gap = 3.0;
-        setPos(annotRect.right() + gap, annotRect.top() - SIZE - gap);
+        setPos(annotRect.right() + gap, annotRect.top());
     }
 
     QRectF boundingRect() const override
@@ -52,9 +52,7 @@ public:
         painter->setRenderHint(QPainter::Antialiasing, true);
 
         const QRectF body(0, 0, SIZE, SIZE * 0.75);
-        constexpr qreal R  = 3.0;
-        constexpr qreal TW = 5.0;         // tail base width
-        constexpr qreal TH = SIZE * 0.25; // tail height
+        constexpr qreal R = 3.0;
 
         // Bubble body
         QPainterPath path;
