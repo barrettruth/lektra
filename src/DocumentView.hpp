@@ -461,7 +461,7 @@ private:
     void updateCurrentPage() noexcept;
     void updateCurrentHitHighlight() noexcept;
     void scrollToCurrentHit() noexcept;
-    void zoomHelper() noexcept;
+    void zoomHelper(const PageLocation &loc = {-1, 0, 0}) noexcept;
     void repositionPages();
     void cachePageStride() noexcept;
     void updateSceneRect() noexcept;
@@ -502,7 +502,7 @@ private:
     FitMode m_fit_mode{FitMode::Width};
     int m_pageno{-1};
     double m_spacing{10.0f};
-    double m_target_zoom{MIN_ZOOM_FACTOR}, m_current_zoom{MIN_ZOOM_FACTOR};
+    double m_current_zoom{MIN_ZOOM_FACTOR};
     bool m_auto_resize{false}, m_auto_reload{false};
     ScrollBar *m_hscroll{nullptr};
     ScrollBar *m_vscroll{nullptr};
