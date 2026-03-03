@@ -3,6 +3,8 @@
 ## This is a list of features and improvements that I want to implement in the future. The list is not exhaustive and is subject to change based on user feedback and my own priorities.
 
 ## HIGH PRIORITY
+- [ ] Fix DJVU rendering
+- [ ] Bug fixes and performance improvements
 - [ ] History for pickers
 - [ ] Undo/Redo operations for annotation color
 
