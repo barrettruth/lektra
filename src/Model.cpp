@@ -2596,7 +2596,6 @@ Model::collectHighlightTexts(bool groupByLine) noexcept
 
             stext_page = fz_new_stext_page_from_page(m_ctx, (fz_page *)pdfPage,
                                                      nullptr);
-            pdf_drop_page(m_ctx, pdfPage);
 
             if (!stext_page)
                 continue;
