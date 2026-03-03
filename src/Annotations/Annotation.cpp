@@ -1,8 +1,11 @@
 #include "Annotation.hpp"
+
 #include "../utils.hpp"
 
+#include <QGuiApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QScreen>
 
 Annotation::Annotation(const int index, const QColor &color,
                        QGraphicsItem *parent)
@@ -198,6 +201,21 @@ Annotation::showTooltip(const QPoint &screenPos)
             m_tooltip->adjustSize();
         }
     }
+
+    QPoint pos          = screenPos + QPoint(12, 12);
+    const QSize tipSize = m_tooltip->sizeHint();
+    const QRect screen
+        = QGuiApplication::screenAt(screenPos)
+              ? QGuiApplication::screenAt(screenPos)->availableGeometry()
+              : QGuiApplication::primaryScreen()->availableGeometry();
+
+    // Flip horizontally if it would overflow the right edge
+    if (pos.x() + tipSize.width() > screen.right())
+        pos.setX(screenPos.x() - tipSize.width() - 12);
+
+    // Flip vertically if it would overflow the bottom edge
+    if (pos.y() + tipSize.height() > screen.bottom())
+        pos.setY(screenPos.y() - tipSize.height() - 12);
 
     m_tooltip->move(screenPos + QPoint(12, 12));
     m_tooltip->show();
