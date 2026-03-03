@@ -82,6 +82,7 @@ add_executable(${PROJECT_NAME}
     src/Picker.cpp
     src/RecentFilesPicker.cpp
     src/OutlinePicker.cpp
+    src/CommentSearchPicker.cpp
 
     src/Config.hpp
     src/MarkManager.hpp
