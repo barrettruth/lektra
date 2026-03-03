@@ -133,6 +133,7 @@ Model::cleanup_djvu() noexcept
     m_render_future.cancel();
 
     ddjvu_document_release(m_ddjvu_doc);
+    ddjvu_context_release(m_ddjvu_ctx);
 
     {
         std::lock_guard<std::recursive_mutex> lock(m_page_cache_mutex);
@@ -436,6 +437,10 @@ Model::clearPageCache() noexcept
 void
 Model::ensurePageCached(int pageno) noexcept
 {
+#ifndef NDEBUG
+    qDebug() << "Model::ensurePageCached(): Ensuring page" << pageno
+             << "is cached";
+#endif
     {
         std::lock_guard<std::recursive_mutex> cache_lock(m_page_cache_mutex);
         if (m_page_lru_cache.has(pageno))

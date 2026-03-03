@@ -2286,10 +2286,6 @@ DocumentView::startNextRenderJob() noexcept
     qDebug() << "DocumentView::startNextRenderJob(): Renders in flight:"
              << m_renders_in_flight << " Queue size: " << m_render_queue.size();
 #endif
-    static bool isProcessing = false;
-    if (isProcessing)
-        return;
-    isProcessing = true;
 
     // Get current visible pages for prioritization
     const std::set<int> &visiblePages = getVisiblePages();
@@ -2406,7 +2402,6 @@ DocumentView::startNextRenderJob() noexcept
             startNextRenderJob();
         });
     }
-    isProcessing = false;
 }
 
 // Remove pending renders for pages that are no longer visible and not
