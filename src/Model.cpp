@@ -2533,6 +2533,48 @@ Model::searchHelperRegex(int pageno, const QRegularExpression &re) noexcept
     return results;
 }
 
+std::vector<Model::AnnotCommentInfo>
+Model::collect_annot_comments() noexcept
+{
+    std::vector<AnnotCommentInfo> results;
+
+    if (!m_ctx || !m_doc || !m_pdf_doc)
+        return results;
+
+    for (int pageno = 0; pageno < m_page_count; ++pageno)
+    {
+        pdf_page *pdfPage{nullptr};
+        fz_try(m_ctx)
+        {
+            pdfPage = pdf_load_page(m_ctx, m_pdf_doc, pageno);
+            if (!pdfPage)
+                fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to load page");
+
+            for (pdf_annot *annot = pdf_first_annot(m_ctx, pdfPage); annot;
+                 annot            = pdf_next_annot(m_ctx, annot))
+            {
+                if (auto *content = pdf_annot_contents(m_ctx, annot);
+                    content && content[0] != '\0')
+                {
+                    results.push_back({pageno, QString(content),
+                                       pdf_annot_rect(m_ctx, annot)});
+                }
+            }
+        }
+        fz_always(m_ctx)
+        {
+            pdf_drop_page(m_ctx, pdfPage);
+        }
+        fz_catch(m_ctx)
+        {
+            qWarning() << "Failed to collect comments for annotations on page"
+                       << pageno;
+        }
+    }
+
+    return results;
+}
+
 std::vector<Model::HighlightText>
 Model::collectHighlightTexts(bool groupByLine) noexcept
 {
