@@ -45,9 +45,9 @@ Annotation::setGlowWidth(int width) noexcept
 }
 
 void
-Annotation::setGlowColor(QRgb rgba) noexcept
+Annotation::setGlowColor(uint32_t rgba) noexcept
 {
-    m_glow_color = QColor::fromRgba(rgba);
+    m_glow_color = QColor(rgba);
     if (m_glow_enabled)
         update();
 }
@@ -184,14 +184,18 @@ Annotation::showTooltip(const QPoint &screenPos)
         m_tooltip->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
         m_tooltip->setAttribute(Qt::WA_TranslucentBackground, false);
         m_tooltip->setStyleSheet("QLabel {"
-                                 "  background-color: #ffffc0;"
-                                 "  color: black;"
-                                 "  border: 1px solid #c0c000;"
                                  "  padding: 4px 6px;"
                                  "  border-radius: 3px;"
-                                 "  font-size: 12px;"
                                  "}");
         m_tooltip->adjustSize();
+
+        if (m_tooltip_font_size > 0)
+        {
+            QFont font = m_tooltip->font();
+            font.setPointSize(m_tooltip_font_size);
+            m_tooltip->setFont(font);
+            m_tooltip->adjustSize();
+        }
     }
 
     m_tooltip->move(screenPos + QPoint(12, 12));
@@ -208,6 +212,7 @@ Annotation::moveTooltip(const QPoint &screenPos)
 void
 Annotation::setTooltipFontSize(int pointSize)
 {
+    m_tooltip_font_size = pointSize;
     if (m_tooltip)
     {
         QFont font = m_tooltip->font();
