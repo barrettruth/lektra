@@ -1,4 +1,5 @@
 #include "Annotation.hpp"
+#include "../utils.hpp"
 
 #include <QMenu>
 #include <QPainter>
@@ -47,7 +48,7 @@ Annotation::setGlowWidth(int width) noexcept
 void
 Annotation::setGlowColor(uint32_t rgba) noexcept
 {
-    m_glow_color = QColor(rgba);
+    m_glow_color = rgbaToQColor(rgba);
     if (m_glow_enabled)
         update();
 }
