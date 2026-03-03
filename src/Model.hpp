@@ -294,7 +294,11 @@ public:
     inline bool hasUnsavedChanges() const noexcept
     {
         // If the undo stack says we are at the 'save point', it's clean.
-        return !m_undo_stack->isClean();
+        // return !m_undo_stack->isClean();
+
+        if (m_filetype != FileType::DJVU)
+            return pdf_has_unsaved_changes(m_ctx, m_pdf_doc);
+        return false;
     }
 
     // This is the "Logical" scale for the UI
