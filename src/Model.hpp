@@ -86,6 +86,7 @@ public:
         QString text;
         fz_quad quad;
     };
+
     struct EncryptInfo
     {
         QString user_password;
