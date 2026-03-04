@@ -62,6 +62,7 @@ NOTE: This is just a convenience table to increase the readability of the config
 
 ### New Commands
 
+- `toggle_annot_comment_marker` - Toggle the comment marker on annotations that have comments (e.g. show/hide the icon indicating that there's a comment associated with the annotation)
 - `none_mode` - Switch to none interaction mode where no interaction mode is active
 - `picker_annot_comment_search` - Open the picker with the list of annotations that have comments, and searching by the comment text. Selecting an entry will jump to the annotation location.
 
