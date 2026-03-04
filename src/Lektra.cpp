@@ -2956,38 +2956,6 @@ Lektra::eventFilter(QObject *object, QEvent *event)
         && type == QEvent::ContextMenu)
         return handleTabContextMenu(object, event);
 
-    if (type == QEvent::Wheel)
-    {
-        QWheelEvent *wheel = static_cast<QWheelEvent *>(event);
-        MouseBindKey key{wheel->modifiers(), Qt::NoButton,
-                         wheel->angleDelta().y() > 0 ? MouseAction::WheelUp
-                                                     : MouseAction::WheelDown};
-
-        if (auto it = m_config.mousebinds.find(key);
-            it != m_config.mousebinds.end())
-        {
-            if (auto *cmd = m_command_manager.find(it.value())) {
-                cmd->action({});
-                PPRINT("Executed mousebind command: ", it.value());
-            }
-            return true;
-        }
-    }
-
-    if (type == QEvent::MouseButtonPress)
-    {
-        auto *mouse = static_cast<QMouseEvent *>(event);
-        MouseBindKey key{mouse->modifiers(), mouse->button()};
-
-        if (auto it = m_config.mousebinds.find(key);
-            it != m_config.mousebinds.end())
-        {
-            if (auto *cmd = m_command_manager.find(it.value()))
-                cmd->action({});
-            return true;
-        }
-    }
-
     // Let other events pass through
     return QObject::eventFilter(object, event);
 }
