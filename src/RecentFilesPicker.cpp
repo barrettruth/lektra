@@ -2,7 +2,10 @@
 
 #include <QFileInfo>
 
-RecentFilesPicker::RecentFilesPicker(QWidget *parent) : Picker(parent) {}
+RecentFilesPicker::RecentFilesPicker(QWidget *parent) : Picker(parent)
+{
+    setColumns({{.header = "Name", .stretch = 2}, {.header = "Path", .stretch = 0}});
+}
 
 QList<Picker::Item>
 RecentFilesPicker::collectItems()
