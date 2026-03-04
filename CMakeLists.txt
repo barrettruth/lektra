@@ -24,8 +24,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -fsanitize=address -Wall -Wextra)
-set(RELEASE_FLAGS -O3 -DNDEBUG)
+# set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -fsanitize=address -Wall -Wextra)
+set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -Wall -Wextra)
+set(RELEASE_FLAGS -O3 -DNDEBUG -march=native -flto=full -fno-exceptions -fno-rtti)
 set(REL_WITH_DEB_INFO -O2 -g -fno-omit-frame-pointer -DNDEBUG)
 
 # set(CMAKE_CXX_FLAGS_DEBUG "-fno-omit-frame-pointer -ggdb3 -O0 -Wall -Wextra -fsanitize=address -Werror")
