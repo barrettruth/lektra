@@ -347,74 +347,52 @@ Model::submitPassword(const QString &password) noexcept
 void
 Model::_continueOpen(fz_context *ctx, fz_document *doc) noexcept
 {
-    auto _ = QtConcurrent::run([this, ctx, doc]
+    int page_count = 0;
+    float w = 0, h = 0;
+
+    fz_try(ctx)
     {
-        struct Guard
+        page_count = fz_count_pages(ctx, doc);
+        if (page_count > 0)
         {
-            fz_context *ctx;
-            fz_document *doc;
-            bool committed{false};
-            ~Guard()
-            {
-                if (!committed)
-                {
-                    if (doc)
-                        fz_drop_document(ctx, doc);
-                    fz_drop_context(ctx);
-                }
-            }
-        } g{ctx, doc};
+            fz_page *p = fz_load_page(ctx, doc, 0);
+            fz_rect r  = fz_bound_page(ctx, p);
+            fz_drop_page(ctx, p);
+            w = r.x1 - r.x0;
+            h = r.y1 - r.y0;
+        }
+    }
+    fz_catch(ctx)
+    {
+        QMetaObject::invokeMethod(this, &Model::openFileFailed,
+                                  Qt::QueuedConnection);
+        return;
+    }
 
-        int page_count = 0;
-        float w = 0, h = 0;
+    QMetaObject::invokeMethod(this, [this, ctx, doc, page_count, w, h]
+    {
+        waitForRenders();
+        cleanup_mupdf();
+        fz_drop_context(m_ctx);
 
-        fz_try(ctx)
+        m_ctx        = ctx;
+        m_doc        = doc;
+        m_pdf_doc    = pdf_specifics(m_ctx, m_doc);
+        m_page_count = page_count;
+        m_success    = true;
+        m_text_cache.setCapacity(std::min(page_count, 1024));
+
         {
-            page_count = fz_count_pages(ctx, doc);
+            std::lock_guard<std::mutex> lk(m_page_dim_mutex);
+            m_default_page_dim = {w, h};
+            m_page_dim_cache.dimensions.assign(page_count, m_default_page_dim);
+            m_page_dim_cache.known.assign(page_count, 0);
             if (page_count > 0)
-            {
-                fz_page *p = fz_load_page(ctx, doc, 0);
-                fz_rect r  = fz_bound_page(ctx, p);
-                fz_drop_page(ctx, p);
-                w = r.x1 - r.x0;
-                h = r.y1 - r.y0;
-            }
-        }
-        fz_catch(ctx)
-        {
-            QMetaObject::invokeMethod(this, &Model::openFileFailed,
-                                      Qt::QueuedConnection);
-            return;
+                m_page_dim_cache.known[0] = true;
         }
 
-        g.committed = true;
-
-        QMetaObject::invokeMethod(this, [this, ctx, doc, page_count, w, h]
-        {
-            waitForRenders();
-            cleanup_mupdf();
-            fz_drop_context(m_ctx);
-
-            m_ctx        = ctx;
-            m_doc        = doc;
-            m_pdf_doc    = pdf_specifics(m_ctx, m_doc);
-            m_page_count = page_count;
-            m_success    = true;
-            m_text_cache.setCapacity(std::min(page_count, 1024));
-
-            {
-                std::lock_guard<std::mutex> lk(m_page_dim_mutex);
-                m_default_page_dim = {w, h};
-                m_page_dim_cache.dimensions.assign(page_count,
-                                                   m_default_page_dim);
-                m_page_dim_cache.known.assign(page_count, 0);
-                if (page_count > 0)
-                    m_page_dim_cache.known[0] = true;
-            }
-
-            emit openFileFinished();
-        }, Qt::QueuedConnection);
-    });
+        emit openFileFinished();
+    }, Qt::QueuedConnection);
 }
 
 void
@@ -1318,12 +1296,6 @@ Model::requestPageRender(
     qDebug() << "Model::requestPageRender(): Requesting render for page"
              << job.pageno;
 #endif
-    m_render_future
-        = QtConcurrent::run([this, job, callback]() -> PageRenderResult
-    {
-        ensurePageCached(job.pageno);
-        return renderPageWithExtrasAsync(job);
-    });
 
     auto watcher = new QFutureWatcher<PageRenderResult>(this);
     connect(watcher, &QFutureWatcher<PageRenderResult>::finished, this,
@@ -1349,6 +1321,14 @@ Model::requestPageRender(
             });
         }
     });
+
+    auto future = QtConcurrent::run([this, job, callback]() -> PageRenderResult
+    {
+        ensurePageCached(job.pageno);
+        return renderPageWithExtrasAsync(job);
+    });
+
+    m_render_future = future;
 
     watcher->setFuture(m_render_future);
 }
