@@ -2227,7 +2227,6 @@ DocumentView::renderPages() noexcept
     }
     m_gscene->blockSignals(false);
     m_gview->setUpdatesEnabled(true);
-
     updateCurrentHitHighlight();
 
     if (m_visual_line_mode)
@@ -3460,13 +3459,12 @@ DocumentView::renderAnnotations(
             if (!ok)
                 return;
 
-            // annot_item->setComment(newComment);
-
-            m_model->addAnnotComment(pageno, annot_item->index(), newComment);
-            setModified(true);
             // m_model->undoStack()->push(new AnnotCommentCommand(
             //     m_model, pageno, annot_item->index(), oldComment,
             //     newComment));
+
+            m_model->addAnnotComment(pageno, annot_item->index(), newComment);
+            setModified(true);
         });
 
         connect(annot_item, &Annotation::annotDeleteRequested, this,
