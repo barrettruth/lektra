@@ -3023,11 +3023,8 @@ Lektra::eventFilter(QObject *object, QEvent *event)
     const QEvent::Type type = event->type();
 
     // Link Hint Handle Key Press
-    if (m_link_hint_mode)
-    {
-        if (handleLinkHintEvent(event))
-            return true;
-    }
+    if (m_link_hint_mode && event->type() == QEvent::KeyPress)
+        return handleLinkHintEvent(event);
 
     // Context menu for the tab widgets
     if ((object == m_tab_widget->tabBar() || object == m_tab_widget)
