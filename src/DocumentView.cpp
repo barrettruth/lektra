@@ -4549,7 +4549,6 @@ DocumentView::visual_line_move(Direction direction) noexcept
 
     switch (direction)
     {
-
         case LEFT:
         case RIGHT:
             PPRINT("Not yet implemented");
