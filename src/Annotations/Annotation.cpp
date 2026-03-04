@@ -258,3 +258,17 @@ Annotation::mousePressEvent(QGraphicsSceneMouseEvent *e)
     }
     QGraphicsItem::mousePressEvent(e);
 }
+
+void
+Annotation::setCommentMarkerVisible(bool visible) noexcept
+{
+    if (visible && !m_comment_marker)
+    {
+        m_comment_marker = new CommentPopupButton(this);
+        m_comment_marker->setAnnotationRect(boundingRect());
+        connect(m_comment_marker, &CommentPopupButton::clicked, this,
+                [this] { emit annotCommentRequested(); });
+    }
+    m_comment_marker_visible = visible;
+    updateCommentMarker();
+}

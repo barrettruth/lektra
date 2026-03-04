@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommentPopupButton.hpp"
+
 #include <QBrush>
 #include <QGraphicsItem>
 #include <QGraphicsSceneContextMenuEvent>
@@ -34,10 +36,20 @@ public:
 
     ~Annotation() override;
 
-    int index() const noexcept
+    inline int index() const noexcept
     {
         return m_index;
     }
+
+    enum class Type
+    {
+        Highlight = 0,
+        Popup,
+        Rect,
+        COUNT
+    };
+
+    virtual Type atype() const noexcept = 0;
 
     /** Restore brush and pen to the values they had at construction time. */
     void restoreBrushPen() noexcept;
@@ -45,34 +57,49 @@ public:
     /** Enable or disable the hover glow outline. */
     void setGlowEnabled(bool enable) noexcept;
 
-    bool isGlowEnabled() const noexcept
+    inline bool isGlowEnabled() const noexcept
     {
         return m_glow_enabled;
     }
 
-    /** Width of the glow outline in pixels. */
     void setGlowWidth(int width) noexcept;
 
-    int glowWidth() const noexcept
+    inline int glowWidth() const noexcept
     {
         return m_glow_width;
     }
 
     void setGlowColor(uint32_t color) noexcept;
 
-    const QColor &glowColor() const noexcept
+    inline const QColor &glowColor() const noexcept
     {
         return m_glow_color;
     }
 
-    const QString &comment() const noexcept
+    inline const QString &comment() const noexcept
     {
         return m_comment;
     }
 
-    bool hasComment() const noexcept
+    inline bool hasComment() const noexcept
     {
         return !m_comment.isEmpty();
+    }
+
+    void setCommentMarkerVisible(bool visible) noexcept;
+    inline bool isCommentMarkerVisible() const noexcept
+    {
+        return m_comment_marker_visible;
+    }
+
+    inline void updateCommentMarker() noexcept
+    {
+        if (m_comment_marker)
+        {
+            m_comment_marker->setVisible(m_comment_marker_visible
+                                         && hasComment());
+            update();
+        }
     }
 
     /** Set the annotation comment; also updates the tooltip text if visible. */
@@ -115,6 +142,7 @@ protected:
     void setTooltipFontSize(int pointSize);
     void hideTooltip();
 
+    CommentPopupButton *m_comment_marker{nullptr};
     int m_index{-1};
     QBrush m_brush{Qt::transparent};
     QPen m_pen{Qt::NoPen};
@@ -134,11 +162,11 @@ protected:
     // (fired by Qt when the menu grabs the mouse) does not clear m_hovered.
     bool m_context_menu_open{false};
 
+    bool m_comment_marker_visible{true};
+
 private:
-    QColor m_glow_color{QColor::fromRgba(0xFFFFFF00)}; // Opaque yellow
-
-    // QPointer so we never dangle if the widget is destroyed externally.
+    QColor m_glow_color{QColor::fromRgba(0xFFFFFF00)};
     QLabel *m_tooltip{nullptr};
-
     int m_tooltip_font_size{12};
+    Type m_atype{Type::COUNT};
 };
