@@ -154,7 +154,7 @@ public:
         return QFileInfo(m_model->filePath()).fileName();
     }
 
-    inline QString filePath() const noexcept
+    inline const QString& filePath() const noexcept
     {
         return m_model->filePath();
     }
