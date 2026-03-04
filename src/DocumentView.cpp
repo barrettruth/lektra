@@ -1444,7 +1444,6 @@ DocumentView::GotoHit(int index) noexcept
     }
 
     m_scroll_to_hit_pending = true;
-
     m_scroll_page_update_timer->stop();
     m_hq_render_timer->stop();
 
@@ -4293,7 +4292,6 @@ DocumentView::zoomHelper(const PageLocation &loc) noexcept
 
     m_gview->flashScrollbars();
     repositionPages();
-    // renderPages();
 
     // 2. Restore the exact viewport position
     if (loc.pageno != -1)
@@ -4396,14 +4394,14 @@ DocumentView::repositionPages()
                          pageOffset(i));
         }
 
-        m_model->invalidatePageCache(i);
+        // m_model->invalidatePageCache(i);
         clearLinksForPage(i);
         clearAnnotationsForPage(i);
         clearSearchItemsForPage(i);
     }
 
     renderSearchHitsInScrollbar();
-    renderPages();
+    // renderPages();
 }
 
 void
