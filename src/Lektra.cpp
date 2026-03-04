@@ -3712,6 +3712,9 @@ Lektra::initCommands() noexcept
     m_command_manager.reg("visual_line_mode", tr("Toggle visual line mode"),
                           [this](const QStringList &)
     { Toggle_visual_line_mode(); });
+    m_command_manager.reg(
+        "toggle_comment_markers", tr("Toggle comment markers"),
+        [this](const QStringList &) { Toggle_comment_markers(); });
 
 #ifdef ENABLE_LLM_SUPPORT
     m_command_manager.reg("llm_widget", tr("Toggle LLM assistant widget"),
