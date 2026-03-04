@@ -308,7 +308,7 @@ public:
     void GotoPrevPage() noexcept;
     void GotoFirstPage() noexcept;
     void GotoLastPage() noexcept;
-    void setZoom(double factor) noexcept;
+    void setZoom(double factor, bool restoreLocation = true) noexcept;
     void Search(const QString &term, bool useRegex) noexcept;
     void SearchInPage(int pageno, const QString &term) noexcept;
     void ZoomIn() noexcept;
