@@ -72,6 +72,7 @@ public:
     void Show_annot_comment_search() noexcept;
     void Show_command_picker() noexcept;
 
+    void Toggle_comment_markers() noexcept;
     void Toggle_none_mode() noexcept;
     void Toggle_visual_line_mode() noexcept;
     void Toggle_presentation_mode() noexcept;
