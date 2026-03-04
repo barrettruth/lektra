@@ -236,6 +236,8 @@ target_link_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:RelWithDebInfo>:${REL_WITH_DEBINFO_FLAGS}>
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 #Install icons to correct freedesktop - compliant locations
 
