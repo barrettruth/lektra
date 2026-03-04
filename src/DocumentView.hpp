@@ -329,6 +329,7 @@ public:
     void SaveFile() noexcept;
     void SaveAsFile() noexcept;
     void CloseFile() noexcept;
+    void Toggle_comment_markers() noexcept;
     void ToggleAutoResize() noexcept;
     void ToggleTextHighlight() noexcept;
     void ToggleRegionSelect() noexcept;
