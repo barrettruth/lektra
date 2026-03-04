@@ -441,6 +441,12 @@ DocumentView::initConnections() noexcept
     connect(m_gview, &GraphicsView::textHighlightRequested, this,
             &DocumentView::handleTextHighlightRequested);
 
+    connect(m_gview, &GraphicsView::zoomInRequested, this,
+            &DocumentView::ZoomIn);
+
+    connect(m_gview, &GraphicsView::zoomOutRequested, this,
+            &DocumentView::ZoomOut);
+
     connect(m_gview, QOverload<QRectF>::of(&GraphicsView::annotSelectRequested),
             this, [this](QRectF sceneRect)
     { handleAnnotSelectRequested(sceneRect); });
