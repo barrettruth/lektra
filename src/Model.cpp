@@ -594,9 +594,10 @@ Model::buildPageCache(int pageno) noexcept
     fz_rect bounds{};
     bool success{false};
 
+    std::lock_guard<std::mutex> lock(m_doc_mutex);
+
     fz_try(ctx)
     {
-        std::lock_guard<std::mutex> lock(m_doc_mutex);
         page = fz_load_page(ctx, m_doc, pageno);
         if (!page)
             fz_throw(ctx, FZ_ERROR_GENERIC, "Failed to load page");
