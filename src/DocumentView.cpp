@@ -1036,12 +1036,12 @@ DocumentView::setFitMode(FitMode mode) noexcept
             break;
     }
 
-    setZoom(newZoom);
+    setZoom(newZoom, false);
 }
 
 // Set zoom factor directly
 void
-DocumentView::setZoom(double factor) noexcept
+DocumentView::setZoom(double factor, bool restoreLocation) noexcept
 {
 #ifndef NDEBUG
     qDebug() << "DocumentView::setZoom(): Setting zoom to factor:" << factor;
@@ -1049,17 +1049,11 @@ DocumentView::setZoom(double factor) noexcept
 
     factor = std::clamp(factor, MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
 
-    PageLocation loc = CurrentLocation();
+    PageLocation loc
+        = restoreLocation ? CurrentLocation() : PageLocation{-1, 0, 0};
 
     m_current_zoom = factor;
-
-    // 2. IMPORTANT: Invalidate the visibility cache so we don't
-    // render pages that were visible at the PREVIOUS zoom level.
     invalidateVisiblePagesCache();
-
-    // GotoPage(m_pageno);
-    // renderPages();
-
     zoomHelper(loc);
 }
 
@@ -1190,7 +1184,7 @@ DocumentView::GotoPageWithHistory(int pageno) noexcept
 void
 DocumentView::GotoPage(int pageno) noexcept
 {
-    if (pageno < 0 || pageno >= m_model->numPages() || m_pageno == pageno)
+    if (pageno < 0 || pageno >= m_model->numPages())
         return;
 
     m_pageno = pageno;
