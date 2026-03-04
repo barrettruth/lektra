@@ -95,10 +95,9 @@ void
 Lektra::construct() noexcept
 {
     initCommands();
+    initDefaultKeybinds();
     initConfig();
     initGui();
-    // if (m_load_default_keybinding)
-    initDefaultKeybinds();
     warnShortcutConflicts();
     initDB();
     trimRecentFilesDatabase();
@@ -1007,7 +1006,6 @@ Lektra::initConfig() noexcept
 
     if (auto keys = toml["keybindings"])
     {
-        // m_load_default_keybinding = false;
         // TODO: Config option to control whether to load default keybindings or
         // not, and how to interact with custom keybindings (override, merge,
         // etc.) For now we load default keybindings first, and then override
@@ -1320,9 +1318,18 @@ Lektra::setupKeybinding(const QString &action, const QString &key) noexcept
 #ifndef NDEBUG
         qDebug() << "Keybinding set:" << action << "->" << key;
 #endif
-        QShortcut *shortcut = new QShortcut(QKeySequence(key), this);
-        connect(shortcut, &QShortcut::activated,
-                [command]() { command->action({}); });
+        QShortcut *shortcut = findChild<QShortcut *>(action);
+        if (shortcut)
+        {
+            shortcut->setKey(QKeySequence(key));
+        }
+        else
+        {
+            shortcut = new QShortcut(QKeySequence(key), this);
+            shortcut->setObjectName(action);
+            connect(shortcut, &QShortcut::activated,
+                    [command]() { command->action({}); });
+        }
         m_config.keybinds[action] = key;
     }
 }

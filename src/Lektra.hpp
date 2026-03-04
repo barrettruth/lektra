@@ -360,8 +360,7 @@ private:
     QString m_config_file_path;
     QString m_lockedInputBuffer; // Used for link hints and waiting input event
                                  // like for marks etc.
-    bool m_link_hint_mode{false}, m_focus_mode{false},
-        m_load_default_keybinding{true};
+    bool m_link_hint_mode{false}, m_focus_mode{false};
     bool m_batch_opening{false};
     StartupWidget *m_startup_widget{nullptr};
     LinkHintMode m_link_hint_current_mode{LinkHintMode::None};

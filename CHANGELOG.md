@@ -78,6 +78,7 @@ NOTE: This is just a convenience table to increase the readability of the config
 
 ### Bug Fix
 
+- Fix user shortcuts fighting with default shortcuts
 - Fix zoom jumping to different page after zooming in/out.
 - Fix annotation comment tooltip going off screen
 - Fix color setting in the wrong format (ARGB instead of RGBA)
