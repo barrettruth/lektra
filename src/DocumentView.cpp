@@ -3890,19 +3890,29 @@ DocumentView::changeColorOfSelectedAnnotations(const QColor &color) noexcept
     }
 }
 
-// Returns the current location in the document
+// Returns the current location in the document that the user is viewing
 DocumentView::PageLocation
 DocumentView::CurrentLocation() noexcept
 {
     int pageno;
     GraphicsImageItem *pageItem;
-    QPointF sceneCenter = m_gview->mapToScene(
-        m_gview->viewport()->width() / 2, m_gview->viewport()->height() / 2);
 
-    if (!pageAtScenePos(sceneCenter, pageno, pageItem))
-        return {-1, 0, 0};
+    // Use top-left of visible area as the anchor point
+    QPointF sceneTopLeft = m_gview->mapToScene(0, 0);
 
-    const QPointF pageLocalPos = pageItem->mapFromScene(sceneCenter);
+    if (!pageAtScenePos(sceneTopLeft, pageno, pageItem))
+    {
+        // Fall back to center if top-left isn't on a page (e.g. margins)
+        QPointF sceneCenter
+            = m_gview->mapToScene(m_gview->viewport()->width() / 2,
+                                  m_gview->viewport()->height() / 2);
+        if (!pageAtScenePos(sceneCenter, pageno, pageItem))
+            return {-1, 0, 0};
+        const QPointF pageLocalPos = pageItem->mapFromScene(sceneCenter);
+        return {pageno, (float)pageLocalPos.x(), (float)pageLocalPos.y()};
+    }
+
+    const QPointF pageLocalPos = pageItem->mapFromScene(sceneTopLeft);
     return {pageno, (float)pageLocalPos.x(), (float)pageLocalPos.y()};
 }
 
