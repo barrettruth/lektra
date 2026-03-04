@@ -31,16 +31,13 @@ public:
         setGlowColor(m_config.glow_color);
         setFlags(flags() | QGraphicsItem::ItemIsFocusable);
         setTooltipFontSize(m_config.comment_font_size);
-        if (m_config.comment_marker)
-        {
-            m_comment_marker = new CommentPopupButton(this);
-            m_comment_marker->setAnnotationRect(m_rect);
-            m_comment_marker->setVisible(hasComment());
-            connect(m_comment_marker, &CommentPopupButton::clicked, this,
-                    [this] { emit annotCommentRequested(); });
-            // Only relevant when a comment actually exists.
-            updateButtonVisibility();
-        }
+        setCommentMarkerVisible(m_config.comment_marker);
+        updateCommentMarker();
+    }
+
+    inline Type atype() const noexcept override
+    {
+        return Type::Highlight;
     }
 
     QRectF boundingRect() const override
@@ -66,9 +63,6 @@ public:
         painter->setPen(m_pen);
         painter->setBrush(m_brush);
         painter->drawRect(m_rect);
-
-        if (m_comment_marker && hasComment())
-            m_comment_marker->setAnnotationRect(m_rect);
 
         // Selection indicator.
         if (option->state & QStyle::State_Selected)
@@ -97,8 +91,6 @@ protected:
         QGraphicsItem::mousePressEvent(e);
     }
 
-    // ------------------------------------------------------------------
-    // context menu
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *e) override
     {
         QMenu menu;
@@ -136,17 +128,10 @@ protected:
     void setComment(const QString &comment) override
     {
         Annotation::setComment(comment);
-        updateButtonVisibility();
+        updateCommentMarker();
     }
 
 private:
-    inline void updateButtonVisibility() noexcept
-    {
-        if (!hasComment())
-            m_comment_marker->hide();
-    }
-
     QRectF m_rect;
     const Config::Annotations::Highlight &m_config;
-    CommentPopupButton *m_comment_marker{nullptr};
 };
