@@ -301,6 +301,7 @@ public:
     void setFitMode(FitMode mode) noexcept;
     void GotoPage(int pageno) noexcept;
     void GotoLocation(const PageLocation &targetlocation) noexcept;
+    void CenterOnLocation(const PageLocation &targetlocation) noexcept;
     void GotoPageWithHistory(int pageno) noexcept;
     void GotoLocationWithHistory(const PageLocation &targetlocation) noexcept;
     void GotoNextPage() noexcept;
@@ -500,7 +501,7 @@ private:
     GraphicsView *m_gview{nullptr};
     GraphicsScene *m_gscene{nullptr};
     const Config &m_config;
-    FitMode m_fit_mode{FitMode::Width};
+    FitMode m_fit_mode{FitMode::COUNT};
     int m_pageno{-1};
     double m_spacing{10.0f};
     double m_current_zoom{MIN_ZOOM_FACTOR};
