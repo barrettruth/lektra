@@ -2,7 +2,6 @@
 
 #include "../Config.hpp"
 #include "Annotation.hpp"
-#include "CommentPopupButton.hpp"
 
 #include <QAction>
 #include <QGraphicsItem>
@@ -29,15 +28,13 @@ public:
         setGlowColor(m_config.glow_color);
         setFlags(flags() | QGraphicsItem::ItemIsFocusable);
         setTooltipFontSize(m_config.comment_font_size);
+        setCommentMarkerVisible(m_config.comment_marker);
+        updateCommentMarker();
+    }
 
-        if (m_config.comment_marker)
-        {
-            m_comment_marker = new CommentPopupButton(this);
-            m_comment_marker->setAnnotationRect(m_rect);
-            connect(m_comment_marker, &CommentPopupButton::clicked, this,
-                    [this] { emit annotCommentRequested(); });
-            updateButtonVisibility();
-        }
+    inline Type atype() const noexcept override
+    {
+        return Type::Rect;
     }
 
     QRectF boundingRect() const override
@@ -62,6 +59,9 @@ public:
         painter->setPen(m_pen);
         painter->setBrush(m_brush);
         painter->drawRect(m_rect);
+
+        // if (m_comment_marker && hasComment())
+        //     m_comment_marker->setAnnotationRect(m_rect);
 
         // Selection indicator.
         if (option->state & QStyle::State_Selected)
@@ -117,17 +117,10 @@ protected:
     void setComment(const QString &comment) override
     {
         Annotation::setComment(comment);
-        updateButtonVisibility();
+        updateCommentMarker();
     }
 
 private:
-    inline void updateButtonVisibility() noexcept
-    {
-        if (!hasComment())
-            m_comment_marker->hide();
-    }
-
     const Config::Annotations::Rect &m_config;
     QRectF m_rect;
-    CommentPopupButton *m_comment_marker{nullptr};
 };
