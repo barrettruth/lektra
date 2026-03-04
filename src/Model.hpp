@@ -235,7 +235,7 @@ public:
         return m_search_match_count;
     }
 
-    inline QString filePath() const noexcept
+    inline const QString &filePath() const noexcept
     {
         return m_filepath;
     }
