@@ -5278,3 +5278,18 @@ Lektra::Toggle_none_mode() noexcept
     else
         m_statusbar->setMode(m_doc->graphicsView()->getDefaultMode());
 }
+
+void
+Lektra::Toggle_comment_markers() noexcept
+{
+    if (!m_doc)
+        return;
+
+    // Toggle in config so that new documents also reflect the change
+    m_config.annotations.highlight.comment_marker
+        = !m_config.annotations.highlight.comment_marker;
+    m_config.annotations.rect.comment_marker
+        = !m_config.annotations.rect.comment_marker;
+
+    m_doc->Toggle_comment_markers();
+}
