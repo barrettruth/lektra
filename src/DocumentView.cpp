@@ -1003,25 +1003,20 @@ DocumentView::setFitMode(FitMode mode) noexcept
                           // center
     }
 
+    double newZoom{m_current_zoom};
     switch (mode)
     {
         case FitMode::Width:
         {
             const int viewWidth = m_gview->viewport()->width();
-
-            // Calculate using the unzoomed page size so fit is absolute.
-            const double newZoom = static_cast<double>(viewWidth) / bboxW;
-
-            setZoom(newZoom);
+            newZoom             = static_cast<double>(viewWidth) / bboxW;
         }
         break;
 
         case FitMode::Height:
         {
             const int viewHeight = m_gview->viewport()->height();
-            const double newZoom = static_cast<double>(viewHeight) / bboxH;
-
-            setZoom(newZoom);
+            newZoom              = static_cast<double>(viewHeight) / bboxH;
         }
         break;
 
@@ -1033,9 +1028,7 @@ DocumentView::setFitMode(FitMode mode) noexcept
             const double zoomX = static_cast<double>(viewWidth) / bboxW;
             const double zoomY = static_cast<double>(viewHeight) / bboxH;
 
-            const double newZoom = std::min(zoomX, zoomY);
-
-            setZoom(newZoom);
+            newZoom = std::min(zoomX, zoomY);
         }
         break;
 
@@ -1043,7 +1036,7 @@ DocumentView::setFitMode(FitMode mode) noexcept
             break;
     }
 
-    GotoPage(m_pageno);
+    setZoom(newZoom);
 }
 
 // Set zoom factor directly
@@ -1068,6 +1061,33 @@ DocumentView::setZoom(double factor) noexcept
     // renderPages();
 
     zoomHelper(loc);
+}
+
+void
+DocumentView::CenterOnLocation(const PageLocation &targetLocation) noexcept
+{
+    if (targetLocation.pageno < 0
+        || targetLocation.pageno >= m_model->numPages())
+        return;
+
+    // Continuous / LTR layouts
+    GraphicsImageItem *pageItem = m_page_items_hash[targetLocation.pageno];
+    if (!pageItem)
+        return;
+
+    const QPointF targetPixelPos = m_model->toPixelSpace(
+        targetLocation.pageno, {targetLocation.x, targetLocation.y});
+
+    const QPointF scenePos = pageItem->mapToScene(targetPixelPos);
+
+    if (m_layout_mode == LayoutMode::SINGLE)
+    {
+        GotoPage(targetLocation.pageno);
+    }
+    else
+    {
+        m_gview->centerOn(scenePos);
+    }
 }
 
 void
@@ -1170,7 +1190,7 @@ DocumentView::GotoPageWithHistory(int pageno) noexcept
 void
 DocumentView::GotoPage(int pageno) noexcept
 {
-    if (pageno < 0 || pageno >= m_model->numPages())
+    if (pageno < 0 || pageno >= m_model->numPages() || m_pageno == pageno)
         return;
 
     m_pageno = pageno;
@@ -1319,9 +1339,10 @@ DocumentView::ZoomIn() noexcept
     if (m_current_zoom >= MAX_ZOOM_FACTOR)
         return;
 
-    m_current_zoom = std::clamp(m_current_zoom * m_config.zoom.factor,
-                                MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
-    zoomHelper();
+    PageLocation loc = CurrentLocation();
+    m_current_zoom   = std::clamp(m_current_zoom * m_config.zoom.factor,
+                                  MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+    zoomHelper(loc);
 }
 
 // Zoom out by a fixed factor
@@ -1331,17 +1352,19 @@ DocumentView::ZoomOut() noexcept
     if (m_current_zoom <= MIN_ZOOM_FACTOR)
         return;
 
-    m_current_zoom = std::clamp(m_current_zoom / m_config.zoom.factor,
-                                MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
-    zoomHelper();
+    PageLocation loc = CurrentLocation();
+    m_current_zoom   = std::clamp(m_current_zoom / m_config.zoom.factor,
+                                  MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+    zoomHelper(loc);
 }
 
 // Reset zoom to 100%
 void
 DocumentView::ZoomReset() noexcept
 {
-    m_current_zoom = 1.0f;
-    zoomHelper();
+    PageLocation loc = CurrentLocation();
+    m_current_zoom   = 1.0f;
+    zoomHelper(loc);
 }
 
 // Navigate to the next search hit
@@ -3896,26 +3919,23 @@ DocumentView::changeColorOfSelectedAnnotations(const QColor &color) noexcept
 DocumentView::PageLocation
 DocumentView::CurrentLocation() noexcept
 {
-    int pageno;
-    GraphicsImageItem *pageItem;
+    if (m_page_items_hash.isEmpty() || m_pageno < 0)
+        return {-1, 0, 0};
 
-    // Use top-left of visible area as the anchor point
-    QPointF sceneTopLeft = m_gview->mapToScene(0, 0);
+    GraphicsImageItem *pageItem = m_page_items_hash.value(m_pageno, nullptr);
+    if (!pageItem)
+        return {-1, 0, 0};
 
-    if (!pageAtScenePos(sceneTopLeft, pageno, pageItem))
-    {
-        // Fall back to center if top-left isn't on a page (e.g. margins)
-        QPointF sceneCenter
-            = m_gview->mapToScene(m_gview->viewport()->width() / 2,
-                                  m_gview->viewport()->height() / 2);
-        if (!pageAtScenePos(sceneCenter, pageno, pageItem))
-            return {-1, 0, 0};
-        const QPointF pageLocalPos = pageItem->mapFromScene(sceneCenter);
-        return {pageno, (float)pageLocalPos.x(), (float)pageLocalPos.y()};
-    }
+    // Use viewport center — must match what GotoLocation restores via
+    // centerOn()
+    const QPointF viewCenter = m_gview->mapToScene(
+        m_gview->viewport()->width() / 2, m_gview->viewport()->height() / 2);
 
-    const QPointF pageLocalPos = pageItem->mapFromScene(sceneTopLeft);
-    return {pageno, (float)pageLocalPos.x(), (float)pageLocalPos.y()};
+    const QPointF itemLocal       = pageItem->mapFromScene(viewCenter);
+    const QPointF logicalPixelPos = itemLocal * pageItem->scale();
+    const fz_point pdfPos = m_model->toPDFSpace(m_pageno, logicalPixelPos);
+
+    return {m_pageno, pdfPos.x, pdfPos.y};
 }
 
 static bool
@@ -4283,7 +4303,7 @@ DocumentView::zoomHelper(const PageLocation &loc) noexcept
 
     // 2. Restore the exact viewport position
     if (loc.pageno != -1)
-        GotoLocation(loc);
+        CenterOnLocation(loc);
     else
         // Fallback if we were out of bounds
         GotoPage(m_pageno);
