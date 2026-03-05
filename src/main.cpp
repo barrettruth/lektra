@@ -165,13 +165,14 @@ main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/resources/png/lektra.png"));
 
     // Load correct localization file
-    QString baseDir = QStringLiteral(TRANSLATIONS_DIR);
-    QString fullLocale = QLocale::system().name();     // ex. "es_MX"
-    QString langOnly = fullLocale.left(2);             // ex: "es"
+    QString baseDir    = QStringLiteral(TRANSLATIONS_DIR);
+    QString fullLocale = QLocale::system().name(); // ex. "es_MX"
+    QString langOnly   = fullLocale.left(2);       // ex: "es"
 
-    QTranslator* translator = new QTranslator(&app);
+    QTranslator *translator = new QTranslator(&app);
 
-    auto tryLoad = [&](const QString& localeDir) -> bool {
+    auto tryLoad = [&](const QString &localeDir) -> bool
+    {
         QString path = baseDir + "/" + localeDir + "/LC_MESSAGES/";
         return translator->load("lektra", path);
     };
@@ -179,23 +180,27 @@ main(int argc, char *argv[])
     // Using es_MX code for explanation
 
     // Try full locale (es_MX)
-    if (tryLoad(fullLocale)) {
+    if (tryLoad(fullLocale))
+    {
         app.installTranslator(translator);
     }
     // Try language only (es)
-    else if (tryLoad(langOnly)) {
+    else if (tryLoad(langOnly))
+    {
         app.installTranslator(translator);
     }
     // Search for any directory beginning with es_ ...
-    else {
+    else
+    {
         QDir dir(baseDir);
-        QStringList candidates = dir.entryList(
-            QStringList() << (langOnly + "_*"),
-            QDir::Dirs | QDir::NoDotAndDotDot
-        );
+        QStringList candidates
+            = dir.entryList(QStringList() << (langOnly + "_*"),
+                            QDir::Dirs | QDir::NoDotAndDotDot);
 
-        for (const QString& candidate : candidates) {
-            if (tryLoad(candidate)) {
+        for (const QString &candidate : candidates)
+        {
+            if (tryLoad(candidate))
+            {
                 app.installTranslator(translator);
                 break;
             }
