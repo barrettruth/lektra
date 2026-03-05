@@ -7,7 +7,7 @@ class Parser:
         self.HOME: str | None = os.getenv("HOME")
         self.file = None
         self.lines = None
-        self.keywords = ["desc", "choice", "type", "default", "note"]
+        self.keywords = ["desc", "choice", "type", "default", "note", "added"]
 
     def __open(self, file: str):
         if file.startswith("~"):
