@@ -8,24 +8,15 @@
 #include <QLineF>
 #include <QMenu>
 #include <QNativeGestureEvent>
-// #include <QOpenGLWidget>
+#include <QOpenGLContext>
+#include <QOpenGLWidget>
 #include <QScroller>
 #include <qsurfaceformat.h>
 
 GraphicsView::GraphicsView(const Config &config, QWidget *parent)
     : QGraphicsView(parent), m_config(config)
 {
-    // setCacheMode(QGraphicsView::CacheNone);
-    // QSurfaceFormat format;
-    // format.setSamples(4);
-    // format.setAlphaBufferSize(8); // Enable alpha buffer for transparency
-    // QOpenGLWidget *glWidget = new QOpenGLWidget();
-    // glWidget->setFormat(format);
-    // setViewport(glWidget);
-    // setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-    // setCacheMode(QGraphicsView::CacheBackground);
-    // setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing
-    //                      | QGraphicsView::DontSavePainterState);
+    applyBackend();
     setMouseTracking(true);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -946,4 +937,57 @@ GraphicsView::handleTouchpadGesture(QNativeGestureEvent *e)
     }
 
     return QGraphicsView::viewportEvent(e);
+}
+
+void
+GraphicsView::applyBackend() noexcept
+{
+    auto backend_opengl = [this]()
+    {
+        QSurfaceFormat format;
+        format.setSamples(
+            m_config.rendering.antialiasing ? 4 : 0); // tie MSAA to your config
+        QOpenGLWidget *glWidget = new QOpenGLWidget(this);
+        glWidget->setFormat(format);
+        setViewport(glWidget);
+        setViewportUpdateMode(
+            QGraphicsView::FullViewportUpdate); // ← change from Minimal
+        setCacheMode(QGraphicsView::CacheBackground);
+    };
+
+    auto backend_raster = [this]()
+    {
+        // setViewport(new QWidget(this)); // Default raster widget
+        setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+        setCacheMode(QGraphicsView::CacheNone);
+    };
+
+    switch (m_config.rendering.backend)
+    {
+        case Config::Rendering::Backend::Raster:
+            backend_raster();
+            break;
+
+        case Config::Rendering::Backend::OpenGL:
+            backend_opengl();
+            break;
+
+        case Config::Rendering::Backend::Auto:
+        {
+            if (QOpenGLContext::supportsThreadedOpenGL())
+            {
+                backend_opengl();
+            }
+            else
+            {
+                backend_raster();
+            }
+        }
+        break;
+    }
+
+    // format.setAlphaBufferSize(8); // Enable alpha buffer for transparency
+    // setCacheMode(QGraphicsView::CacheBackground);
+    // setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing
+    //                      | QGraphicsView::DontSavePainterState);
 }

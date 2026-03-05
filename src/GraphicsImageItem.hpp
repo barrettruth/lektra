@@ -26,7 +26,7 @@ public:
         // If not using OpenGL, DeviceCoordinateCache provides better scroll
         // performance.
         // setCacheMode(QGraphicsItem::NoCache);
-        // setCacheMode(QGraphicsItem::ItemCoordinateCache);
+        setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     }
 
     // Set image (copy)

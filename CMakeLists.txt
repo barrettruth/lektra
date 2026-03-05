@@ -209,7 +209,7 @@ endforeach()
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent #mupdf mupdf-third
+    Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent Qt6::OpenGLWidgets
     ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf.a
     ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-third.a
     ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-threads.a

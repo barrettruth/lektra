@@ -169,6 +169,7 @@ private slots:
 private:
     void updateCursorForMode() noexcept;
     void onScrollbarActivity() noexcept;
+    void applyBackend() noexcept;
 
     inline void setActive(bool state) noexcept
     {

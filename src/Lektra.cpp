@@ -912,6 +912,31 @@ Lektra::initConfig() noexcept
     // Rendering
     if (auto rendering = toml["rendering"])
     {
+        if (auto backend_str = rendering["backend"])
+        {
+            Config::Rendering::Backend backend{
+                Config::Rendering::Backend::Auto};
+            if (backend_str == "opengl")
+            {
+                backend = Config::Rendering::Backend::OpenGL;
+            }
+            else if (backend_str == "raster")
+            {
+                backend = Config::Rendering::Backend::Raster;
+            }
+            else if (backend_str == "auto")
+            {
+                backend = Config::Rendering::Backend::Auto;
+            }
+            else
+            {
+                qWarning() << "Unknown rendering backend in config:"
+                           << QString::fromStdString(backend_str.value_or(""));
+                qWarning() << "Falling back to auto-detection.";
+            }
+            m_config.rendering.backend = backend;
+        }
+
         set(rendering["antialiasing"], m_config.rendering.antialiasing);
         set(rendering["text_antialiasing"],
             m_config.rendering.text_antialiasing);
