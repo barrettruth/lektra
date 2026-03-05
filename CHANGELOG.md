@@ -21,6 +21,10 @@ backend = "auto" # "auto", "opengl", "raster"
 - Fix djvu code under non-djvu builds causing compilation errors
 - Fix optional dependency locator in `CMakeLists.txt`
 
+### Breaking Changes
+
+- Removed `grid` option from `[command_palette]` section of the config as it was not implemented.
+
 ## 0.6.5
 
 ### End User Features
