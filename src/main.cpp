@@ -130,6 +130,10 @@ init_args(argparse::ArgumentParser &program)
         .default_value(std::string{"vertical"})
         .metavar("LAYOUT");
 
+    program.add_argument("--tutorial")
+        .help("Start with the tutorial file open")
+        .flag();
+
     program.add_argument("files").remaining().metavar("FILE_PATH(s)");
 }
 

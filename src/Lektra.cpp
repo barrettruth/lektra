@@ -1516,6 +1516,12 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
         hsplit = true;
     }
 
+    if (argparser.is_used("tutorial"))
+    {
+        showTutorialFile();
+        return;
+    }
+
     if (argparser.is_used("files"))
     {
         auto files = argparser.get<std::vector<std::string>>("files");
