@@ -142,10 +142,10 @@ endif()
 
 qt_add_resources(RESOURCES resources.qrc)
 
-# Add MuPDF headers
+
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/external/mupdf/include
-    ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${CMAKE_SOURCE_DIR}/external/mupdf/include # Include MuPDF headers
+    ${CMAKE_CURRENT_BINARY_DIR}/include # Include generated headers like TranslationsDir.hpp
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
@@ -159,14 +159,11 @@ else()
     message(STATUS "SyncTeX not found.")
 endif()
 
-
 if (DJVULIBRE_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${DJVU_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} PRIVATE djvulibre)
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_DJVU=1)
 endif()
-
-
 
 # ------------------------------
 # Translations
@@ -215,6 +212,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent #mupdf mupdf-third
     ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf.a
     ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-third.a
+    ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-threads.a
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
