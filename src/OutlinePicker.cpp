@@ -5,8 +5,8 @@ OutlinePicker::OutlinePicker(const Config::Outline &config,
     : Picker(parent), m_config(config)
 {
     // Configure the columns for the new populate() logic
-
-    if (config.show_page_numbers)
+    m_listView-
+    if (config.show_page_number)
     {
         setColumns({{.header = tr("Title"), .stretch = 1},
                     {.header = tr("Page"), .stretch = 0}});
