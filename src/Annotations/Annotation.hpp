@@ -30,6 +30,8 @@
 class Annotation : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
 public:
     explicit Annotation(int index, const QColor &color,
                         QGraphicsItem *parent = nullptr);

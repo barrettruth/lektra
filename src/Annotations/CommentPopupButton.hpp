@@ -22,7 +22,7 @@
 class CommentPopupButton : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-
+    Q_INTERFACES(QGraphicsItem)
 public:
     explicit CommentPopupButton(QGraphicsItem *parent)
         : QObject(), QGraphicsItem(parent)
