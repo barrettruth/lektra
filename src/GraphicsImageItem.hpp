@@ -87,8 +87,8 @@ public:
             return;
 
         // Draw the image scaled to its logical size (accounting for DPR)
-        // painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        // painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawImage(m_bounding_rect, m_image);
     }
 
