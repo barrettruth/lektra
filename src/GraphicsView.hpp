@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QElapsedTimer>
+#include <QGestureEvent>
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QRubberBand>
@@ -137,6 +138,7 @@ signals:
     void annotSelectRequested(QPointF scenePos);
     void annotSelectClearRequested();
     void zoomInRequested();
+    void zoomRequested(float factor);
     void textSelectionDeletionRequested();
     void zoomOutRequested();
     void contextMenuRequested(QPoint globalPos, bool *handled);
@@ -160,6 +162,9 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void scrollContentsBy(int dx, int dy) override;
     bool viewportEvent(QEvent *event) override;
+
+private slots:
+    bool handleTouchpadGesture(QNativeGestureEvent *event);
 
 private:
     void updateCursorForMode() noexcept;

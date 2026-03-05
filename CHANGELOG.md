@@ -5,6 +5,7 @@
 ### Features
 
 - Add `--tutorial` command line argument to open the tutorial PDF file directly from the command line without having to open the command palette and search for the command. This is useful for new users who want to quickly access the tutorial file and learn how to use LEKTRA.
+- Add touchpad gesture support for zooming (pinch to zoom)
 
 ### Bug Fixes
 

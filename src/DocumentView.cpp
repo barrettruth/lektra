@@ -447,6 +447,9 @@ DocumentView::initConnections() noexcept
     connect(m_gview, &GraphicsView::zoomInRequested, this,
             &DocumentView::ZoomIn);
 
+    connect(m_gview, &GraphicsView::zoomRequested, this,
+            [this](float factor) { setZoom(m_current_zoom * factor); });
+
     connect(m_gview, &GraphicsView::zoomOutRequested, this,
             &DocumentView::ZoomOut);
 
