@@ -754,7 +754,7 @@ struct Config
         // @type str
         // @choice auto, raster, opengl
         // @default auto
-        Backend backend{Backend::Auto};
+        Backend backend{Backend::Raster};
 
     } rendering{};
     // @endsection

@@ -915,7 +915,7 @@ Lektra::initConfig() noexcept
         if (auto backend_str = rendering["backend"])
         {
             Config::Rendering::Backend backend{
-                Config::Rendering::Backend::Auto};
+                Config::Rendering::Backend::Raster};
             if (backend_str == "opengl")
             {
                 backend = Config::Rendering::Backend::OpenGL;
@@ -932,7 +932,7 @@ Lektra::initConfig() noexcept
             {
                 qWarning() << "Unknown rendering backend in config:"
                            << QString::fromStdString(backend_str.value_or(""));
-                qWarning() << "Falling back to auto-detection.";
+                qWarning() << "Falling back to `raster` backend.";
             }
             m_config.rendering.backend = backend;
         }
