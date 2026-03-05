@@ -17,6 +17,9 @@ struct Config
     // *NOTE*: Colors can be specified in hex format (e.g. #RRGGBBAA) or as a
     // color name
 
+    // @section Page
+    // @section_desc Page options struct
+    // @section_type struct
     struct Page
     {
         // @desc Page background color
@@ -29,6 +32,7 @@ struct Config
         // @default "#000000FF"
         uint32_t fg{0x000000FF};
     } page{};
+    // @endsection
 
     // @section Search
     // @section_desc Search options struct
@@ -178,6 +182,9 @@ struct Config
     } annotations{};
     // @endsection
 
+    // @section Portal
+    // @section_desc Portal options struct
+    // @section_type struct
     struct Portal
     {
         // @desc Portal border color
@@ -208,6 +215,7 @@ struct Config
         // @default false
         bool dim_inactive{false};
     } portal{};
+    // @endsection
 
     // @section Window
     // @desc Window options struct
@@ -753,6 +761,7 @@ struct Config
         // @desc Rendering backend to use
         // @type str
         // @choice auto, raster, opengl
+        // @added 0.6.5
         // @default auto
         Backend backend{Backend::Raster};
 
