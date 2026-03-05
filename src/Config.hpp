@@ -448,7 +448,7 @@ struct Config
     // @section Split
     // @section_desc Split options struct
     // @section_type struct
-    // @section_added 0.6.4
+    // @section_added 0.6.2
     struct Split
     {
         // @desc Focus of split follows the mouse
@@ -480,7 +480,7 @@ struct Config
     // @section Scrollbars
     // @section_desc Scrollbars options struct
     // @section_type struct
-    // @section_added 0.5.4
+    // @section_added 0.5.1
     struct Scrollbars
     {
         // @desc Show the horizontal scrollbar
@@ -744,10 +744,10 @@ struct Config
         // @added 0.6.0
         bool border{true};
 
-        // @section Shadow
+        // @section Picker.Shadow
         // @section_desc Picker shadow struct
         // @section_type struct
-        // @added 0.6.0
+        // @section_added 0.6.0
         struct shadow
         {
             // @desc Enable shadow
