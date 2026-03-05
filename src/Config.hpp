@@ -20,16 +20,19 @@ struct Config
     // @section Page
     // @section_desc Page options struct
     // @section_type struct
+    // @section_added 0.6.4
     struct Page
     {
         // @desc Page background color
         // @type str
         // @default "#FFFFFFFF"
+        // @added 0.6.4
         uint32_t bg{0xFFFFFFFF};
 
         // @desc Page foreground color
         // @type str
         // @default "#000000FF"
+        // @added 0.6.4
         uint32_t fg{0x000000FF};
     } page{};
     // @endsection
@@ -37,17 +40,20 @@ struct Config
     // @section Search
     // @section_desc Search options struct
     // @section_type struct
+    // @section_added 0.6.0
     struct Search
     {
 
         // @desc Search match count color
         // @type str
         // @default "#55500033"
+        // @added 0.6.5
         uint32_t match_color{0x55500033};
 
         // @desc Search match index color
         // @type str
         // @default "#55FF0055"
+        // @added 0.6.5
         uint32_t index_color{0x55FF0055};
     } search{};
     // @endsection
@@ -55,37 +61,45 @@ struct Config
     // @section Annotations
     // @section_desc Annotation options struct
     // @section_type struct
+    // @section_added 0.6.5
     struct Annotations
     {
+
         // @section Popup
         // @section_desc Popup annotation options struct
         // @section_type struct
+        // @section_added 0.6.5
         struct Popup
         {
             // @desc Enable hover effect (e.g., glow on highlight)
             // @type bool
             // @default true
+            // @added 0.6.5
             bool hover_glow{true};
 
             // @desc Annotation glow color (on hover)
             // @type str
             // @default "#FF5000AA"
+            // @added 0.6.5
             uint32_t glow_color{0xFF5000AA};
 
             // @desc Glow width in pixels
             // @type int
             // @default 5
+            // @added 0.6.5
             int glow_width{5};
 
             // @desc { Show comment text in tooltip on hover (if comment
             // exists) }
             // @type bool
             // @default true
+            // @added 0.6.5
             bool comment{true};
 
             // @desc Font size for the comment tooltip (in points)
             // @type int
             // @default 12
+            // @added 0.6.5
             int comment_font_size{12};
 
         } popup{};
@@ -94,42 +108,50 @@ struct Config
         // @section Rect
         // @section_desc Rect annotation options struct
         // @section_type struct
+        // @section_added 0.6.5
         struct Rect
         {
             // @desc Enable hover effect (e.g., glow on highlight)
             // @type bool
             // @default true
+            // @added 0.6.5
             bool hover_glow{true};
 
             // @desc Annotation glow color (on hover)
             // @type str
             // @default "#FF5000AA"
+            // @added 0.6.5
             uint32_t glow_color{0xFF5000AA};
 
             // @desc Rect annotation color
             // @type str
             // @default "#55FF5588"
+            // @added 0.6.5
             uint32_t color{0x55FF5588};
 
             // @desc Glow width in pixels
             // @type int
             // @default 5
+            // @added 0.6.5
             int glow_width{5};
 
             // @desc { Show comment text in tooltip on hover (if comment
             // exists) }
             // @type bool
             // @default true
+            // @added 0.6.5
             bool comment{true};
 
             // @desc Font size for the comment tooltip (in points)
             // @type int
             // @default 12
+            // @added 0.6.5
             int comment_font_size{12};
 
             // @desc Show marker in the corner of the rect (if comment exists)
             // @type bool
             // @default true
+            // @added 0.6.5
             bool comment_marker{true};
 
         } rect{};
@@ -138,42 +160,50 @@ struct Config
         // @section Highlight
         // @section_desc Highlight annotation options struct
         // @section_type struct
+        // @section_added 0.6.5
         struct Highlight
         {
             // @desc { Show comment text in tooltip on hover (if commentb
             // exists) }
             // @type bool
             // @default true
+            // @added 0.6.5
             bool comment{true};
 
             // @desc Font size for the comment tooltip (in points)
             // @type int
             // @default 12
+            // @added 0.6.5
             int comment_font_size{12};
 
             // @desc Annotation glow color (on hover)
             // @type str
             // @default "#FF5000AA"
+            // @added 0.6.5
             uint32_t glow_color{0xFF5000AA};
 
             // @desc Highlight annotation color
             // @type str
             // @default "#55FF0055"
+            // @added 0.6.5
             uint32_t color{0x55FF0055};
 
             // @desc Glow width in pixels
             // @type int
             // @default 5
+            // @added 0.6.5
             int glow_width{5};
 
             // @desc Enable hover effect (e.g., glow on highlight)
             // @type bool
             // @default true
+            // @added 0.6.5
             bool hover_glow{true};
 
             // @desc Show marker at the highlight (if comment exists)
             // @type bool
             // @default true
+            // @added 0.6.5
             bool comment_marker{true};
 
         } highlight{};
@@ -185,21 +215,25 @@ struct Config
     // @section Portal
     // @section_desc Portal options struct
     // @section_type struct
+    // @section_added 0.6.4
     struct Portal
     {
         // @desc Portal border color
         // @type str
         // @default "#FFFFFFAA"
+        // @added 0.6.4
         uint32_t border_color{0xFFFFFFAA};
 
         // @desc Enable portal ability
         // @type bool
         // @default true
+        // @added 0.6.4
         bool enabled{true};
 
         // @desc Portal border width
         // @type int
         // @default 5
+        // @added 0.6.4
         int border_width{5};
 
         // @desc {
@@ -208,48 +242,57 @@ struct Config
         // }
         // @type bool
         // @default true
+        // @added 0.6.4
         bool respect_parent{true};
 
         // @desc Dim inactive for portal views too
         // @type bool
         // @default false
+        // @added 0.6.5
         bool dim_inactive{false};
     } portal{};
     // @endsection
 
     // @section Window
-    // @desc Window options struct
-    // @type struct
+    // @section_desc Window options struct
+    // @section_type struct
+    // @section_added 0.3.0
     struct Window
     {
         // @desc Background color
         // @type str
         // @default "#00000000"
+        // @added 0.3.0
         uint32_t bg{0x00000000};
 
         // @desc Accent color
         // @type str
         // @default "#3daee9FF"
+        // @added 0.3.0
         uint32_t accent{0x3daee9FF};
 
         // @desc Set the window fullscreen
         // @type bool
         // @default false
+        // @added 0.3.0
         bool fullscreen{false};
 
         // @desc Show the menubar
         // @type bool
         // @default true
+        // @added 0.3.0
         bool menubar{true};
 
         // @desc Show startup widget tab
         // @type bool
         // @default true
+        // @added 0.3.0
         bool startup_tab{false};
 
         // @desc Title format for the window title
         // @type str
         // @default "{} - lektra"
+        // @added 0.3.0
         QString title_format{"{} - lektra"};
 
         // Required for documentation parsing, do not remove
@@ -258,6 +301,7 @@ struct Config
         // @desc Initial size of the window
         // @type table
         // @default 600,400
+        // @added 0.6.3
         WindowSize initial_size{600, 400}; // width, height; -1 for default
     } window{};
     // @endsection
@@ -265,28 +309,33 @@ struct Config
     // @section Layout
     // @section_desc Layout options struct
     // @section_type struct
+    // @section_added 0.5.1
     struct Layout
     {
 
         // @desc Initial page layout mode
         // @type str
         // @choice vertical, horizontal, single, book
-        // @default top_to_bottom
+        // @default vertical
+        // @added 0.5.1
         DocumentView::LayoutMode mode{DocumentView::LayoutMode::VERTICAL};
 
         // @desc Initial page fit mode
         // @default width
         // @choice width, height, window
+        // @added 0.5.1
         DocumentView::FitMode initial_fit{DocumentView::FitMode::Width};
 
         // @desc Apply auto fit when resizing window
         // @type bool
         // @default false
+        // @added 0.5.1
         bool auto_resize{false};
 
         // @desc Page spacing in pixels
         // @type int
         // @default 10
+        // @added 0.5.1
         int spacing{10};
     } layout{};
     // @endsection
@@ -294,47 +343,56 @@ struct Config
     // @section Statusbar
     // @section_desc Statusbar options struct
     // @section_type struct
+    // @section_added 0.5.5
     struct Statusbar
     {
         // @desc Show statusbar
         // @type bool
         // @default true
+        // @added 0.5.5
         bool visible{true};
 
         using Padding = std::array<int, 4>;
         // @desc Padding
         // @type table
         // @default [5, 5, 5, 5]
+        // @added 0.5.5
         Padding padding{5, 5, 5, 5}; // top, right, bottom, left
 
         // @desc Show session name (if in session)
         // @type bool
         // @default true
+        // @added 0.5.5
         bool show_session_name{true};
 
         // @desc Show file name only (as opposed to full path)
         // @type bool
         // @default false
+        // @added 0.5.5
         bool file_name_only{false};
 
         // @desc Show file info
         // @type bool
         // @default true
+        // @added 0.5.5
         bool show_file_info{true};
 
         // @desc Show page number
         // @type bool
         // @default true
+        // @added 0.5.5
         bool show_page_number{true};
 
         // @desc Show interaction mode
         // @type bool
         // @default true
+        // @added 0.5.5
         bool show_mode{true};
 
         // @desc Show page read progress
         // @type bool
         // @default true
+        // @added 0.5.5
         bool show_progress{true};
     } statusbar{};
     // @endsection
@@ -342,17 +400,20 @@ struct Config
     // @section Zoom
     // @section_desc Zoom options struct
     // @section_type struct
+    // @section_added 0.3.0
     struct Zoom
     {
 
         // @desc Default zoom level
         // @type float
         // @default 0.5f
+        // @added 0.3.0
         float level{0.5f};
 
         // @desc Zoom factor
         // @type float
         // @default 1.25f
+        // @added 0.3.0
         float factor{1.25f};
     } zoom{};
     // @endsection
@@ -360,21 +421,25 @@ struct Config
     // @section Selection
     // @section_desc Selection options struct
     // @section_type struct
+    // @section_added 0.5.1
     struct Selection
     {
         // @desc Threshold in pixels before actually starting the selection
         // @type int
         // @default 50
+        // @added 0.5.1
         int drag_threshold{50};
 
         // @desc Copy on text selection
         // @type bool
         // @default false
+        // @added 0.6.3
         bool copy_on_select{false};
 
         // @desc Selection color
         // @type str
         // @default "#0000FF55"
+        // @added 0.5.1
         uint32_t color{0x0000FF55};
 
     } selection{};
@@ -383,26 +448,31 @@ struct Config
     // @section Split
     // @section_desc Split options struct
     // @section_type struct
+    // @section_added 0.6.4
     struct Split
     {
         // @desc Focus of split follows the mouse
         // @type bool
         // @default true
+        // @added 0.6.2
         bool focus_follows_mouse{true};
 
         // @desc Moving mouse changes the focus
         // @type bool
         // @default true
+        // @added 0.6.2
         bool mouse_follows_focus{true};
 
         // @desc Dims splits that are not currently focused
         // @type bool
         // @default true
+        // @added 0.6.2
         bool dim_inactive{true};
 
         // @desc Set the inactive split dim opacity [0-1]
         // @type float
         // @default 0.5f
+        // @added 0.6.2
         float dim_inactive_opacity{0.5f}; // 0.0 (no dim) to 1.0 (fully dimmed)
     } split{};
     // @endsection
@@ -410,36 +480,43 @@ struct Config
     // @section Scrollbars
     // @section_desc Scrollbars options struct
     // @section_type struct
+    // @section_added 0.5.4
     struct Scrollbars
     {
         // @desc Show the horizontal scrollbar
         // @type bool
         // @default true
+        // @added 0.5.4
         bool horizontal{true};
 
         // @desc Show the vertical scrollbar
         // @type bool
         // @default true
+        // @added 0.5.4
         bool vertical{true};
 
         // @desc Show the search hits in scrollbar
         // @type bool
         // @default true
+        // @added 0.5.1
         bool search_hits{true};
 
         // @desc Auto hide after timeout
         // @type bool
         // @default true
+        // @added 0.5.4
         bool auto_hide{true};
 
         // @desc Size of the scrollbar in pixels
         // @type int
         // @default 12
+        // @added 0.5.4
         int size{12};
 
         // @desc Inactive timeout after which to hide the scrollbar
         // @type float
         // @default 1.5
+        // @added 0.5.4
         float hide_timeout{1.5}; // seconds of inactivity before hiding
     } scrollbars{};
     // @endsection
@@ -447,16 +524,19 @@ struct Config
     // @section Jump Marker
     // @section_desc Jump marker options struct
     // @section_type struct
+    // @section_added 0.3.1
     struct JumpMarker
     {
         // @desc Show the jump marker
         // @type bool
         // @default true
+        // @added 0.3.1
         bool enabled{true};
 
         // @desc Jump marker color
         // @type str
         // @default "#FF0000FF"
+        // @added 0.3.1
         uint32_t color{0xFF0000FF};
 
     } jump_marker{};
@@ -465,26 +545,31 @@ struct Config
     // @section Links
     // @section_desc Links options struct
     // @section_type struct
+    // @section_added 0.3.1
     struct Links
     {
         // @desc Enable link support (both pdf links and detected URLs)
         // @type bool
         // @default true
+        // @added 0.6.5
         bool enabled{true};
 
         // @desc Show the rect boundary for links
         // @type bool
         // @default false
+        // @added 0.3.1
         bool boundary{false};
 
         // @desc Detect non-pdf link objects that are valid links
         // @type bool
         // @default false
+        // @added 0.5.3
         bool detect_urls{false};
 
         // @desc Valid regular expression that detects URLs
         // @type str
         // @default R"((https?://|www\.)[^\s<>()\"']+)"
+        // @added 0.5.3
         QString url_regex{R"((https?://|www\.)[^\s<>()\"']+)"};
     } links{};
     // @endsection
@@ -492,21 +577,25 @@ struct Config
     // @section Link Hints
     // @section_desc Link hint options struct
     // @section_type struct
+    // @section_added 0.3.0
     struct Link_hints
     {
         // @desc Size of the link hint rects
         // @type float
         // @default 0.5f
+        // @added 0.3.0
         float size{0.5f};
 
         // @desc Link hint background color
         // @type str
         // @default "#000000FF"
+        // @added 0.6.4
         uint32_t bg{0x000000FF};
 
         // @desc Link hint foreground color
         // @type str
         // @default "#ea3ee9FF"
+        // @added 0.6.4
         uint32_t fg{0xea3ee9FF};
 
     } link_hints{};
@@ -515,48 +604,57 @@ struct Config
     // @section Tabs
     // @section_desc Tab options struct
     // @section_type struct
+    // @section_added 0.3.0
     struct Tabs
     {
         // @desc Show tabs
         // @type bool
         // @default true
+        // @added 0.3.0
         bool visible{true};
 
         // @desc Auto hide tabs when tab count equals 1
         // @type bool
         // @default false
+        // @added 0.3.0
         bool auto_hide{false};
 
         // @desc Show the tab close buttons
         // @type bool
         // @default true
+        // @added 0.3.0
         bool closable{true};
 
         // @desc Tabs can be rearranged
         // @type bool
         // @default true
+        // @added 0.3.0
         bool movable{true};
 
         // @desc Text elide mode when text can't fit in the tab fully
         // @type str
         // @choice right, left, middle, none
         // @default right
+        // @added 0.3.0
         Qt::TextElideMode elide_mode{Qt::TextElideMode::ElideRight};
 
         // @desc Location of the tabs in the window
         // @type str
         // @choice top, bottom, left, right
         // @default top
+        // @added 0.3.0
         QTabWidget::TabPosition location{QTabWidget::TabPosition::North};
 
         // @desc Show full file path
         // @type bool
         // @default false
+        // @added 0.3.0
         bool full_path{false};
 
         // @desc Lazy load tabs
         // @type bool
         // @default true
+        // @added 0.6.0
         bool lazy_load{true};
     } tabs{};
     // @endsection
@@ -564,23 +662,27 @@ struct Config
     // @section Outline
     // @section_desc Outline options struct
     // @section_type struct
+    // @section_added 0.5.3
     struct Outline
     {
         // @desc Indent width
         // @type int
         // @default 10
+        // @added 0.6.5
         int indent_width{10};
 
         // @desc Show page numbers
         // @type bool
-        // @defaul true
-        bool show_page_numbers{true};
+        // @default true
+        // @added 0.6.5
+        bool show_page_number{true};
     } outline{};
     // @endsection
 
     // @section Highlight
     // @section_desc Highlight Search options struct
     // @section_type struct
+    // @section_added 0.5.3
     struct Highlight_search
     {
     } highlight_search{};
@@ -589,84 +691,93 @@ struct Config
     // @section Command Palette
     // @section_desc Command Palette options struct
     // @section_type struct
+    // @section_added 0.5.4
     struct Command_palette
     {
         // @desc Width of the command palette picker
         // @type int
         // @default 500
+        // @added 0.5.4
         int width{500};
 
         // @desc Height of the command palette picker
         // @type int
         // @default 300
+        // @added 0.5.4
         int height{300};
 
         // @desc Placeholder text for the input field
         // @type str
         // @default "Type a command..."
+        // @added 0.5.4
         QString placeholder_text{"Type a command..."};
 
         // @desc Show the vertical scrollbar in the picker
         // @type bool
         // @default true
+        // @added 0.5.4
         bool vscrollbar{true};
 
         // @desc Show shortcuts
         // @type bool
         // @default true
+        // @added 0.5.4
         bool shortcuts{true};
 
         // @desc Show command description
         // @type bool
         // @default false
+        // @added 0.6.5
         bool description{false};
-
-        // @desc Show grids
-        // @type bool
-        // @default false
-        bool grid{false};
     } command_palette{};
     // @endsection
 
     // @section Picker
     // @section_desc Split options struct
     // @section_type struct
+    // @section_added 0.6.0
     struct Picker
     {
-
         // @desc Show stylish border around picker
         // @type bool
         // @default true
+        // @added 0.6.0
         bool border{true};
 
         // @section Shadow
         // @section_desc Picker shadow struct
         // @section_type struct
+        // @added 0.6.0
         struct shadow
         {
             // @desc Enable shadow
             // @type bool
             // @default true
+            // @added 0.6.0
             bool enabled{true};
 
             // @desc Blur radius of shadow in pixels
             // @type int
             // @default 18
+            // @added 0.6.0
             int blur_radius{18};
 
             // @desc X-offset of the shadow
             // @type int
             // @default 0
+            // @added 0.6.0
             int offset_x{0};
 
             // @desc Y-offset of the shadow
             // @type int
             // @default 6
+            // @added 0.6.0
             int offset_y{6};
 
             // @desc Opacity of the shadow
             // @type int
             // @default 120
+            // @added 0.6.0
             int opacity{120};
         } shadow{};
     } picker{};
@@ -676,22 +787,30 @@ struct Config
     // @section LLM Widget
     // @section_desc LLM widget options struct
     // @section_type struct
+    // @section_note {
+    // This is still a work in progress and subject to change, but
+    // the options are here for documentation purposes
+    // }
+    // @section_added 0.5.4
     struct Llm_widget
     {
         // @desc Show the LLM Widget
         // @type bool
         // @default false
+        // @added 0.5.4
         bool visible{false};
 
         // @desc LLM Widget Panel position
         // @type str
         // @choice left, right, top, bottom
         // @default right
+        // @added 0.5.4
         QString panel_position{"right"};
 
         // @desc LLM Widget Panel width
         // @type int
         // @default 400
+        // @added 0.5.4
         int panel_width{400};
     } llm_widget{};
     // @endsection
@@ -699,21 +818,29 @@ struct Config
     // @section LLM
     // @section_desc LLM options struct
     // @section_type struct
+    // @section_added 0.5.4
+    // @section_note {
+    // This is still a work in progress and subject to change, but
+    // the options are here for documentation purposes
+    // }
     struct LLM
     {
         // @desc LLM Provider
         // @type str
         // @default ollama
+        // @added 0.5.4
         std::string provider{"ollama"};
 
         // @desc LLM Model to use
         // @type str
         // @default "llama2-7b-chat"
+        // @added 0.5.4
         std::string model{"llama2-7b-chat"};
 
         // @desc Max tokens
         // @type int
         // @default 512
+        // @added 0.5.4
         int max_tokens{512};
         // float temperature{0.7f}; //
     } llm{};
@@ -723,32 +850,38 @@ struct Config
     // @section Rendering
     // @section_desc Rendering options struct
     // @section_type struct
+    // @section_added 0.3.0
     struct Rendering
     {
         using DPR = std::variant<float, QMap<QString, float>>;
         // @desc Device Pixel Ratio
         // @type float or table
         // @default 1.0
+        // @added 0.3.0
         DPR dpr{1.0f};
 
         // @desc Enable Antialiasing
         // @type bool
         // @default true
+        // @added 0.6.3
         bool antialiasing{true};
 
         // @desc Antialiasing bits
         // @type int
         // @default 8
+        // @added 0.3.0
         int antialiasing_bits{8};
 
         // @desc Enable text antialiasing
         // @type bool
         // @default true
+        // @added 0.6.3
         bool text_antialiasing{true};
 
         // @desc Smooth pixmap transform
         // @type bool
         // @default true
+        // @added 0.6.3
         bool smooth_pixmap_transform{true};
 
         enum class Backend
@@ -761,7 +894,7 @@ struct Config
         // @desc Rendering backend to use
         // @type str
         // @choice auto, raster, opengl
-        // @added 0.6.5
+        // @added 0.6.6
         // @default auto
         Backend backend{Backend::Raster};
 
@@ -771,66 +904,79 @@ struct Config
     // @section Behavior
     // @section_desc Behavior options struct
     // @section_type struct
+    // @section_added 0.3.0
     struct Behavior
     {
         // @desc Confirm before quitting
         // @type bool
         // @default true
+        // @added 0.3.0
         bool confirm_on_quit{true};
 
         // @desc Undo limit
         // @type int
         // @default 25
+        // @added 0.3.1
         int undo_limit{25};
 
         // @desc Number of pages to cache page
         // @type int
         // @default 10
+        // @added 0.5.3
         int cache_pages{10};
 
         // @desc Preload pages
         // @type int
         // @default 2
+        // @added 0.6.3
         int preload_pages{2};
 
         // @desc Auto-reload file upon detecting file change
         // @type bool
         // @default true
+        // @added 0.3.0
         bool auto_reload{true};
 
         // @desc Invert color mode (aka dark mode)
         // @type bool
         // @default false
+        // @added 0.3.0
         bool invert_mode{false};
 
         // @desc Open last visited file when launching new instance
         // @type bool
         // @default false
+        // @added 0.3.0
         bool open_last_visited{false};
 
         // @desc Always open files in new window
         // @type bool
         // @default false
+        // @added 0.5.3
         bool always_open_in_new_window{false};
 
         // @desc Remembers last visited page number
         // @type bool
         // @default true
+        // @added 0.3.0
         bool remember_last_visited{true};
 
         // @desc Keep track of recent files
         // @type bool
         // @default true
+        // @added 0.3.0
         bool recent_files{true};
 
         // @desc Max number of recent files to keep track
         // @type int
         // @default 10
+        // @added 0.3.0
         int num_recent_files{10};
 
         // @desc Page history location limit to keep track
         // @type int
         // @default 5
+        // @added 0.3.0
         int page_history_limit{5};
 
         // Don't document this as it's for internal use
@@ -843,12 +989,14 @@ struct Config
         // annot_highlight
         // }
         // @default text_selection
+        // @added 0.3.0
         GraphicsView::Mode initial_mode{GraphicsView::Mode::TextSelection};
 #ifdef HAS_SYNCTEX
 
         // @desc Synctex editor command
         // @type str
         // @default ""
+        // @added 0.3.0
         QString synctex_editor_command{QString()};
 #endif
     } behavior{};
