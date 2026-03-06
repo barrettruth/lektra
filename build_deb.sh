@@ -19,9 +19,6 @@ BUILD_TYPE=${BUILD_TYPE:-Release}
 ENABLE_LLM_SUPPORT=${ENABLE_LLM_SUPPORT:-OFF}
 CLEAN_BUILD=${CLEAN_BUILD:-0}
 
-MUPDF_LIB="$ROOT_DIR/external/mupdf/build/release/libmupdf.a"
-MUPDF_THIRD_LIB="$ROOT_DIR/external/mupdf/build/release/libmupdf-third.a"
-
 need() {
     command -v "$1" >/dev/null 2>&1 || {
         echo "Error: missing required tool: $1" >&2
@@ -32,15 +29,6 @@ need() {
 need cmake
 need make
 need dpkg-deb
-
-if [ ! -f "$MUPDF_LIB" ] || [ ! -f "$MUPDF_THIRD_LIB" ]; then
-    if [ ! -d "$ROOT_DIR/external/mupdf" ]; then
-        echo "Error: external/mupdf missing. Run ./install.sh --rebuild-mupdf to fetch it." >&2
-        exit 1
-    fi
-    echo "MuPDF libs missing; building MuPDF..."
-    make -C "$ROOT_DIR/external/mupdf" build=release HAVE_X11=no HAVE_GLUT=no
-fi
 
 if [ "$CLEAN_BUILD" -eq 1 ]; then
     rm -rf "$BUILD_DIR"

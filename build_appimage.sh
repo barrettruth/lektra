@@ -4,8 +4,6 @@ set -eu
 ROOT_DIR=$(cd "$(dirname "$0")" && pwd)
 BUILD_DIR="$ROOT_DIR/build-appimage"
 APPDIR="$ROOT_DIR/appimage/AppDir"
-MUPDF_LIB="$ROOT_DIR/external/mupdf/build/release/libmupdf.a"
-MUPDF_THIRD_LIB="$ROOT_DIR/external/mupdf/build/release/libmupdf-third.a"
 DESKTOP_FILE="$APPDIR/usr/share/applications/lektra.desktop"
 ICON_FILE="$APPDIR/usr/share/icons/hicolor/512x512/apps/lektra.png"
 JOBS=${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)}
@@ -26,15 +24,6 @@ need() {
 need cmake
 need make
 need linuxdeploy
-
-if [ ! -f "$MUPDF_LIB" ] || [ ! -f "$MUPDF_THIRD_LIB" ]; then
-    if [ ! -d "$ROOT_DIR/external/mupdf" ]; then
-        echo "Error: external/mupdf missing. Run ./install.sh --rebuild-mupdf to fetch it." >&2
-        exit 1
-    fi
-    echo "MuPDF libs missing; building MuPDF..."
-    make -C "$ROOT_DIR/external/mupdf" build=release HAVE_X11=no HAVE_GLUT=no
-fi
 
 if [ "$CLEAN_APPDIR" -eq 1 ]; then
     rm -rf "$APPDIR"

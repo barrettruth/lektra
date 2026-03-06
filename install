@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+
+# Read the prefix from the first argument, or use /usr if not provided
+PREFIX=${1:-/usr/local}
+
+# Check if build directory exists and has cmake files
+if [ ! -d "build" ] || [ -z "$(ls -A build/*.cmake 2>/dev/null)" ]; then
+    echo "Error: Build directory does not exist or is empty. Please run the configure script first."
+    exit 1
+fi
+
+# If there's ninja files, use ninja to install
+if [ -n "$(ls -A build/build.ninja 2>/dev/null)" ]; then
+    ninja -C build install
+else
+    # Install the project using CMake
+    cmake --install build --prefix "$PREFIX"
+fi
+
+
+# vim:ft=bash

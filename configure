@@ -5,6 +5,8 @@
 # --build-type, --with-llm, --without-llm
 # This script should be run from the root of the Lektra repository.
 
+set -e
+
 BUILD_TYPE="Release"
 LLM="OFF"
 
