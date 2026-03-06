@@ -85,18 +85,14 @@ add_dependencies(mupdf_lib mupdf_external)
 find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent LinguistTools OpenGLWidgets)
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules(DJVULIBRE QUIET ddjvuapi)
-pkg_check_modules(SYNCTEX QUIET synctex)
+pkg_check_modules(DJVULIBRE ddjvuapi)
+pkg_check_modules(SYNCTEX synctex)
 
-if(DJVULIBRE_FOUND)
-    message(STATUS "Found DjVuLibre: ${DJVULIBRE_VERSION}. Compiling with DJVU support.")
-else()
+if(NOT DJVULIBRE_FOUND)
     message(STATUS "DjVuLibre not found, disabling DjVu support")
 endif()
 
-if (SYNCTEX_FOUND)
-    message(STATUS "Found SyncTeX: ${SYNCTEX_VERSION}. Compiling with SyncTeX support.")
-else()
+if (NOT SYNCTEX_FOUND)
     message(STATUS "SyncTeX not found, disabling SyncTeX support.")
 endif()
 
