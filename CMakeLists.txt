@@ -218,6 +218,10 @@ else()
     )
 endif()
 
+if(TARGET lektra_lrelease)
+    add_dependencies(${PROJECT_NAME} lektra_lrelease)
+endif()
+
 # qt_add_translations(
 #     TARGETS ${PROJECT_NAME}         # Target that will use the .qm files
 #     TS_FILES ${TRANSLATION_FILES}   # Explicit .ts files
