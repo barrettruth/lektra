@@ -55,6 +55,12 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
+# Check if thirdparty mupdf directory exists and is not empty
+if [ ! -d "thirdparty/mupdf" ] || [ -z "$(ls -A "thirdparty/mupdf")" ]; then
+    echo "Error: The directory 'thirdparty/mupdf' does not exist or is empty."
+    git submodule update --init --recursive
+fi
+
 # Create the build directory if it doesn't exist
 mkdir -p build
 
