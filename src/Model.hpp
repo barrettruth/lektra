@@ -407,10 +407,6 @@ public:
         const RenderJob &job,
         const std::function<void(PageRenderResult)> &callback) noexcept;
     PageRenderResult renderPageWithExtrasAsync(const RenderJob &job) noexcept;
-
-    // fz_pixmap *hitTestImage(int pageno, QPointF pt, float zoom,
-    //                         float rotation) noexcept;
-
     std::vector<std::pair<QString, QString>> properties() noexcept;
     fz_outline *getOutline() noexcept;
     void cancelOpen() noexcept;
@@ -705,8 +701,6 @@ private:
     fz_outline *m_outline{nullptr};
 
 #ifdef HAS_DJVU
-
-    // DJVU core objects
     ddjvu_context_t *m_ddjvu_ctx{nullptr};
     ddjvu_document_t *m_ddjvu_doc{nullptr};
 #endif

@@ -4765,3 +4765,23 @@ DocumentView::Toggle_comment_markers() noexcept
         }
     }
 }
+
+void
+DocumentView::set_portal(DocumentView *portal) noexcept
+{
+    m_portal_view = portal;
+    portal->set_source(this);
+    portal->m_gview->setPortal(true);
+}
+
+void
+DocumentView::clear_portal() noexcept
+{
+    if (m_portal_view)
+    {
+        m_portal_view->clear_source();
+        m_portal_view->m_gview->setPortal(false);
+        m_portal_view = nullptr;
+    }
+    // TODO: Maybe notify views that the portal was cleared
+}

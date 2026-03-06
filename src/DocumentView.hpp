@@ -251,24 +251,6 @@ public:
         return m_portal_view;
     }
 
-    inline void set_portal(DocumentView *portal) noexcept
-    {
-        m_portal_view = portal;
-        portal->set_source(this);
-        portal->m_gview->setPortal(true);
-    }
-
-    inline void clear_portal() noexcept
-    {
-        if (m_portal_view)
-        {
-            m_portal_view->clear_source();
-            m_portal_view->m_gview->setPortal(false);
-            m_portal_view = nullptr;
-        }
-        // TODO: Maybe notify views that the portal was cleared
-    }
-
     inline void setActive(bool state) noexcept
     {
         m_gview->setActive(state);
@@ -285,6 +267,8 @@ public:
         return m_visual_line_mode;
     }
 
+    void set_portal(DocumentView *portal) noexcept;
+    void clear_portal() noexcept;
     void set_visual_line_mode(bool state) noexcept;
     void FollowLink(const Model::LinkInfo &info) noexcept;
     void setInvertColor(bool invert) noexcept;
@@ -469,6 +453,7 @@ private:
     void updateSceneRect() noexcept;
     void initConnections() noexcept;
     void resetConnections() noexcept;
+    QGraphicsPathItem *ensureSearchItemForPage(int pageno) noexcept;
 
     std::set<int> getPreloadPages() noexcept;
     const std::set<int> &getVisiblePages() noexcept;
@@ -479,7 +464,6 @@ private:
     void renderSearchHitsForPage(int pageno) noexcept;
     void renderSearchHitsInScrollbar() noexcept;
     void clearSearchHits() noexcept;
-    QGraphicsPathItem *ensureSearchItemForPage(int pageno) noexcept;
     QGraphicsPathItem *m_current_search_hit_item{nullptr};
     QSizeF pageSceneSize(int pageno) const noexcept;
     std::vector<Annotation *> annotationsInArea(int pageno,
@@ -529,7 +513,6 @@ private:
     std::vector<PageLocation> m_loc_history;
     int m_loc_history_index{-1};
     bool m_is_modified{false};
-    // fz_pixmap *m_hit_pixmap{nullptr};
     LayoutMode m_layout_mode{LayoutMode::VERTICAL};
     WaitingSpinnerWidget *m_spinner{nullptr};
     bool m_visible_pages_dirty{true};
