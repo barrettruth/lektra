@@ -26,6 +26,25 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(MUPDF_INSTALL_DIR "${CMAKE_BINARY_DIR}/mupdf-install")
+
+# Get the version from the mupdf source if possible
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/include/mupdf/fitz/version.h")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/include/mupdf/fitz/version.h" MUPDF_VERSION_CONTENTS)
+    string(REGEX MATCH "#define FZ_VERSION \"([^\"]+)\"" _ ${MUPDF_VERSION_CONTENTS})
+    if (CMAKE_MATCH_1)
+        set(MUPDF_VERSION "${CMAKE_MATCH_1}")
+    else()
+        message(FATAL_ERROR "Could not find MuPDF version in source. Please ensure the mupdf submodule is initialized and try again.")
+    endif()
+    set(MUPDF_FOUND TRUE)
+    set(MUPDF_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/include")
+    set(MUPDF_LIBRARIES
+        "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+        "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
+    )
+endif()
+
 # set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -fsanitize=address -Wall -Wextra)
 set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -Wall -Wextra)
 set(RELEASE_FLAGS -O3 -DNDEBUG -fno-rtti)
@@ -35,18 +54,39 @@ set(REL_WITH_DEB_INFO -O2 -g -fno-omit-frame-pointer -DNDEBUG)
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer -DNDEBUG")
 
+include(ExternalProject)
+ExternalProject_Add(mupdf_external
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND
+        make -C <SOURCE_DIR>
+        XCFLAGS=-fPIC
+        USE_TESSERACT=no
+        USE_CURL=no
+        USE_X11=no
+        USE_GLUT=no
+        prefix=${MUPDF_INSTALL_DIR}
+    INSTALL_COMMAND
+        make -C <SOURCE_DIR>
+        prefix=${MUPDF_INSTALL_DIR}
+        install
+    BUILD_BYPRODUCTS
+        "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+        "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
+    UPDATE_COMMAND ""
+)
+add_library(mupdf_lib STATIC IMPORTED GLOBAL)
+set_target_properties(mupdf_lib PROPERTIES
+    IMPORTED_LOCATION "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+    INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
+)
+add_dependencies(mupdf_lib mupdf_external)
+
 find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent LinguistTools OpenGLWidgets)
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules(MUPDF REQUIRED mupdf>=1.19.0)
 pkg_check_modules(DJVULIBRE QUIET ddjvuapi)
 pkg_check_modules(SYNCTEX QUIET synctex)
-
-if (MUPDF_FOUND)
-    message(STATUS "Found MuPDF: ${MUPDF_VERSION}. Compiling with MuPDF support.")
-else()
-    message(FATAL_ERROR "MuPDF not found. Please install MuPDF (>=1.19.0) development files to enable PDF support.")
-endif()
 
 if(DJVULIBRE_FOUND)
     message(STATUS "Found DjVuLibre: ${DJVULIBRE_VERSION}. Compiling with DJVU support.")
@@ -158,6 +198,8 @@ qt_add_resources(RESOURCES resources.qrc)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/include # Include generated headers like TranslationsDir.hpp
+    # Include thirdparty folder
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
@@ -168,8 +210,9 @@ target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 
 if (MUPDF_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${MUPDF_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE mupdf_lib "${MUPDF_INSTALL_DIR}/lib/libmupdf.a" "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a")
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
+    add_dependencies(${PROJECT_NAME} mupdf_external)
 endif()
 
 if(SYNCTEX_FOUND)
