@@ -869,7 +869,7 @@ Lektra::initConfig() noexcept
     if (auto outline = toml["outline"])
     {
         set(outline["indent_width"], m_config.outline.indent_width);
-        set(outline["show_page_numbers"], m_config.outline.show_page_numbers);
+        set(outline["show_page_numbers"], m_config.outline.show_page_number);
     }
 
     // Highlight Search

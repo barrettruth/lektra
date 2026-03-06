@@ -5,7 +5,6 @@ OutlinePicker::OutlinePicker(const Config::Outline &config,
     : Picker(parent), m_config(config)
 {
     // Configure the columns for the new populate() logic
-    m_listView-
     if (config.show_page_number)
     {
         setColumns({{.header = tr("Title"), .stretch = 1},
@@ -54,7 +53,7 @@ OutlinePicker::collectItems()
     QList<Item> items;
     items.reserve(static_cast<int>(m_entries.size()));
 
-    if (m_config.show_page_numbers)
+    if (m_config.show_page_number)
     {
         for (size_t i = 0; i < m_entries.size(); ++i)
         {
