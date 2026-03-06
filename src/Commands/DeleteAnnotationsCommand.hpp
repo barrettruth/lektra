@@ -150,7 +150,7 @@ private:
         }
         fz_always(ctx)
         {
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
             pdf_drop_page(ctx, page);
 #else
             fz_drop_page(m_ctx, (fz_page *)page);

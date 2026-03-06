@@ -1757,7 +1757,7 @@ Model::addHighlightAnnotation(const int pageno,
     fz_always(m_ctx)
     {
         pdf_drop_annot(m_ctx, annot);
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -1826,7 +1826,7 @@ Model::addRectAnnotation(const int pageno, const fz_rect &rect,
     fz_always(m_ctx)
     {
         pdf_drop_annot(m_ctx, annot);
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -1900,7 +1900,7 @@ Model::addTextAnnotation(const int pageno, const fz_rect &rect,
     fz_always(m_ctx)
     {
         pdf_drop_annot(m_ctx, annot);
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -1945,7 +1945,7 @@ Model::getAnnotComment(const int pageno, const int objNum) noexcept
             break;
         }
 
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -1988,7 +1988,7 @@ Model::addAnnotComment(const int pageno, const int objNum,
     }
     fz_always(m_ctx)
     {
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -2075,7 +2075,7 @@ Model::removeAnnotations(int pageno, const std::vector<int> &objNums) noexcept
             emit reloadRequested(pageno);
         }
 
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -2570,7 +2570,7 @@ Model::collect_annot_comments() noexcept
         }
         fz_always(m_ctx)
         {
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
             pdf_drop_page(m_ctx, pdfPage);
 #else
             fz_drop_page(m_ctx, (fz_page *)pdfPage);
@@ -2657,7 +2657,7 @@ Model::collectHighlightTexts(bool groupByLine) noexcept
         }
         fz_always(m_ctx)
         {
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
             pdf_drop_page(m_ctx, pdfPage);
 #else
             fz_drop_page(m_ctx, (fz_page *)pdfPage);
@@ -2764,7 +2764,7 @@ Model::annotChangeColor(int pageno, int index, const QColor &color) noexcept
             break;
         }
 
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -2823,7 +2823,7 @@ Model::getAnnotColor(const int pageno, const int objNum) noexcept
             break;
         }
 
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
         pdf_drop_page(m_ctx, page);
 #else
         fz_drop_page(m_ctx, (fz_page *)page);
@@ -3464,7 +3464,7 @@ Model::get_obj_num_at_rect(int pageno, fz_rect targetRect) noexcept
             break;
         }
     }
-#if FZ_VERSION_MINOR >= 23
+#if FZ_VERSION_MINOR >= 19
     pdf_drop_page(m_ctx, page);
 #else
     fz_drop_page(m_ctx, (fz_page *)page);
