@@ -3076,7 +3076,7 @@ Lektra::eventFilter(QObject *object, QEvent *event)
     const QEvent::Type type = event->type();
 
     // Link Hint Handle Key Press
-    if (m_link_hint_mode && event->type() == QEvent::KeyPress)
+    if (m_link_hint_mode)
         return handleLinkHintEvent(event);
 
     // Context menu for the tab widgets
