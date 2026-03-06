@@ -1,0 +1,67 @@
+#!/bin/sh
+# Lektra configuration script
+# This script is used to configure Lektra for the current system.
+# I need flags that specify turning on or off features, which are flags that are passed to cmake
+# --build-type, --with-llm, --without-llm
+# This script should be run from the root of the Lektra repository.
+
+BUILD_TYPE="Release"
+LLM="OFF"
+
+print_help() {
+    cat <<EOF
+Usage: ./configure [OPTIONS]
+
+Options:
+  --build-type TYPE     Set the CMake build type [default: Release]
+                        Valid values: Debug, Release, RelWithDebInfo
+  --with-llm            Enable LLM support
+  --without-llm         Disable LLM support [default]
+  -h, --help            Show this help message and exit
+
+Examples:
+  ./configure
+  ./configure --build-type Debug
+  ./configure --build-type Release --with-llm
+EOF
+}
+
+# Check for the arguments
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --build-type)
+            BUILD_TYPE="$2"
+            shift 2
+            ;;
+        --with-llm)
+            LLM="ON"
+            shift 1
+            ;;
+        --without-llm)
+            LLM="OFF"
+            shift 1
+            ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Run './configure --help' for usage."
+            exit 1
+            ;;
+    esac
+done
+
+# Create the build directory if it doesn't exist
+mkdir -p build
+
+# If `ninja` is available, use it as the generator for CMake
+if command -v ninja > /dev/null 2>&1; then
+    export CMAKE_GENERATOR="Ninja"
+fi
+
+# Run cmake with the specified options
+cmake -S . -B build -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DENABLE_LLM_SUPPORT="$LLM"
+
+# vim:ft=bash
