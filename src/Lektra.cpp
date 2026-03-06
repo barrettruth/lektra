@@ -9,8 +9,8 @@
 #include "SearchBar.hpp"
 #include "StartupWidget.hpp"
 #include "TabBar.hpp"
-#include "utils.hpp"
 #include "toml.hpp"
+#include "utils.hpp"
 
 #include <QColorDialog>
 #include <QDesktopServices>
