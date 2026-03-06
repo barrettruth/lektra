@@ -3,6 +3,8 @@ project(lektra VERSION 0.6.6 LANGUAGES CXX)
 
 option(ENABLE_LLM_SUPPORT "Enable LLM support for advanced features" OFF)
 
+include(GNUInstallDirs)
+
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 endif()
@@ -36,15 +38,26 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer -DNDEBUG")
 find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent LinguistTools OpenGLWidgets)
 find_package(PkgConfig REQUIRED)
 
+pkg_check_modules(MUPDF REQUIRED mupdf>=1.25.0)
 pkg_check_modules(DJVULIBRE QUIET ddjvuapi)
 pkg_check_modules(LIBSYNCTEX QUIET synctex)
 
-include(GNUInstallDirs)
+if (MUPDF_FOUND)
+    message(STATUS "Found MuPDF: ${MUPDF_VERSION}. Compiling with MuPDF support.")
+else()
+    message(FATAL_ERROR "MuPDF not found. Please install MuPDF (>=1.25.0) development files to enable PDF support.")
+endif()
 
 if(DJVULIBRE_FOUND)
-    message(STATUS "Found DjVuLibre. Compiling with DJVU support.")
+    message(STATUS "Found DjVuLibre: ${DJVULIBRE_VERSION}. Compiling with DJVU support.")
 else()
     message(STATUS "DjVuLibre not found, disabling DjVu support")
+endif()
+
+if (LIBSYNCTEX_FOUND)
+    message(STATUS "Found SyncTeX: ${SYNCTEX_VERSION}. Compiling with SyncTeX support.")
+else()
+    message(STATUS "SyncTeX not found, disabling SyncTeX support.")
 endif()
 
 add_executable(${PROJECT_NAME}
@@ -144,19 +157,25 @@ qt_add_resources(RESOURCES resources.qrc)
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/external/mupdf/include # Include MuPDF headers
     ${CMAKE_CURRENT_BINARY_DIR}/include # Include generated headers like TranslationsDir.hpp
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 
+# ------------------------------
+# Link Libraries
+# ------------------------------
+
+if (MUPDF_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${MUPDF_LIBRARIES})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
+endif()
+
 if(LIBSYNCTEX_FOUND)
-    message(STATUS "Found SyncTex: ${synctex_VERSION}. Compiling with SyncTeX support.")
     target_include_directories(${PROJECT_NAME} PRIVATE "${SYNCTEX_INCLUDE_DIR}")
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_SYNCTEX=1)
     target_link_libraries(${PROJECT_NAME} PRIVATE synctex)
-else()
-    message(STATUS "SyncTeX not found.")
 endif()
 
 if (DJVULIBRE_FOUND)
@@ -210,9 +229,6 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent Qt6::OpenGLWidgets
-    ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf.a
-    ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-third.a
-    ${CMAKE_SOURCE_DIR}/external/mupdf/build/release/libmupdf-threads.a
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
