@@ -207,9 +207,13 @@ if(Qt6LinguistTools_VERSION VERSION_GREATER_EQUAL "6.7")
         QM_FILES_OUTPUT_VARIABLE QM_FILES
     )
 else()
+    foreach(ts_file ${TRANSLATION_FILES})
+        set_source_files_properties(${ts_file} PROPERTIES
+            OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/translations"
+        )
+    endforeach()
     qt_add_translations(${PROJECT_NAME}
         TS_FILES ${TRANSLATION_FILES}
-        QM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/translations"
         QM_FILES_OUTPUT_VARIABLE QM_FILES
     )
 endif()
