@@ -17,6 +17,7 @@ add_compile_definitions(
     APP_NAME="${PROJECT_NAME}"
 )
 
+message(STATUS "Installation prefix: ${CMAKE_INSTALL_PREFIX}")
 set(PREFIX "${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
