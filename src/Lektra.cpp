@@ -10,6 +10,7 @@
 #include "StartupWidget.hpp"
 #include "TabBar.hpp"
 #include "utils.hpp"
+#include "toml.hpp"
 
 #include <QColorDialog>
 #include <QDesktopServices>
@@ -1286,7 +1287,7 @@ Lektra::initGui() noexcept
 
     initMenubar();
 
-    m_marks_manager = new MarkManager(this);
+    m_marks_manager = std::make_unique<MarkManager>(this);
 }
 
 // Updates the UI elements checking if valid
@@ -1361,7 +1362,7 @@ Lektra::updateUiEnabledState() noexcept
 void
 Lektra::setupKeybinding(const QString &action, const QString &key) noexcept
 {
-    if (const Command *command = m_command_manager.find(action))
+    if (const Command *command = m_command_manager->find(action))
     {
 #ifndef NDEBUG
         qDebug() << "Keybinding set:" << action << "->" << key;
@@ -1429,7 +1430,8 @@ Lektra::setupKeybinding(const QString &action, const QString &key) noexcept
 //         MouseBindKey key = get_mouse_bind_key(trigger);
 //         if (key.button == Qt::NoButton)
 //         {
-//             qWarning() << "Invalid mouse binding for action" << action << ": "
+//             qWarning() << "Invalid mouse binding for action" << action << ":
+//             "
 //                        << trigger;
 //             return;
 //         }
@@ -3808,320 +3810,328 @@ void
 Lektra::initCommands() noexcept
 {
     // Selection
-    m_command_manager.reg("selection_copy",
-                          tr("Copy current selection to clipboard"),
-                          [this](const QStringList &) { Selection_copy(); });
-    m_command_manager.reg("selection_cancel",
-                          tr("Cancel and clear current selection"),
-                          [this](const QStringList &) { Selection_cancel(); });
-    m_command_manager.reg(
+    m_command_manager = std::make_unique<CommandManager>();
+
+    m_command_manager->reg("selection_copy",
+                           tr("Copy current selection to clipboard"),
+                           [this](const QStringList &) { Selection_copy(); });
+    m_command_manager->reg("selection_cancel",
+                           tr("Cancel and clear current selection"),
+                           [this](const QStringList &) { Selection_cancel(); });
+    m_command_manager->reg(
         "selection_last", tr("Reselect the last text selection"),
         [this](const QStringList &) { ReselectLastTextSelection(); });
 
     // Toggles
-    m_command_manager.reg("presentation_mode", tr("Toggle presentation mode"),
-                          [this](const QStringList &)
+    m_command_manager->reg("presentation_mode", tr("Toggle presentation mode"),
+                           [this](const QStringList &)
     { Toggle_presentation_mode(); });
-    m_command_manager.reg("fullscreen", tr("Toggle fullscreen"),
-                          [this](const QStringList &) { ToggleFullscreen(); });
-    m_command_manager.reg("command_palette", tr("Open command palette"),
-                          [this](const QStringList &)
+    m_command_manager->reg("fullscreen", tr("Toggle fullscreen"),
+                           [this](const QStringList &) { ToggleFullscreen(); });
+    m_command_manager->reg("command_palette", tr("Open command palette"),
+                           [this](const QStringList &)
     { Show_command_picker(); });
-    m_command_manager.reg("tabs", tr("Toggle tab bar"),
-                          [this](const QStringList &) { ToggleTabBar(); });
-    m_command_manager.reg("menubar", tr("Toggle menu bar"),
-                          [this](const QStringList &) { ToggleMenubar(); });
-    m_command_manager.reg("statusbar", tr("Toggle status bar"),
-                          [this](const QStringList &) { TogglePanel(); });
-    m_command_manager.reg("focus_mode", tr("Toggle focus mode"),
-                          [this](const QStringList &) { ToggleFocusMode(); });
-    m_command_manager.reg("visual_line_mode", tr("Toggle visual line mode"),
-                          [this](const QStringList &)
+    m_command_manager->reg("tabs", tr("Toggle tab bar"),
+                           [this](const QStringList &) { ToggleTabBar(); });
+    m_command_manager->reg("menubar", tr("Toggle menu bar"),
+                           [this](const QStringList &) { ToggleMenubar(); });
+    m_command_manager->reg("statusbar", tr("Toggle status bar"),
+                           [this](const QStringList &) { TogglePanel(); });
+    m_command_manager->reg("focus_mode", tr("Toggle focus mode"),
+                           [this](const QStringList &) { ToggleFocusMode(); });
+    m_command_manager->reg("visual_line_mode", tr("Toggle visual line mode"),
+                           [this](const QStringList &)
     { Toggle_visual_line_mode(); });
-    m_command_manager.reg(
+    m_command_manager->reg(
         "toggle_comment_markers", tr("Toggle comment markers"),
         [this](const QStringList &) { Toggle_comment_markers(); });
 
 #ifdef ENABLE_LLM_SUPPORT
-    m_command_manager.reg("llm_widget", tr("Toggle LLM assistant widget"),
-                          [this](const QStringList &) { ToggleLLMWidget(); });
+    m_command_manager->reg("llm_widget", tr("Toggle LLM assistant widget"),
+                           [this](const QStringList &) { ToggleLLMWidget(); });
 #endif
 
     // Link hints
-    m_command_manager.reg("link_hint_visit",
-                          tr("Open link using keyboard hint"),
-                          [this](const QStringList &) { VisitLinkKB(); });
-    m_command_manager.reg("link_hint_copy",
-                          tr("Copy link URL using keyboard hint"),
-                          [this](const QStringList &) { CopyLinkKB(); });
+    m_command_manager->reg("link_hint_visit",
+                           tr("Open link using keyboard hint"),
+                           [this](const QStringList &) { VisitLinkKB(); });
+    m_command_manager->reg("link_hint_copy",
+                           tr("Copy link URL using keyboard hint"),
+                           [this](const QStringList &) { CopyLinkKB(); });
 
     // Page navigation
-    m_command_manager.reg("page_first", tr("Go to first page"),
-                          [this](const QStringList &) { FirstPage(); });
-    m_command_manager.reg("page_last", tr("Go to last page"),
-                          [this](const QStringList &) { LastPage(); });
-    m_command_manager.reg("page_next", tr("Go to next page"),
-                          [this](const QStringList &) { NextPage(); });
-    m_command_manager.reg("page_prev", tr("Go to previous page"),
-                          [this](const QStringList &) { PrevPage(); });
-    m_command_manager.reg("page_goto", tr("Jump to a specific page number"),
-                          [this](const QStringList &) { Goto_page(); });
+    m_command_manager->reg("page_first", tr("Go to first page"),
+                           [this](const QStringList &) { FirstPage(); });
+    m_command_manager->reg("page_last", tr("Go to last page"),
+                           [this](const QStringList &) { LastPage(); });
+    m_command_manager->reg("page_next", tr("Go to next page"),
+                           [this](const QStringList &) { NextPage(); });
+    m_command_manager->reg("page_prev", tr("Go to previous page"),
+                           [this](const QStringList &) { PrevPage(); });
+    m_command_manager->reg("page_goto", tr("Jump to a specific page number"),
+                           [this](const QStringList &) { Goto_page(); });
 
     // Marks
-    m_command_manager.reg("mark_set",
-                          tr("Set a named mark at current position"),
-                          [this](const QStringList &) { SetMark(); });
-    m_command_manager.reg("mark_delete", tr("Delete a named mark"),
-                          [this](const QStringList &) { DeleteMark(); });
-    m_command_manager.reg("mark_goto", tr("Jump to a named mark"),
-                          [this](const QStringList &) { GotoMark(); });
+    m_command_manager->reg("mark_set",
+                           tr("Set a named mark at current position"),
+                           [this](const QStringList &) { SetMark(); });
+    m_command_manager->reg("mark_delete", tr("Delete a named mark"),
+                           [this](const QStringList &) { DeleteMark(); });
+    m_command_manager->reg("mark_goto", tr("Jump to a named mark"),
+                           [this](const QStringList &) { GotoMark(); });
 
     // Scrolling
-    m_command_manager.reg("scroll_down", tr("Scroll down"),
-                          [this](const QStringList &) { ScrollDown(); });
-    m_command_manager.reg("scroll_up", tr("Scroll up"),
-                          [this](const QStringList &) { ScrollUp(); });
-    m_command_manager.reg("scroll_left", tr("Scroll left"),
-                          [this](const QStringList &) { ScrollLeft(); });
-    m_command_manager.reg("scroll_right", tr("Scroll right"),
-                          [this](const QStringList &) { ScrollRight(); });
+    m_command_manager->reg("scroll_down", tr("Scroll down"),
+                           [this](const QStringList &) { ScrollDown(); });
+    m_command_manager->reg("scroll_up", tr("Scroll up"),
+                           [this](const QStringList &) { ScrollUp(); });
+    m_command_manager->reg("scroll_left", tr("Scroll left"),
+                           [this](const QStringList &) { ScrollLeft(); });
+    m_command_manager->reg("scroll_right", tr("Scroll right"),
+                           [this](const QStringList &) { ScrollRight(); });
 
     // Rotation
-    m_command_manager.reg("rotate_clock", tr("Rotate page clockwise"),
-                          [this](const QStringList &) { RotateClock(); });
-    m_command_manager.reg("rotate_anticlock",
-                          tr("Rotate page counter-clockwise"),
-                          [this](const QStringList &) { RotateAnticlock(); });
+    m_command_manager->reg("rotate_clock", tr("Rotate page clockwise"),
+                           [this](const QStringList &) { RotateClock(); });
+    m_command_manager->reg("rotate_anticlock",
+                           tr("Rotate page counter-clockwise"),
+                           [this](const QStringList &) { RotateAnticlock(); });
 
     // Location history
-    m_command_manager.reg("location_prev", tr("Go back in location history"),
-                          [this](const QStringList &) { GoBackHistory(); });
-    m_command_manager.reg("location_next", tr("Go forward in location history"),
-                          [this](const QStringList &) { GoForwardHistory(); });
+    m_command_manager->reg("location_prev", tr("Go back in location history"),
+                           [this](const QStringList &) { GoBackHistory(); });
+    m_command_manager->reg("location_next",
+                           tr("Go forward in location history"),
+                           [this](const QStringList &) { GoForwardHistory(); });
 
     // Zoom
-    m_command_manager.reg("zoom_in", tr("Zoom in"),
-                          [this](const QStringList &) { ZoomIn(); });
-    m_command_manager.reg("zoom_out", tr("Zoom out"),
-                          [this](const QStringList &) { ZoomOut(); });
-    m_command_manager.reg("zoom_reset", tr("Reset zoom to default"),
-                          [this](const QStringList &) { ZoomReset(); });
-    m_command_manager.reg("zoom_set", tr("Set zoom to a specific level"),
-                          [this](const QStringList &) { Zoom_set(); });
+    m_command_manager->reg("zoom_in", tr("Zoom in"),
+                           [this](const QStringList &) { ZoomIn(); });
+    m_command_manager->reg("zoom_out", tr("Zoom out"),
+                           [this](const QStringList &) { ZoomOut(); });
+    m_command_manager->reg("zoom_reset", tr("Reset zoom to default"),
+                           [this](const QStringList &) { ZoomReset(); });
+    m_command_manager->reg("zoom_set", tr("Set zoom to a specific level"),
+                           [this](const QStringList &) { Zoom_set(); });
 
     // Splits
-    m_command_manager.reg("split_horizontal", tr("Split view horizontally"),
-                          [this](const QStringList &) { VSplit(); });
-    m_command_manager.reg("split_vertical", tr("Split view vertically"),
-                          [this](const QStringList &) { HSplit(); });
-    m_command_manager.reg("split_close", tr("Close current split"),
-                          [this](const QStringList &) { Close_split(); });
-    m_command_manager.reg("split_focus_right", tr("Focus split to the right"),
-                          [this](const QStringList &) { Focus_split_right(); });
-    m_command_manager.reg("split_focus_left", tr("Focus split to the left"),
-                          [this](const QStringList &) { Focus_split_left(); });
-    m_command_manager.reg("split_focus_up", tr("Focus split above"),
-                          [this](const QStringList &) { Focus_split_up(); });
-    m_command_manager.reg("split_focus_down", tr("Focus split below"),
-                          [this](const QStringList &) { Focus_split_down(); });
-    m_command_manager.reg(
+    m_command_manager->reg("split_horizontal", tr("Split view horizontally"),
+                           [this](const QStringList &) { VSplit(); });
+    m_command_manager->reg("split_vertical", tr("Split view vertically"),
+                           [this](const QStringList &) { HSplit(); });
+    m_command_manager->reg("split_close", tr("Close current split"),
+                           [this](const QStringList &) { Close_split(); });
+    m_command_manager->reg("split_focus_right", tr("Focus split to the right"),
+                           [this](const QStringList &)
+    { Focus_split_right(); });
+    m_command_manager->reg("split_focus_left", tr("Focus split to the left"),
+                           [this](const QStringList &) { Focus_split_left(); });
+    m_command_manager->reg("split_focus_up", tr("Focus split above"),
+                           [this](const QStringList &) { Focus_split_up(); });
+    m_command_manager->reg("split_focus_down", tr("Focus split below"),
+                           [this](const QStringList &) { Focus_split_down(); });
+    m_command_manager->reg(
         "split_close_others", tr("Close all splits except current"),
         [this](const QStringList &) { Close_other_splits(); });
 
     // Portal
-    m_command_manager.reg("portal", tr("Create or focus portal"),
-                          [this](const QStringList &)
+    m_command_manager->reg("portal", tr("Create or focus portal"),
+                           [this](const QStringList &)
     { Create_or_focus_portal(); });
 
     // File operations
-    m_command_manager.reg("file_open_tab", tr("Open file in new tab"),
-                          [this](const QStringList &) { OpenFileInNewTab(); });
-    m_command_manager.reg("file_open_vsplit", tr("Open file in vertical split"),
-                          [this](const QStringList &) { OpenFileVSplit(); });
-    m_command_manager.reg("file_open_hsplit",
-                          tr("Open file in horizontal split"),
-                          [this](const QStringList &) { OpenFileHSplit(); });
-    m_command_manager.reg("file_open_dwim", tr("Open file (do what I mean)"),
-                          [this](const QStringList &) { OpenFileDWIM(); });
-    m_command_manager.reg("file_close", tr("Close current file"),
-                          [this](const QStringList &) { CloseFile(); });
-    m_command_manager.reg("file_save", tr("Save current file"),
-                          [this](const QStringList &) { SaveFile(); });
-    m_command_manager.reg("file_save_as", tr("Save current file as a new name"),
-                          [this](const QStringList &) { SaveAsFile(); });
-    m_command_manager.reg("file_encrypt", tr("Encrypt current document"),
-                          [this](const QStringList &) { EncryptDocument(); });
-    m_command_manager.reg("file_decrypt", tr("Decrypt current document"),
-                          [this](const QStringList &) { DecryptDocument(); });
-    m_command_manager.reg("file_reload", tr("Reload current file from disk"),
-                          [this](const QStringList &) { reloadDocument(); });
-    m_command_manager.reg("file_properties", tr("Show file properties"),
-                          [this](const QStringList &) { FileProperties(); });
-    m_command_manager.reg("files_recent", tr("Show recently opened files"),
-                          [this](const QStringList &)
+    m_command_manager->reg("file_open_tab", tr("Open file in new tab"),
+                           [this](const QStringList &) { OpenFileInNewTab(); });
+    m_command_manager->reg("file_open_vsplit",
+                           tr("Open file in vertical split"),
+                           [this](const QStringList &) { OpenFileVSplit(); });
+    m_command_manager->reg("file_open_hsplit",
+                           tr("Open file in horizontal split"),
+                           [this](const QStringList &) { OpenFileHSplit(); });
+    m_command_manager->reg("file_open_dwim", tr("Open file (do what I mean)"),
+                           [this](const QStringList &) { OpenFileDWIM(); });
+    m_command_manager->reg("file_close", tr("Close current file"),
+                           [this](const QStringList &) { CloseFile(); });
+    m_command_manager->reg("file_save", tr("Save current file"),
+                           [this](const QStringList &) { SaveFile(); });
+    m_command_manager->reg("file_save_as",
+                           tr("Save current file as a new name"),
+                           [this](const QStringList &) { SaveAsFile(); });
+    m_command_manager->reg("file_encrypt", tr("Encrypt current document"),
+                           [this](const QStringList &) { EncryptDocument(); });
+    m_command_manager->reg("file_decrypt", tr("Decrypt current document"),
+                           [this](const QStringList &) { DecryptDocument(); });
+    m_command_manager->reg("file_reload", tr("Reload current file from disk"),
+                           [this](const QStringList &) { reloadDocument(); });
+    m_command_manager->reg("file_properties", tr("Show file properties"),
+                           [this](const QStringList &) { FileProperties(); });
+    m_command_manager->reg("files_recent", tr("Show recently opened files"),
+                           [this](const QStringList &)
     { Show_recent_files_picker(); });
 
     // Annotation modes
-    m_command_manager.reg("annot_edit_mode",
-                          tr("Toggle annotation select mode"),
-                          [this](const QStringList &) { ToggleAnnotSelect(); });
-    m_command_manager.reg("annot_popup_mode",
-                          tr("Toggle annotation popup mode"),
-                          [this](const QStringList &) { ToggleAnnotPopup(); });
-    m_command_manager.reg("annot_rect_mode",
-                          tr("Toggle rectangle annotation mode"),
-                          [this](const QStringList &) { ToggleAnnotRect(); });
-    m_command_manager.reg(
+    m_command_manager->reg(
+        "annot_edit_mode", tr("Toggle annotation select mode"),
+        [this](const QStringList &) { ToggleAnnotSelect(); });
+    m_command_manager->reg("annot_popup_mode",
+                           tr("Toggle annotation popup mode"),
+                           [this](const QStringList &) { ToggleAnnotPopup(); });
+    m_command_manager->reg("annot_rect_mode",
+                           tr("Toggle rectangle annotation mode"),
+                           [this](const QStringList &) { ToggleAnnotRect(); });
+    m_command_manager->reg(
         "annot_highlight_mode", tr("Toggle text highlight mode"),
         [this](const QStringList &) { ToggleTextHighlight(); });
-    m_command_manager.reg("none_mode", tr("Toggle none interaction mode"),
-                          [this](const QStringList &) { Toggle_none_mode(); });
+    m_command_manager->reg("none_mode", tr("Toggle none interaction mode"),
+                           [this](const QStringList &) { Toggle_none_mode(); });
 
     // Selection modes
-    m_command_manager.reg(
+    m_command_manager->reg(
         "selection_mode_text", tr("Switch to text selection mode"),
         [this](const QStringList &) { ToggleTextSelection(); });
-    m_command_manager.reg(
+    m_command_manager->reg(
         "selection_mode_region", tr("Switch to region selection mode"),
         [this](const QStringList &) { ToggleRegionSelect(); });
 
     // Fit modes
-    m_command_manager.reg("fit_width", tr("Fit page to window width"),
-                          [this](const QStringList &) { Fit_width(); });
-    m_command_manager.reg("fit_height", tr("Fit page to window height"),
-                          [this](const QStringList &) { Fit_height(); });
-    m_command_manager.reg("fit_page", tr("Fit entire page in window"),
-                          [this](const QStringList &) { Fit_page(); });
-    m_command_manager.reg("fit_auto", tr("Toggle automatic resize to fit"),
-                          [this](const QStringList &) { ToggleAutoResize(); });
+    m_command_manager->reg("fit_width", tr("Fit page to window width"),
+                           [this](const QStringList &) { Fit_width(); });
+    m_command_manager->reg("fit_height", tr("Fit page to window height"),
+                           [this](const QStringList &) { Fit_height(); });
+    m_command_manager->reg("fit_page", tr("Fit entire page in window"),
+                           [this](const QStringList &) { Fit_page(); });
+    m_command_manager->reg("fit_auto", tr("Toggle automatic resize to fit"),
+                           [this](const QStringList &) { ToggleAutoResize(); });
 
     // Sessions
-    m_command_manager.reg("session_save", tr("Save current session"),
-                          [this](const QStringList &) { SaveSession(); });
-    m_command_manager.reg("session_save_as",
-                          tr("Save current session under a new name"),
-                          [this](const QStringList &) { SaveAsSession(); });
-    m_command_manager.reg("session_load", tr("Load a saved session"),
-                          [this](const QStringList &) { LoadSession(); });
+    m_command_manager->reg("session_save", tr("Save current session"),
+                           [this](const QStringList &) { SaveSession(); });
+    m_command_manager->reg("session_save_as",
+                           tr("Save current session under a new name"),
+                           [this](const QStringList &) { SaveAsSession(); });
+    m_command_manager->reg("session_load", tr("Load a saved session"),
+                           [this](const QStringList &) { LoadSession(); });
 
     // Tabs
-    m_command_manager.reg("tabs_close_left", tr("Close all tabs to the left"),
-                          [this](const QStringList &) { TabsCloseLeft(); });
-    m_command_manager.reg("tabs_close_right", tr("Close all tabs to the right"),
-                          [this](const QStringList &) { TabsCloseRight(); });
-    m_command_manager.reg("tabs_close_others",
-                          tr("Close all tabs except current"),
-                          [this](const QStringList &) { TabsCloseOthers(); });
-    m_command_manager.reg("tab_move_right", tr("Move current tab right"),
-                          [this](const QStringList &) { TabMoveRight(); });
-    m_command_manager.reg("tab_move_left", tr("Move current tab left"),
-                          [this](const QStringList &) { TabMoveLeft(); });
-    m_command_manager.reg("tab_first", tr("Switch to first tab"),
-                          [this](const QStringList &) { Tab_first(); });
-    m_command_manager.reg("tab_last", tr("Switch to last tab"),
-                          [this](const QStringList &) { Tab_last(); });
-    m_command_manager.reg("tab_next", tr("Switch to next tab"),
-                          [this](const QStringList &) { Tab_next(); });
-    m_command_manager.reg("tab_prev", tr("Switch to previous tab"),
-                          [this](const QStringList &) { Tab_prev(); });
-    m_command_manager.reg("tab_close", tr("Close current tab"),
-                          [this](const QStringList &) { Tab_close(); });
-    m_command_manager.reg("tab_goto", tr("Go to tab by number"),
-                          [this](const QStringList &) { Tab_goto(); });
-    m_command_manager.reg("tab_1", tr("Switch to tab 1"),
-                          [this](const QStringList &) { Tab_goto(1); });
-    m_command_manager.reg("tab_2", tr("Switch to tab 2"),
-                          [this](const QStringList &) { Tab_goto(2); });
-    m_command_manager.reg("tab_3", tr("Switch to tab 3"),
-                          [this](const QStringList &) { Tab_goto(3); });
-    m_command_manager.reg("tab_4", tr("Switch to tab 4"),
-                          [this](const QStringList &) { Tab_goto(4); });
-    m_command_manager.reg("tab_5", tr("Switch to tab 5"),
-                          [this](const QStringList &) { Tab_goto(5); });
-    m_command_manager.reg("tab_6", tr("Switch to tab 6"),
-                          [this](const QStringList &) { Tab_goto(6); });
-    m_command_manager.reg("tab_7", tr("Switch to tab 7"),
-                          [this](const QStringList &) { Tab_goto(7); });
-    m_command_manager.reg("tab_8", tr("Switch to tab 8"),
-                          [this](const QStringList &) { Tab_goto(8); });
-    m_command_manager.reg("tab_9", tr("Switch to tab 9"),
-                          [this](const QStringList &) { Tab_goto(9); });
+    m_command_manager->reg("tabs_close_left", tr("Close all tabs to the left"),
+                           [this](const QStringList &) { TabsCloseLeft(); });
+    m_command_manager->reg("tabs_close_right",
+                           tr("Close all tabs to the right"),
+                           [this](const QStringList &) { TabsCloseRight(); });
+    m_command_manager->reg("tabs_close_others",
+                           tr("Close all tabs except current"),
+                           [this](const QStringList &) { TabsCloseOthers(); });
+    m_command_manager->reg("tab_move_right", tr("Move current tab right"),
+                           [this](const QStringList &) { TabMoveRight(); });
+    m_command_manager->reg("tab_move_left", tr("Move current tab left"),
+                           [this](const QStringList &) { TabMoveLeft(); });
+    m_command_manager->reg("tab_first", tr("Switch to first tab"),
+                           [this](const QStringList &) { Tab_first(); });
+    m_command_manager->reg("tab_last", tr("Switch to last tab"),
+                           [this](const QStringList &) { Tab_last(); });
+    m_command_manager->reg("tab_next", tr("Switch to next tab"),
+                           [this](const QStringList &) { Tab_next(); });
+    m_command_manager->reg("tab_prev", tr("Switch to previous tab"),
+                           [this](const QStringList &) { Tab_prev(); });
+    m_command_manager->reg("tab_close", tr("Close current tab"),
+                           [this](const QStringList &) { Tab_close(); });
+    m_command_manager->reg("tab_goto", tr("Go to tab by number"),
+                           [this](const QStringList &) { Tab_goto(); });
+    m_command_manager->reg("tab_1", tr("Switch to tab 1"),
+                           [this](const QStringList &) { Tab_goto(1); });
+    m_command_manager->reg("tab_2", tr("Switch to tab 2"),
+                           [this](const QStringList &) { Tab_goto(2); });
+    m_command_manager->reg("tab_3", tr("Switch to tab 3"),
+                           [this](const QStringList &) { Tab_goto(3); });
+    m_command_manager->reg("tab_4", tr("Switch to tab 4"),
+                           [this](const QStringList &) { Tab_goto(4); });
+    m_command_manager->reg("tab_5", tr("Switch to tab 5"),
+                           [this](const QStringList &) { Tab_goto(5); });
+    m_command_manager->reg("tab_6", tr("Switch to tab 6"),
+                           [this](const QStringList &) { Tab_goto(6); });
+    m_command_manager->reg("tab_7", tr("Switch to tab 7"),
+                           [this](const QStringList &) { Tab_goto(7); });
+    m_command_manager->reg("tab_8", tr("Switch to tab 8"),
+                           [this](const QStringList &) { Tab_goto(8); });
+    m_command_manager->reg("tab_9", tr("Switch to tab 9"),
+                           [this](const QStringList &) { Tab_goto(9); });
 
     // Pickers
-    m_command_manager.reg("picker_outline", tr("Open document outline picker"),
-                          [this](const QStringList &) { Show_outline(); });
-    m_command_manager.reg(
+    m_command_manager->reg("picker_outline", tr("Open document outline picker"),
+                           [this](const QStringList &) { Show_outline(); });
+    m_command_manager->reg(
         "picker_highlight_search", tr("Search within highlights"),
         [this](const QStringList &) { Show_highlight_search(); });
-    m_command_manager.reg(
+    m_command_manager->reg(
         "picker_annot_comment_search", tr("Search annotation comments"),
         [this](const QStringList &) { Show_annot_comment_search(); });
 
     // Search
-    m_command_manager.reg("search", "Search document",
-                          [this](const QStringList &) { Search(); });
-    m_command_manager.reg("search_regex", tr("Search document using regex"),
-                          [this](const QStringList &) { Search_regex(); });
-    m_command_manager.reg("search_next", tr("Jump to next search result"),
-                          [this](const QStringList &) { NextHit(); });
-    m_command_manager.reg("search_prev", tr("Jump to previous search result"),
-                          [this](const QStringList &) { PrevHit(); });
-    m_command_manager.reg(
+    m_command_manager->reg("search", "Search document",
+                           [this](const QStringList &) { Search(); });
+    m_command_manager->reg("search_regex", tr("Search document using regex"),
+                           [this](const QStringList &) { Search_regex(); });
+    m_command_manager->reg("search_next", tr("Jump to next search result"),
+                           [this](const QStringList &) { NextHit(); });
+    m_command_manager->reg("search_prev", tr("Jump to previous search result"),
+                           [this](const QStringList &) { PrevHit(); });
+    m_command_manager->reg(
         "search_args", tr("Search with inline query argument"),
         [this](const QStringList &args) { search(args.join(" ")); });
 
     // Layout modes
-    m_command_manager.reg("layout_single", tr("Single page layout"),
-                          [this](const QStringList &)
+    m_command_manager->reg("layout_single", tr("Single page layout"),
+                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::SINGLE); });
-    m_command_manager.reg("layout_horizontal",
-                          tr("Horizontal (left to right) layout"),
-                          [this](const QStringList &)
+    m_command_manager->reg("layout_horizontal",
+                           tr("Horizontal (left to right) layout"),
+                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::HORIZONTAL); });
-    m_command_manager.reg("layout_vertical",
-                          tr("Vertical (top to bottom) layout"),
-                          [this](const QStringList &)
+    m_command_manager->reg("layout_vertical",
+                           tr("Vertical (top to bottom) layout"),
+                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::VERTICAL); });
-    m_command_manager.reg("layout_book", tr("Book (two page spread) layout"),
-                          [this](const QStringList &)
+    m_command_manager->reg("layout_book", tr("Book (two page spread) layout"),
+                           [this](const QStringList &)
     { SetLayoutMode(DocumentView::LayoutMode::BOOK); });
 
     // Miscellaneous
-    m_command_manager.reg("set_dpr", tr("Set device pixel ratio"),
-                          [this](const QStringList &) { SetDPR(); });
-    m_command_manager.reg(
+    m_command_manager->reg("set_dpr", tr("Set device pixel ratio"),
+                           [this](const QStringList &) { SetDPR(); });
+    m_command_manager->reg(
         "open_containing_folder", tr("Open folder containing current file"),
         [this](const QStringList &) { OpenContainingFolder(); });
-    m_command_manager.reg("undo", tr("Undo last action"),
-                          [this](const QStringList &) { Undo(); });
-    m_command_manager.reg("redo", tr("Redo last undone action"),
-                          [this](const QStringList &) { Redo(); });
-    m_command_manager.reg(
+    m_command_manager->reg("undo", tr("Undo last action"),
+                           [this](const QStringList &) { Undo(); });
+    m_command_manager->reg("redo", tr("Redo last undone action"),
+                           [this](const QStringList &) { Redo(); });
+    m_command_manager->reg(
         "highlight_selection", tr("Highlight current text selection"),
         [this](const QStringList &) { TextHighlightCurrentSelection(); });
-    m_command_manager.reg("invert_color",
-                          tr("Toggle inverted colour rendering"),
-                          [this](const QStringList &) { InvertColor(); });
-    m_command_manager.reg(
+    m_command_manager->reg("invert_color",
+                           tr("Toggle inverted colour rendering"),
+                           [this](const QStringList &) { InvertColor(); });
+    m_command_manager->reg(
         "reshow_jump_marker", tr("Re-show the last jump marker"),
         [this](const QStringList &) { Reshow_jump_marker(); });
-    m_command_manager.reg(
+    m_command_manager->reg(
         "reopen_last_closed_file", tr("Reopen last closed file"),
         [this](const QStringList &) { Reopen_last_closed_file(); });
-    m_command_manager.reg("copy_page_image", tr("Copy current page as image"),
-                          [this](const QStringList &) { Copy_page_image(); });
+    m_command_manager->reg("copy_page_image", tr("Copy current page as image"),
+                           [this](const QStringList &) { Copy_page_image(); });
 #ifndef NDEBUG
-    m_command_manager.reg("debug_command", tr("Run debug command"),
-                          [this](const QStringList &) { debug_command(); });
+    m_command_manager->reg("debug_command", tr("Run debug command"),
+                           [this](const QStringList &) { debug_command(); });
 #endif
 
     // Help / About
-    m_command_manager.reg("show_startup_widget", tr("Show startup screen"),
-                          [this](const QStringList &) { showStartupWidget(); });
-    m_command_manager.reg("show_tutorial_file", tr("Open tutorial document"),
-                          [this](const QStringList &) { showTutorialFile(); });
-    m_command_manager.reg("show_about", tr("Show about dialog"),
-                          [this](const QStringList &) { ShowAbout(); });
+    m_command_manager->reg("show_startup_widget", tr("Show startup screen"),
+                           [this](const QStringList &)
+    { showStartupWidget(); });
+    m_command_manager->reg("show_tutorial_file", tr("Open tutorial document"),
+                           [this](const QStringList &) { showTutorialFile(); });
+    m_command_manager->reg("show_about", tr("Show about dialog"),
+                           [this](const QStringList &) { ShowAbout(); });
 }
 
 // Trims the recent files store to `num_recent_files` number of files
@@ -4592,7 +4602,7 @@ Lektra::Show_command_picker() noexcept
     if (!m_command_picker)
     {
         m_command_picker = new CommandPicker(m_config.command_palette,
-                                             m_command_manager.commands(),
+                                             m_command_manager->commands(),
                                              m_config.keybinds, this);
         m_command_picker->setKeybindings(m_picker_keybinds);
     }
