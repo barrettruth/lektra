@@ -2213,7 +2213,7 @@ Lektra::OpenFileInNewTab(const QString &filename,
     // }
 
     // Create a new DocumentView
-    DocumentView *view = new DocumentView(m_config, this);
+    DocumentView *view = new DocumentView(m_config, m_dpr, this);
 
     // Create a DocumentContainer with this view
     DocumentContainer *container = new DocumentContainer(view, this);
@@ -2250,10 +2250,6 @@ Lektra::OpenFileInNewTab(const QString &filename,
 
     // Initialize connections for the initial view
     initTabConnections(view);
-
-    // Set DPR BEFORE opening the file to ensure correct resolution
-    // rendering
-    view->setDPR(m_dpr);
 
     // Open the file asynchronously
     view->openAsync(filename);

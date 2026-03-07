@@ -57,7 +57,8 @@ class DocumentView : public QWidget
     Q_OBJECT
 public:
     using Id = uint32_t;
-    DocumentView(const Config &config, QWidget *parent = nullptr) noexcept;
+    DocumentView(const Config &config, const float dpr = 1.0f,
+                 QWidget *parent = nullptr) noexcept;
     ~DocumentView() noexcept;
 
     inline Id id() const noexcept

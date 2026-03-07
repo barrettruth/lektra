@@ -341,7 +341,7 @@ DocumentContainer::createViewFromTemplate(DocumentView *templateView) noexcept
     if (!templateView)
         return nullptr;
 
-    DocumentView *newView = new DocumentView(templateView->config(), this);
+    DocumentView *newView = new DocumentView(templateView->config(), templateView->dpr(), this);
     newView->setContainer(this);
     newView->setDPR(templateView->dpr());
     newView->setInvertColor(templateView->invertColor());

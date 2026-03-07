@@ -52,7 +52,8 @@ g_newId() noexcept
     return nextId++;
 }
 
-DocumentView::DocumentView(const Config &config, QWidget *parent) noexcept
+DocumentView::DocumentView(const Config &config, float dpr,
+                           QWidget *parent) noexcept
     : QWidget(parent), m_id(g_newId()), m_config(config)
 {
 #ifndef NDEBUG
@@ -60,6 +61,8 @@ DocumentView::DocumentView(const Config &config, QWidget *parent) noexcept
 #endif
 
     m_model = new Model(m_config, this);
+    m_model->setDPR(dpr);
+
     connect(m_model, &Model::openFileFailed, this,
             [this]() { emit openFileFailed(this); });
 
