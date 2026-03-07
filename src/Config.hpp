@@ -1015,4 +1015,27 @@ struct Config
 #endif
     } behavior{};
     // @endsection
+
+
+    // Just for documentation parsing, do not remove
+
+    // @section MouseBindings
+    // @section_type struct
+    // @section_added 0.6.6
+    // @section_desc {
+    // Mouse binding options struct<br>
+    // <p>Valid commands are:
+    // <ul>
+    // <li><code class="inline">synctex_jump</code> - Takes to the source code if opened in SyncTeX mode</li>
+    // <li><code class="inline">portal</code> - Opens a portal pointing to the clicked link</li>
+    // </ul>
+    // Example of how to define a mouse binding in the config file:</p>
+    // <pre><code class="language-toml">
+    // [mousebindings]&#10;
+    // # Format: mouse_command_name = "Modifier(s)+MouseButton"&#10;
+    // synctex_jump = "Shift+LeftButton"
+    // </code></pre>
+    // }
+    // @endsection
+
 };
