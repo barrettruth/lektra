@@ -11,11 +11,25 @@
 
 struct Config
 {
-    QHash<QString, QString> keybinds{};
-    // QHash<MouseBindKey, QString> mousebinds{};
+    struct MouseBinding
+    {
+        Qt::MouseButton button           = Qt::NoButton;
+        Qt::KeyboardModifiers modifiers  = Qt::NoModifier;
+        GraphicsView::MouseAction action = GraphicsView::MouseAction::None;
 
-    // *NOTE*: Colors can be specified in hex format (e.g. #RRGGBBAA) or as a
-    // color name
+        inline bool isValid() const noexcept
+        {
+            return button != Qt::NoButton;
+        }
+    };
+
+    QHash<QString, QString> keybinds;
+    std::vector<MouseBinding> mousebinds{
+        {Qt::LeftButton, Qt::ShiftModifier,
+         GraphicsView::MouseAction::SynctexJump},
+        {Qt::LeftButton, Qt::ControlModifier,
+         GraphicsView::MouseAction::Portal},
+    };
 
     // @section Page
     // @section_desc Page options struct

@@ -4,6 +4,11 @@
 
 ### Features
 
+- Add mousebindings to allow users to configure mouse interactions (e.g. mouse click, double click, right click, mouse wheel, etc.) with different modifiers (e.g. Ctrl, Shift, Alt) to trigger different mouse related commands.
+    **Mouse commands**:
+    - `portal` - open link in portal (ctrl + click on link)
+    - `syntex_jump` - jump to source location in synctex enabled PDFs
+
 - Add `backend` option in `[rendering]` section of the config to choose between "auto", "opengl" and "raster" rendering backends. The "auto" option will choose the best available backend based on the system capabilities, with a preference for OpenGL when available for better performance.
 
 ```toml

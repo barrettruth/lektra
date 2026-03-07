@@ -2717,6 +2717,9 @@ DocumentView::resizeEvent(QResizeEvent *event)
     if (m_resize_timer)
         m_resize_timer->start();
 
+    // Update the text selection path item to shift with the viewport during
+    // resize, so it remains correctly aligned
+
     QWidget::resizeEvent(event);
 }
 

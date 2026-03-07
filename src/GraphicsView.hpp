@@ -18,6 +18,7 @@ class GraphicsView : public QGraphicsView
 public:
     enum class Mode
     {
+        None,
         VisualLine,
         RegionSelection,
         TextSelection,
@@ -26,8 +27,14 @@ public:
         AnnotRect,
         AnnotPopup,
         AnnotPen,
-        None,
         COUNT
+    };
+
+    enum class MouseAction
+    {
+        None,
+        SynctexJump, // e.g. Shift+click in TextSelection mode
+        Portal,      // e.g. Ctrl+click on a link item
     };
 
     explicit GraphicsView(const Config &config, QWidget *parent = nullptr);
@@ -155,9 +162,9 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void wheelEvent(QWheelEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
     void enterEvent(QEnterEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void scrollContentsBy(int dx, int dy) override;
@@ -167,10 +174,6 @@ private slots:
     bool handleTouchpadGesture(QNativeGestureEvent *event);
 
 private:
-    void updateCursorForMode() noexcept;
-    void onScrollbarActivity() noexcept;
-    void applyBackend() noexcept;
-
     inline void setActive(bool state) noexcept
     {
         m_is_active = state;
@@ -181,11 +184,6 @@ private:
         return m_is_active;
     }
 
-    // Overlay scrollbar helpers (optimized)
-    void updateScrollbars();
-    void layoutScrollbars();
-    QScrollBar *scrollbarAt(const QPoint &pos) const noexcept;
-    void forwardMouseEvent(QScrollBar *bar, QMouseEvent *event);
     inline void showScrollbars()
     {
         if (!m_scrollbarsVisible)
@@ -194,6 +192,7 @@ private:
             updateScrollbars();
         }
     }
+
     inline void hideScrollbars()
     {
         if (m_scrollbarsVisible)
@@ -202,11 +201,22 @@ private:
             updateScrollbars();
         }
     }
+
     inline void restartHideTimer()
     {
         if (m_autoHide && !m_activeScrollbar)
             m_scrollbar_hide_timer.start();
     }
+
+    void updateCursorForMode() noexcept;
+    void onScrollbarActivity() noexcept;
+    void applyBackend() noexcept;
+    void updateScrollbars();
+    void layoutScrollbars();
+    QScrollBar *scrollbarAt(const QPoint &pos) const noexcept;
+    void forwardMouseEvent(QScrollBar *bar, QMouseEvent *event);
+    MouseAction resolveMouseAction(Qt::MouseButton button,
+                                   Qt::KeyboardModifiers mods) const noexcept;
 
     QRect m_rect;
     QPoint m_start;
