@@ -180,6 +180,7 @@ public:
 #endif
 
 protected:
+    void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *e) override;
     bool eventFilter(QObject *object, QEvent *event) override;
     void dropEvent(QDropEvent *event) noexcept override;
@@ -289,7 +290,6 @@ private:
         const argparse::ArgumentParser &argparser) noexcept;
     DocumentView *create_portal(DocumentView *sourceView,
                                 const QString &filePath) noexcept;
-
     QDir m_config_dir, m_session_dir;
     Statusbar *m_statusbar{nullptr};
     QMenuBar *m_menuBar{nullptr};
@@ -373,9 +373,7 @@ private:
     QString m_session_name;
     MessageBar *m_message_bar{nullptr};
     SearchBar *m_search_bar{nullptr};
-
     Picker::Keybindings m_picker_keybinds{};
-
     OutlinePicker *m_outline_picker{nullptr};
     CommandPicker *m_command_picker{nullptr};
     HighlightSearchPicker *m_highlight_search_picker{nullptr};
