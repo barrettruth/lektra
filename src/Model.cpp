@@ -17,6 +17,298 @@
 
 static std::array<std::mutex, FZ_LOCK_MAX> mupdf_mutexes;
 
+// Helper: compute signed distance along a direction from origin to point
+static float
+linedist_sel(const fz_point &origin, const fz_point &dir, const fz_point &q)
+{
+    return dir.x * (q.x - origin.x) + dir.y * (q.y - origin.y);
+}
+
+// Helper: count characters in a line
+static int
+line_length(fz_stext_line *line)
+{
+    int n = 0;
+    for (fz_stext_char *ch = line->first_char; ch; ch = ch->next)
+        ++n;
+    return n;
+}
+
+// Helper: get largest character size in a line
+static float
+largest_size_in_line(fz_stext_line *line)
+{
+    float size = 0;
+    for (fz_stext_char *ch = line->first_char; ch; ch = ch->next)
+        if (ch->size > size)
+            size = ch->size;
+    return size;
+}
+
+// Helper: find the closest character index within a line to point q
+static int
+find_closest_in_line(fz_stext_line *line, int idx, fz_point q)
+{
+    float closest_dist = 1e30f;
+    int closest_idx    = idx;
+
+    const float hsize = largest_size_in_line(line) / 2;
+    const fz_point vdir{-line->dir.y, line->dir.x};
+    const fz_point hdir = line->dir;
+
+    // Compute mid-line from quads
+    const fz_point p1{
+        (line->first_char->quad.ll.x + line->first_char->quad.ul.x) / 2,
+        (line->first_char->quad.ll.y + line->first_char->quad.ul.y) / 2};
+
+    // Signed distance perpendicular mid-line (positive is below)
+    const float vd = linedist_sel(p1, vdir, q);
+    if (vd < -hsize)
+        return idx;
+    if (vd > hsize)
+        return idx + line_length(line);
+
+    for (fz_stext_char *ch = line->first_char; ch; ch = ch->next)
+    {
+        float d1, d2;
+        if (ch->bidi & 1)
+        {
+            d1 = std::abs(linedist_sel(ch->quad.lr, hdir, q));
+            d2 = std::abs(linedist_sel(ch->quad.ll, hdir, q));
+        }
+        else
+        {
+            d1 = std::abs(linedist_sel(ch->quad.ll, hdir, q));
+            d2 = std::abs(linedist_sel(ch->quad.lr, hdir, q));
+        }
+
+        if (d1 < closest_dist)
+        {
+            closest_dist = d1;
+            closest_idx  = idx;
+        }
+
+        if (d2 < closest_dist)
+        {
+            closest_dist = d2;
+            closest_idx  = idx + 1;
+        }
+
+        ++idx;
+    }
+
+    return closest_idx;
+}
+
+// Helper: find the closest character index in the page to point q
+// This is column-aware because it considers both horizontal and vertical
+// distance to find the geometrically closest line
+static int
+find_closest_in_page(fz_stext_page *page, fz_point q)
+{
+    fz_stext_line *closest_line = nullptr;
+    int closest_idx             = 0;
+    float closest_dist          = 1e30f;
+    int idx                     = 0;
+
+    for (fz_stext_block *block = page->first_block; block; block = block->next)
+    {
+        if (block->type != FZ_STEXT_BLOCK_TEXT)
+            continue;
+
+        for (fz_stext_line *line = block->u.t.first_line; line;
+             line                = line->next)
+        {
+            if (!line->first_char)
+            {
+                idx += line_length(line);
+                continue;
+            }
+
+            const float hsize   = largest_size_in_line(line) / 2;
+            const fz_point hdir = line->dir;
+            const fz_point vdir{-line->dir.y, line->dir.x};
+
+            // Compute mid-line from quads
+            const fz_point p1{
+                (line->first_char->quad.ll.x + line->first_char->quad.ul.x) / 2,
+                (line->first_char->quad.ll.y + line->first_char->quad.ul.y)
+                    / 2};
+            const fz_point p2{
+                (line->last_char->quad.lr.x + line->last_char->quad.ur.x) / 2,
+                (line->last_char->quad.lr.y + line->last_char->quad.ur.y) / 2};
+
+            // Signed distance perpendicular to mid-line (positive is below)
+            const float vdist = linedist_sel(p1, vdir, q);
+
+            // Signed distance tangent to mid-line from end points
+            const float hdist1 = linedist_sel(p1, hdir, q);
+            const float hdist2 = linedist_sel(p2, hdir, q);
+
+            // Within the line itself (horizontally between endpoints)
+            if (vdist >= -hsize && vdist <= hsize
+                && (hdist1 > 0) != (hdist2 > 0))
+            {
+                // Perfect match - point is directly on this line
+                closest_dist = 0;
+                closest_line = line;
+                closest_idx  = idx;
+            }
+            else
+            {
+                // Vertical distance from mid-line
+                const float avdist = std::abs(vdist);
+
+                // Horizontal distance from closest end-point (0 if within line)
+                float ahdist = 0;
+                if ((hdist1 > 0) == (hdist2 > 0))
+                {
+                    // Point is outside the horizontal extent of the line
+                    ahdist = std::min(std::abs(hdist1), std::abs(hdist2));
+                }
+
+                // Compute combined distance metric
+                // Use Euclidean-like distance but weight vertical distance
+                // less when we're within the vertical band of the line.
+                // This ensures that when cursor is at the same Y-level as
+                // lines in different columns, we strongly prefer the
+                // horizontally closer column.
+                float dist;
+                if (avdist < hsize)
+                {
+                    // Within vertical band - horizontal distance dominates
+                    // Small vertical component prevents jumping between
+                    // adjacent lines in same column
+                    dist = ahdist + avdist * 0.1f;
+                }
+                else
+                {
+                    // Outside vertical band - use weighted Euclidean distance
+                    // Weight horizontal distance more to prefer staying in
+                    // the same column
+                    dist = std::sqrt(avdist * avdist + ahdist * ahdist * 4.0f);
+                }
+
+                if (dist < closest_dist)
+                {
+                    closest_dist = dist;
+                    closest_line = line;
+                    closest_idx  = idx;
+                }
+            }
+
+            idx += line_length(line);
+        }
+    }
+
+    if (closest_line)
+        return find_closest_in_line(closest_line, closest_idx, q);
+
+    return 0;
+}
+
+// Check if two points are approximately the same
+static bool
+same_point(const fz_point &a, const fz_point &b)
+{
+    return std::abs(a.x - b.x) < 0.1f && std::abs(a.y - b.y) < 0.1f;
+}
+
+// Check if a point is near another within the given fuzz values
+static bool
+is_near(float hfuzz, float vfuzz, const fz_point &hdir, const fz_point &end,
+        const fz_point &p1, const fz_point &p2)
+{
+    const fz_point vdir{-hdir.y, hdir.x};
+    const float v  = std::abs(linedist_sel(end, vdir, p1));
+    const float d1 = std::abs(linedist_sel(end, hdir, p1));
+    const float d2 = std::abs(linedist_sel(end, hdir, p2));
+    return (v < vfuzz && d1 < hfuzz && d1 < d2);
+}
+
+// Main selection function - uses character index-based selection
+// which properly handles multi-column layouts
+static int
+highlight_selection(fz_stext_page *stext_page, fz_point a, fz_point b,
+                    fz_quad *quads, int max_quads)
+{
+    // Find character indices closest to points a and b
+    int start = find_closest_in_page(stext_page, a);
+    int end   = find_closest_in_page(stext_page, b);
+
+    // Swap if needed to ensure start <= end
+    if (start > end)
+        std::swap(start, end);
+
+    if (start == end)
+        return 0;
+
+    // Enumerate characters between start and end, collecting quads
+    int count   = 0;
+    int idx     = 0;
+    bool inside = false;
+
+    // Fuzz values for merging adjacent quads
+    constexpr float hfuzz = 0.5f;
+    constexpr float vfuzz = 0.1f;
+
+    for (fz_stext_block *block = stext_page->first_block; block;
+         block                 = block->next)
+    {
+        if (block->type != FZ_STEXT_BLOCK_TEXT)
+            continue;
+
+        for (fz_stext_line *line = block->u.t.first_line; line;
+             line                = line->next)
+        {
+            for (fz_stext_char *ch = line->first_char; ch; ch = ch->next)
+            {
+                if (!inside && idx == start)
+                    inside = true;
+
+                if (inside)
+                {
+                    // Skip zero-extent quads
+                    if (!same_point(ch->quad.ll, ch->quad.lr))
+                    {
+                        const float char_vfuzz = vfuzz * ch->size;
+                        const float char_hfuzz = hfuzz * ch->size;
+
+                        // Try to merge with the previous quad
+                        if (count > 0)
+                        {
+                            fz_quad &prev = quads[count - 1];
+                            if (is_near(char_hfuzz, char_vfuzz, line->dir,
+                                        prev.lr, ch->quad.ll, ch->quad.lr)
+                                && is_near(char_hfuzz, char_vfuzz, line->dir,
+                                           prev.ur, ch->quad.ul, ch->quad.ur))
+                            {
+                                // Merge by extending the previous quad
+                                prev.ur = ch->quad.ur;
+                                prev.lr = ch->quad.lr;
+                                ++idx;
+                                if (idx == end)
+                                    return count;
+                                continue;
+                            }
+                        }
+
+                        // Add new quad if we have space
+                        if (count < max_quads)
+                            quads[count++] = ch->quad;
+                    }
+                }
+
+                ++idx;
+                if (idx == end)
+                    return count;
+            }
+        }
+    }
+
+    return count;
+}
+
 static void
 mupdf_lock_mutex(void *user, int lock)
 {
@@ -1017,14 +1309,13 @@ Model::computeTextSelectionQuad(int pageno, QPointF devStart,
         if (!stext_page)
             fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to build text page");
 
-        fz_snap_selection(m_ctx, stext_page, &a, &b, FZ_SELECT_CHARS);
+        // fz_snap_selection(m_ctx, stext_page, &a, &b, FZ_SELECT_CHARS);
 
         // Re-store snapped endpoints so callers get the corrected range
         // m_selection_start = a;
         // m_selection_end   = b;
 
-        count = fz_highlight_selection(m_ctx, stext_page, a, b, hits.data(),
-                                       MAX_HITS);
+        count = highlight_selection(stext_page, a, b, hits.data(), MAX_HITS);
     }
     fz_always(m_ctx)
     {
@@ -1682,7 +1973,7 @@ Model::highlight_text_selection(int pageno, QPointF start, QPointF end) noexcept
         if (!stext_page)
             fz_throw(m_ctx, FZ_ERROR_GENERIC, "failed to load stext page");
 
-        count = fz_highlight_selection(m_ctx, stext_page, a, b, hits, MAX_HITS);
+        count = highlight_selection(stext_page, a, b, hits, MAX_HITS);
     }
     fz_always(m_ctx)
     {
@@ -2146,8 +2437,7 @@ Model::selectAtHelper(int pageno, fz_point pt, int snapMode) noexcept
             fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to load stext page");
 
         fz_snap_selection(m_ctx, stext_page, &a, &b, snapMode);
-        count = fz_highlight_selection(m_ctx, stext_page, a, b, hits.data(),
-                                       MAX_HITS);
+        count = highlight_selection(stext_page, a, b, hits.data(), MAX_HITS);
     }
     fz_catch(m_ctx)
     {
@@ -2233,9 +2523,8 @@ Model::selectParagraphAt(int pageno, fz_point pt) noexcept
                 fz_point blockStart = {block->bbox.x0, block->bbox.y0};
                 fz_point blockEnd   = {block->bbox.x1, block->bbox.y1};
 
-                int count
-                    = fz_highlight_selection(m_ctx, stext_page, blockStart,
-                                             blockEnd, hits.data(), MAX_HITS);
+                int count = highlight_selection(
+                    stext_page, blockStart, blockEnd, hits.data(), MAX_HITS);
 
                 auto toDev = [&](const fz_point &p0) -> QPointF
                 {

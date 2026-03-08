@@ -35,6 +35,11 @@ backend = "auto" # "auto", "opengl", "raster"
 - Add `--tutorial` command line argument to open the tutorial PDF file directly from the command line without having to open the command palette and search for the command. This is useful for new users who want to quickly access the tutorial file and learn how to use LEKTRA.
 - Add touchpad gesture support for zooming (pinch to zoom)
 
+### Optimizations
+
+
+- Improved text selection. Text selection is now more responsive and accurate, especially for multi-columned layouts. It should now be less jumpy and more stable when selecting text across columns and pages.
+
 ### Bug Fixes
 
 - Fix portals and preview docs appearing blurry due to not using the correct DPR for rendering
