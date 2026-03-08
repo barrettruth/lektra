@@ -1,8 +1,10 @@
-# TODO
+    # TODO
 
 ## This is a list of features and improvements that I want to implement in the future. The list is not exhaustive and is subject to change based on user feedback and my own priorities.
 
 ## HIGH PRIORITY
+- [ ] Scissor mode for cropping and copying specific regions of the PDF when zoomed in to a high level (high performance gain)
+- [ ] See fz_cookie*
 - [ ] Text selection change pos on resize event
 - [ ] Picker strong key grab
 - [ ] Visual line mode index resetting after zoom
