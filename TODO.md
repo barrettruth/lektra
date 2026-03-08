@@ -43,7 +43,6 @@
 - [ ] Auto-find current position in the outline
 - [ ] Narrow to region
 - [ ] Ruler
-- [ ] Preview window
 - [ ] Try to generate outline if not present somehow
 - [ ] Visual line mode, if starting fresh, enable at the viewport
 - [ ] Custom source DPI region copy to clipboard
