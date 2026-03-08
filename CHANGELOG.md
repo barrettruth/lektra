@@ -1,5 +1,13 @@
 # LEKTRA CHANGELOG
 
+## 0.6.7
+
+### Features
+
+### Bug Fixes
+
+- Fix spawning multiple instances of `AboutDialog`
+
 ## 0.6.6
 
 ### Features
