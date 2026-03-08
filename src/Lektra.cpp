@@ -549,7 +549,7 @@ Lektra::initConfig() noexcept
     // Portals
     if (auto portal = toml["portal"])
     {
-        set_color(portal["portal_border"], m_config.portal.border_color);
+        set_color(portal["border_color"], m_config.portal.border_color);
         set(portal["enabled"], m_config.portal.enabled);
         set(portal["border_width"], m_config.portal.border_width);
         set(portal["dim_inactive"], m_config.portal.dim_inactive);
