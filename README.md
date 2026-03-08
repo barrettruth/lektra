@@ -79,10 +79,6 @@
   <strong>SyncTeX integration</strong>
 </p>
 
-# Lines of Code
-
-![Lines of Code](https://img.shields.io/badge/Lines%20of%20Code-~20k-blue?style=for-the-badge)
-
 # Contributing
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md)
