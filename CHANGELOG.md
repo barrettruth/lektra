@@ -4,8 +4,12 @@
 
 ### Features
 
+- Config option for `[zoom]` to choose whether zoom should be anchored at mouse position or center of the viewport. This can be configured with the `anchor_to_mouse` option. Otherwise, zoom will be anchored to the center of the viewport as it was before.
+
 ### Bug Fixes
 
+- Fix viewport center anchor zoom not centering on the actual center of the viewport. (Feels more natural now)
+- Now pinch-zoom respects the mouse position anchor instead of the center of the viewport
 - Fix spawning multiple instances of `AboutDialog`
 
 ## 0.6.6
