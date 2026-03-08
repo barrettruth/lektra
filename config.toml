@@ -1,14 +1,16 @@
-# Lektra configuration file
-# For more information see `https://dheerajshenoy.github.io/lektra/configuration`
-
 [window]
 fullscreen = false
 menubar = false
 startup_tab = false
-window_title = "{} - lektra"
+window_title = "{} - lektra" # '{}' replaced with base file name
 initial_size = { width = 1200, height = 800 }
 accent = "#3daee9FF"
 bg = "#00000000"
+
+[preview]
+size_ratio = { width = 0.25, height = 0.25 }
+border_radius = 0
+close_on_click_outside = true
 
 [page]
 bg = "#FFFFFF"
@@ -33,6 +35,7 @@ enabled = true
 border_color = "#3daee9FF"
 border_width = 5
 respect_parent = true
+opacity = 25
 
 [split]
 mouse_follows_focus = false
@@ -160,7 +163,7 @@ smooth_pixmap_transform = true
 cache_pages = 0
 antialiasing_bits = 4 # 4=good, 8=high
 icc_color_profile = true
-backend = "auto"
+backend = "raster"
 
 [behavior]
 initial_mode = "text_select_mode" # { "region_select_mode", "annot_rect_mode", "annot_select_mode", "text_select_mode", "text_highlight_mode", "annot_popup_mode" }
@@ -168,6 +171,7 @@ always_open_in_new_window = false
 remember_last_visited = true
 confirm_on_quit = false
 invert_mode = false
+dont_invert_images = true
 auto_reload = true
 recent_files = true
 num_recent_files = 25
@@ -263,9 +267,8 @@ layout_top_to_bottom = "Ctrl+Shift+2"
 layout_left_to_right = "Ctrl+Shift+3"
 layout_book = "Ctrl+Shift+4"
 
-# [mousebindings] (Work in progress, not implemented yet)
-# WheelUp, WheelDown, LeftButton, RightButton, MiddleButton
-# zoom_in = "Ctrl+WheelUp"
-# zoom_out = "Ctrl+WheelDown"
-# portal = "Ctrl+LeftButton"
-# synctex = "Shift+LeftButton"
+[mousebindings]
+# LeftButton, RightButton, MiddleButton
+portal = "Ctrl+LeftButton"
+synctex_jump = "Shift+LeftButton"
+preview = "Alt+LeftButton"
