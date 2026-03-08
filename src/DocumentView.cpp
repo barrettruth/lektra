@@ -332,7 +332,7 @@ DocumentView::resetConnections() noexcept
         << "DocumentView::resetConnections(): Clearing existing connections";
 #endif
 
-    // 1. Disconnect specific objects that signal INTO this DocumentView
+    // Disconnect specific objects that signal INTO this DocumentView
     if (m_model)
     {
         m_model->disconnect(this);
@@ -343,7 +343,7 @@ DocumentView::resetConnections() noexcept
         m_gview->disconnect(this);
     }
 
-    // 3. Disconnect UI elements that are layout-dependent
+    // Disconnect UI elements that are layout-dependent
     if (m_hscroll)
     {
         m_hscroll->disconnect(this);
@@ -450,8 +450,10 @@ DocumentView::initConnections() noexcept
     connect(m_gview, &GraphicsView::zoomInRequested, this,
             &DocumentView::ZoomIn);
 
+    // Pinch zoom
     connect(m_gview, &GraphicsView::zoomRequested, this,
-            [this](float factor) { setZoom(m_current_zoom * factor); });
+            [this](float factor, QPointF anchorScenePos)
+    { setZoomAnchored(m_current_zoom * factor, anchorScenePos); });
 
     connect(m_gview, &GraphicsView::zoomOutRequested, this,
             &DocumentView::ZoomOut);
@@ -1104,12 +1106,91 @@ DocumentView::setZoom(double factor, bool restoreLocation) noexcept
 
     factor = std::clamp(factor, MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
 
-    PageLocation loc
-        = restoreLocation ? CurrentLocation() : PageLocation{-1, 0, 0};
+    if (restoreLocation)
+    {
+        // Use anchored zoom with viewport center as anchor
+        const QPointF viewCenter
+            = m_gview->mapToScene(m_gview->viewport()->width() / 2,
+                                  m_gview->viewport()->height() / 2);
+        setZoomAnchored(factor, viewCenter);
+    }
+    else
+    {
+        m_current_zoom = factor;
+        invalidateVisiblePagesCache();
+        zoomHelper(PageLocation{-1, 0, 0});
+    }
+}
 
-    m_current_zoom = factor;
-    invalidateVisiblePagesCache();
-    zoomHelper(loc);
+// Set zoom factor with anchor point (for pinch-to-zoom gestures)
+void
+DocumentView::setZoomAnchored(double factor, QPointF anchorScenePos) noexcept
+{
+#ifndef NDEBUG
+    qDebug() << "DocumentView::setZoomAnchored(): Zooming to" << factor
+             << "anchored at" << anchorScenePos;
+#endif
+
+    factor = std::clamp(factor, MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+
+    // If effectively no change, skip
+    if (qFuzzyCompare(factor, m_current_zoom))
+        return;
+
+    // Record where the anchor point is in the viewport (as a ratio)
+    const QPointF anchorViewport = m_gview->mapFromScene(anchorScenePos);
+    const QPointF viewportRatio(
+        anchorViewport.x() / m_gview->viewport()->width(),
+        anchorViewport.y() / m_gview->viewport()->height());
+
+    // Find which page the anchor is on and its relative position
+    int anchorPage              = -1;
+    GraphicsImageItem *pageItem = nullptr;
+    if (pageAtScenePos(anchorScenePos, anchorPage, pageItem) && pageItem)
+    {
+        // Convert anchor to page-local normalized coordinates (0-1)
+        const QPointF localPos     = pageItem->mapFromScene(anchorScenePos);
+        const QSizeF pagePixelSize = pageItem->boundingRect().size();
+        const double relX          = localPos.x() / pagePixelSize.width();
+        const double relY          = localPos.y() / pagePixelSize.height();
+
+        // Apply zoom
+        m_current_zoom = factor;
+        invalidateVisiblePagesCache();
+        ClearTextSelection();
+        m_model->setZoom(m_current_zoom);
+        cachePageStride();
+        updateSceneRect();
+        m_gview->flashScrollbars();
+        repositionPages();
+
+        // Find where the anchor point is now in scene coordinates
+        pageItem = m_page_items_hash.value(anchorPage, nullptr);
+        if (pageItem)
+        {
+            const QSizeF newPageSize = pageItem->boundingRect().size();
+            const QPointF newLocalPos(relX * newPageSize.width(),
+                                      relY * newPageSize.height());
+            const QPointF newScenePos = pageItem->mapToScene(newLocalPos);
+
+            // Adjust view so anchor stays at same viewport position
+            const QPointF currentCenter
+                = m_gview->mapToScene(m_gview->viewport()->rect().center());
+            const QPointF desiredAnchorViewport(
+                viewportRatio.x() * m_gview->viewport()->width(),
+                viewportRatio.y() * m_gview->viewport()->height());
+            const QPointF anchorOffset
+                = m_gview->mapToScene(desiredAnchorViewport.toPoint())
+                  - currentCenter;
+            const QPointF newCenter = newScenePos - anchorOffset;
+            m_gview->centerOn(newCenter);
+        }
+    }
+    else
+    {
+        // Fallback: no page at anchor, use regular zoom
+        setZoom(factor);
+    }
 }
 
 void
@@ -1388,10 +1469,12 @@ DocumentView::ZoomIn() noexcept
     if (m_current_zoom >= MAX_ZOOM_FACTOR)
         return;
 
-    PageLocation loc = CurrentLocation();
-    m_current_zoom   = std::clamp(m_current_zoom * m_config.zoom.factor,
-                                  MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
-    zoomHelper(loc);
+    const double newZoom = std::clamp(m_current_zoom * m_config.zoom.factor,
+                                      MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+    if (m_config.zoom.anchor_to_mouse)
+        setZoomAnchored(newZoom, m_gview->getCursorPos());
+    else
+        setZoom(newZoom);
 }
 
 // Zoom out by a fixed factor
@@ -1401,10 +1484,12 @@ DocumentView::ZoomOut() noexcept
     if (m_current_zoom <= MIN_ZOOM_FACTOR)
         return;
 
-    PageLocation loc = CurrentLocation();
-    m_current_zoom   = std::clamp(m_current_zoom / m_config.zoom.factor,
-                                  MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
-    zoomHelper(loc);
+    const double newZoom = std::clamp(m_current_zoom / m_config.zoom.factor,
+                                      MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+    if (m_config.zoom.anchor_to_mouse)
+        setZoomAnchored(newZoom, m_gview->getCursorPos());
+    else
+        setZoom(newZoom);
 }
 
 // Reset zoom to 100%
@@ -3661,7 +3746,7 @@ DocumentView::renderSearchHitsForPage(int pageno) noexcept
 
     const auto &hits = m_search_hits.value(pageno); // Local copy
 
-    // 2. Validate the Page Item still exists in the scene
+    // Validate the Page Item still exists in the scene
     const GraphicsImageItem *pageItem = m_page_items_hash[pageno];
 
     if (!pageItem)
@@ -3970,11 +4055,7 @@ DocumentView::changeColorOfSelectedAnnotations(const QColor &color) noexcept
 DocumentView::PageLocation
 DocumentView::CurrentLocation() noexcept
 {
-    if (m_page_items_hash.isEmpty() || m_pageno < 0)
-        return {-1, 0, 0};
-
-    GraphicsImageItem *pageItem = m_page_items_hash.value(m_pageno, nullptr);
-    if (!pageItem)
+    if (m_page_items_hash.isEmpty())
         return {-1, 0, 0};
 
     // Use viewport center — must match what GotoLocation restores via
@@ -3982,11 +4063,23 @@ DocumentView::CurrentLocation() noexcept
     const QPointF viewCenter = m_gview->mapToScene(
         m_gview->viewport()->width() / 2, m_gview->viewport()->height() / 2);
 
+    // Find the actual page at the viewport center
+    int pageIndex               = -1;
+    GraphicsImageItem *pageItem = nullptr;
+    if (!pageAtScenePos(viewCenter, pageIndex, pageItem) || !pageItem)
+    {
+        // Fallback to m_pageno if no page at center (e.g., between pages)
+        pageItem = m_page_items_hash.value(m_pageno, nullptr);
+        if (!pageItem)
+            return {-1, 0, 0};
+        pageIndex = m_pageno;
+    }
+
     const QPointF itemLocal       = pageItem->mapFromScene(viewCenter);
     const QPointF logicalPixelPos = itemLocal * pageItem->scale();
-    const fz_point pdfPos = m_model->toPDFSpace(m_pageno, logicalPixelPos);
+    const fz_point pdfPos = m_model->toPDFSpace(pageIndex, logicalPixelPos);
 
-    return {m_pageno, pdfPos.x, pdfPos.y};
+    return {pageIndex, pdfPos.x, pdfPos.y};
 }
 
 static bool
@@ -4351,7 +4444,7 @@ DocumentView::zoomHelper(const PageLocation &loc) noexcept
     m_gview->flashScrollbars();
     repositionPages();
 
-    // 2. Restore the exact viewport position
+    // Restore the exact viewport position
     if (loc.pageno != -1)
         CenterOnLocation(loc);
     else

@@ -797,6 +797,7 @@ Lektra::initConfig() noexcept
     {
         set(zoom["level"], m_config.zoom.level);
         set(zoom["factor"], m_config.zoom.factor);
+        set(zoom["anchor_to_mouse"], m_config.zoom.anchor_to_mouse);
     }
 
     // Selection

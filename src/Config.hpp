@@ -430,6 +430,13 @@ struct Config
         // @default 1.25f
         // @added 0.3.0
         float factor{1.25f};
+
+        // @desc Anchor zoom to mouse position (instead of center of the view)
+        // @type bool
+        // @default true
+        // @added 0.6.5
+        bool anchor_to_mouse{true};
+
     } zoom{};
     // @endsection
 

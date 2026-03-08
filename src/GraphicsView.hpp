@@ -147,7 +147,7 @@ signals:
     void annotSelectRequested(QPointF scenePos);
     void annotSelectClearRequested();
     void zoomInRequested();
-    void zoomRequested(float factor);
+    void zoomRequested(float factor, QPointF anchorScenePos);
     void textSelectionDeletionRequested();
     void zoomOutRequested();
     void contextMenuRequested(QPoint globalPos, bool *handled);
@@ -249,6 +249,8 @@ private:
         = 0.0; // accumulate pinch/native zoom deltas to trigger steps
     qreal m_scrollAccumY
         = 0.0; // accumulate trackpad scroll to trigger page flips
+    bool m_inNativeGesture{
+        false}; // tracks if we're in a native gesture sequence
 
     static constexpr qreal ZOOM_STEP_TRIGGER
         = 0.12; // ~12% “gesture energy” per step (tweak)

@@ -703,12 +703,33 @@ GraphicsView::handleTouchpadGesture(QNativeGestureEvent *e)
 {
     switch (e->gestureType())
     {
+        case Qt::BeginNativeGesture:
+            // Mark that a native gesture sequence has started
+            m_inNativeGesture = true;
+            return true;
+
+        case Qt::EndNativeGesture:
+            // Gesture sequence ended
+            m_inNativeGesture = false;
+            return true;
+
         case Qt::ZoomNativeGesture:
         {
-            emit zoomRequested(1 + e->value());
+            // Use the gesture position as the zoom anchor point
+            const QPointF anchorScenePos = mapToScene(e->position().toPoint());
+            emit zoomRequested(1 + e->value(), anchorScenePos);
             return true;
         }
-        break;
+
+        case Qt::PanNativeGesture:
+        case Qt::SwipeNativeGesture:
+        case Qt::RotateNativeGesture:
+            // During a pinch-zoom gesture, trackpads often send pan/swipe
+            // events simultaneously. Suppress these to prevent unwanted
+            // scrolling while zooming.
+            if (m_inNativeGesture)
+                return true;
+            break;
 
         default:
             break;
