@@ -62,10 +62,10 @@ ExternalProject_Add(mupdf_external
     BUILD_COMMAND
         make -C <SOURCE_DIR>
         XCFLAGS=-fPIC
-        USE_TESSERACT=no
-        USE_CURL=no
-        USE_X11=no
-        USE_GLUT=no
+        HAVE_TESSERACT=no
+        HAVE_CURL=no
+        HAVE_X11=no
+        HAVE_GLUT=no
         prefix=${MUPDF_INSTALL_DIR}
     INSTALL_COMMAND
         make -C <SOURCE_DIR>
