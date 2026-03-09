@@ -3,6 +3,8 @@
 ## This is a list of features and improvements that I want to implement in the future. The list is not exhaustive and is subject to change based on user feedback and my own priorities.
 
 ## HIGH PRIORITY
+- [ ] Outline widget not working
+- [ ] Exiting picker disables shortcut
 - [ ] Read file type from file content instead of extension
 - [ ] Scissor mode for cropping and copying specific regions of the PDF when zoomed in to a high level (high performance gain)
 - [ ] Text selection change pos on resize event
@@ -12,12 +14,17 @@
 - [ ] History for pickers
 - [ ] Undo/Redo operations for annotation color
 - [ ] Don't add connection to annotation when in non-annotatable mode
+- [ ] External search engine configuration
+- [ ] Crash when zoom out too much and then in
 
 ## MEDIUM PRIORITY
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
 - [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
+- [ ] Command Line Arguments
+    - [ ]
+- [ ] Read the docs page
 
 ## LOW PRIORITY
 
