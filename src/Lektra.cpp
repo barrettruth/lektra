@@ -5368,7 +5368,8 @@ Lektra::Show_recent_files_picker() noexcept
         m_recent_file_picker->setKeybindings(m_picker_keybinds);
 
         connect(m_recent_file_picker, &RecentFilesPicker::fileRequested, this,
-                [this](const QString &file) { OpenFileInNewTab(file); });
+                [this](const QString &file)
+        { OpenFileInNewTab(file, [this]() { m_doc->setFocus(); }); });
     }
 
     // Always update the recent files list before launching

@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+- Fix file not focusing when opened from the recent files picker.
 - Fix viewport center anchor zoom not centering on the actual center of the viewport. (Feels more natural now)
 - Now pinch-zoom respects the mouse position anchor instead of the center of the viewport
 - Fix spawning multiple instances of `AboutDialog`
