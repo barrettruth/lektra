@@ -12,12 +12,16 @@
 - [ ] History for pickers
 - [ ] Undo/Redo operations for annotation color
 - [ ] Don't add connection to annotation when in non-annotatable mode
+- [ ] External search engine configuration
 
 ## MEDIUM PRIORITY
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
 - [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
+- [ ] Command Line Arguments
+    - [ ]
+- [ ] Read the docs page
 
 ## LOW PRIORITY
 
