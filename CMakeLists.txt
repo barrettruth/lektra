@@ -61,16 +61,26 @@ ExternalProject_Add(mupdf_external
     CONFIGURE_COMMAND ""
     BUILD_COMMAND
         make -C <SOURCE_DIR>
-        XCFLAGS=-fPIC
+        build=release
+        shared=no
         HAVE_TESSERACT=no
         HAVE_CURL=no
         HAVE_X11=no
         HAVE_GLUT=no
-        prefix=${MUPDF_INSTALL_DIR}
+        HAVE_LIBCRYPTO=no
+        LIB_CFLAGS=-fPIC
+        libs
     INSTALL_COMMAND
         make -C <SOURCE_DIR>
-        prefix=${MUPDF_INSTALL_DIR}
-        install
+        build=release
+        shared=no
+        HAVE_TESSERACT=no
+        HAVE_CURL=no
+        HAVE_X11=no
+        HAVE_GLUT=no
+        HAVE_LIBCRYPTO=no
+        prefix="${MUPDF_INSTALL_DIR}"
+        install-libs
     BUILD_BYPRODUCTS
         "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
         "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
@@ -207,7 +217,13 @@ target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 
 if (MUPDF_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE mupdf_lib "${MUPDF_INSTALL_DIR}/lib/libmupdf.a" "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a")
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        mupdf_lib
+        "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
+        z      # zlib
+        m      # libm (math, also needed by mupdf)
+        dl     # libdl
+    )
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
     add_dependencies(${PROJECT_NAME} mupdf_external)
 endif()
