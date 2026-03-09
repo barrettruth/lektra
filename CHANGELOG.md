@@ -5,6 +5,7 @@
 ### Features
 
 - Config option for `[zoom]` to choose whether zoom should be anchored at mouse position or center of the viewport. This can be configured with the `anchor_to_mouse` option. Otherwise, zoom will be anchored to the center of the viewport as it was before.
+- Added macOS support for LEKTRA. Check out [installation](https://dheerajshenoy.github.io/lektra/installation.html) instructions for more details. (Thanks to [@budingZou](https://codeberg.org/budingZou) for the PR!)
 
 ### Bug Fixes
 
