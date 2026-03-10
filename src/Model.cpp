@@ -4156,7 +4156,8 @@ Model::getFileType(const QString &path) noexcept
     if (name == "image/tiff")
         return FileType::TIFF;
 #ifdef HAS_DJVU
-    if (name == "image/vnd.djvu" || name == "image/x-djvu")
+    if (name == "image/vnd.djvu" || name == "image/vnd.djvu+multipage"
+        || name == "image/x-djvu")
         return FileType::DJVU;
 #endif
 
