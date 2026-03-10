@@ -51,6 +51,11 @@ DocumentContainer::split(DocumentView *view, Qt::Orientation orientation,
 
     // Create new view for the split - copy settings from current view
     DocumentView *newView = createViewFromTemplate(view);
+
+    connect(newView, &DocumentView::openFileFinished, this, [view, newView]() {
+        newView->GotoLocation(view->CurrentLocation());
+    }, Qt::SingleShotConnection);
+
     newView->openAsync(filePath);
 
     // If the current widget is the view itself (not in a splitter yet)

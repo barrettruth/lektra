@@ -54,7 +54,7 @@ backend = "auto" # "auto", "opengl", "raster"
 
 ### Optimizations
 
-
+- **Splitting view now takes you to the same page and location in the new split instead of the first page, which provides a more seamless experience when splitting the view to reference different parts of the same document side by side.**
 - Improved text selection. Text selection is now more responsive and accurate, especially for multi-columned layouts. It should now be less jumpy and more stable when selecting text across columns and pages.
 
 ### Bug Fixes
