@@ -1,8 +1,9 @@
-    # TODO
+# TODO
 
 ## This is a list of features and improvements that I want to implement in the future. The list is not exhaustive and is subject to change based on user feedback and my own priorities.
 
 ## HIGH PRIORITY
+
 - [ ] Outline widget not working
 - [ ] Exiting picker disables shortcut
 - [ ] Read file type from file content instead of extension
@@ -24,7 +25,7 @@
 - [ ] Shell Scripting
 - [ ] Command Line Arguments
     - [ ]
-- [ ] Read the docs page
+- [ ] readthedocs.io page
 
 ## LOW PRIORITY
 
