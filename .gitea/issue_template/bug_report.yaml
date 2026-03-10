@@ -28,21 +28,23 @@ body:
   - type: input
     attributes:
       label: OS
-      placeholder: "e.g. Arch Linux 6.18, macOS 15.3"
+      placeholder: "NixOS 24.11"
     validations:
       required: true
 
   - type: input
     attributes:
       label: Qt version
-      placeholder: "qmake6 --version"
+      description: "`qmake6 --version`"
+      placeholder: "6.8.1"
     validations:
       required: true
 
   - type: input
     attributes:
       label: MuPDF version
-      placeholder: "grep FZ_VERSION thirdparty/mupdf/include/mupdf/fitz/version.h"
+      description: "`grep FZ_VERSION thirdparty/mupdf/include/mupdf/fitz/version.h`"
+      placeholder: "1.27.0"
     validations:
       required: true
 
