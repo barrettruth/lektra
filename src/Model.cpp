@@ -45,6 +45,22 @@ largest_size_in_line(fz_stext_line *line)
     return size;
 }
 
+#ifdef HAS_DJVU
+static void
+handle_messages(ddjvu_context_t *ctx, int wait)
+{
+    const ddjvu_message_t *msg;
+    if (wait)
+        ddjvu_message_wait(ctx);
+    while ((msg = ddjvu_message_peek(ctx)))
+    {
+        if (msg->m_any.tag == DDJVU_ERROR)
+            fprintf(stderr, "ddjvu error: %s\n", msg->m_error.message);
+        ddjvu_message_pop(ctx);
+    }
+}
+#endif
+
 // Helper: find the closest character index within a line to point q
 static int
 find_closest_in_line(fz_stext_line *line, int idx, fz_point q)
