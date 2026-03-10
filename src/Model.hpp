@@ -676,7 +676,7 @@ private:
     fz_point getFirstCharPos(const int pageno) noexcept;
     std::vector<Model::RenderLink>
     detectUrlLinksForPage(const RenderJob &job) noexcept;
-    FileType detectFileType(const QString &path) noexcept;
+    FileType getFileType(const QString &filepath) noexcept;
 
     QUndoStack *m_undo_stack{nullptr};
     // std::optional<std::wstring>

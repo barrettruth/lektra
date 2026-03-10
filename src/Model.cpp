@@ -852,7 +852,7 @@ Model::openAsync(const QString &filePath) noexcept
     // Detect file type before launching the background task, so we can fail
     // fast for unsupported types without incurring the overhead of starting a
     // thread and cloning the context.
-    m_filetype = detectFileType(m_filepath);
+    m_filetype = getFileType(canonPath);
 
     if (m_filetype == FileType::NONE)
     {
@@ -4063,44 +4063,37 @@ Model::visual_line_index_at_pos(
 }
 
 Model::FileType
-Model::detectFileType(const QString &path) noexcept
+Model::getFileType(const QString &path) noexcept
 {
-    const QString ext = QFileInfo(path).suffix().toLower();
+    const QMimeType mime
+        = QMimeDatabase().mimeTypeForFile(path, QMimeDatabase::MatchContent);
+    const QString name = mime.name();
 
-    if (ext.isEmpty())
-        return FileType::NONE;
-
-    // ---- core formats ----
-    if (ext == "pdf")
+    if (name == "application/pdf")
         return FileType::PDF;
-    if (ext == "epub")
+    if (name == "application/epub+zip")
         return FileType::EPUB;
-    if (ext == "svg")
+    if (name == "image/svg+xml")
         return FileType::SVG;
-    if (ext == "xps" || ext == "oxps")
+    if (name == "application/vnd.ms-xpsdocument" || name == "application/oxps")
         return FileType::XPS;
-    if (ext == "mobi")
+    if (name == "application/x-mobipocket-ebook")
         return FileType::MOBI;
-
-    // ---- ebooks / archives ----
-    if (ext == "cbz" || ext == "cbt")
+    if (name == "application/vnd.comicbook+zip" || name == "application/x-cbz")
         return FileType::CBZ;
-
-    if (ext == "fb2" || ext == "fbz")
+    if (name == "application/x-tar")
+        return FileType::CBZ; // cbt
+    if (name == "application/x-fictionbook+xml"
+        || name == "application/x-fictionbook")
         return FileType::FB2;
-
-    // ---- images ----
-    if (ext == "jpg" || ext == "jpeg")
+    if (name == "image/jpeg")
         return FileType::JPG;
-
-    if (ext == "png")
+    if (name == "image/png")
         return FileType::PNG;
-
-    if (ext == "tif" || ext == "tiff")
+    if (name == "image/tiff")
         return FileType::TIFF;
-
 #ifdef HAS_DJVU
-    if (ext == "djvu" || ext == "djv")
+    if (name == "image/vnd.djvu" || name == "image/x-djvu")
         return FileType::DJVU;
 #endif
 
