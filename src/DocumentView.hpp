@@ -59,6 +59,14 @@ public:
     using Id = uint32_t;
     DocumentView(const Config &config, const float dpr = 1.0f,
                  QWidget *parent = nullptr) noexcept;
+
+
+    DocumentView(const DocumentView &) = delete;
+    DocumentView &operator=(const DocumentView &) = delete;
+    DocumentView(DocumentView &&) = delete;
+    DocumentView &operator=(DocumentView &&) = delete;
+    DocumentView(DocumentView* sourceView) = delete;
+
     ~DocumentView() noexcept;
 
     inline Id id() const noexcept
