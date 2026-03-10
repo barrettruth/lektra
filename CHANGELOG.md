@@ -58,6 +58,7 @@ backend = "auto" # "auto", "opengl", "raster"
 
 ### Bug Fixes
 
+- Fix Outline picker not going to the correct page and position when selecting an entry
 - Fix portals and preview docs appearing blurry due to not using the correct DPR for rendering
 - Fix remove item 0 warning in QGraphicsScene when closing document
 - Fix double memory free crash on DJVU files

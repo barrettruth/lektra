@@ -1227,46 +1227,53 @@ DocumentView::GotoLocation(const PageLocation &targetLocation) noexcept
     if (m_model->numPages() == 0)
         return;
 
+    // Sanitize NaN coordinates - default to top-left of page
+    PageLocation sanitized = targetLocation;
+    if (std::isnan(sanitized.x))
+        sanitized.x = 0.0f;
+    if (std::isnan(sanitized.y))
+        sanitized.y = 0.0f;
+
     // HANDLE PENDING RENDERS
-    if (!m_page_items_hash.contains(targetLocation.pageno))
+    if (!m_page_items_hash.contains(sanitized.pageno))
     {
 #ifndef NDEBUG
         qDebug() << "DocumentView::GotoLocation(): Target page"
-                 << targetLocation.pageno
+                 << sanitized.pageno
                  << "not yet rendered. Deferring jump until render.";
 #endif
-        m_pending_jump = targetLocation;
-        GotoPage(targetLocation.pageno);
+        m_pending_jump = sanitized;
+        GotoPage(sanitized.pageno);
         return;
     }
 
 #ifndef NDEBUG
     qDebug() << "DocumentView::GotoLocation(): Requested "
                 "target location:"
-             << targetLocation.pageno << targetLocation.x << targetLocation.y
+             << sanitized.pageno << sanitized.x << sanitized.y
              << "in document with" << m_model->numPages() << "pages.";
 #endif
 
     // Continuous / LTR layouts
-    GraphicsImageItem *pageItem = m_page_items_hash[targetLocation.pageno];
+    GraphicsImageItem *pageItem = m_page_items_hash[sanitized.pageno];
     if (!pageItem)
         return;
     if (pageItem->data(0).toString() == "placeholder_page")
     {
-        m_pending_jump = targetLocation;
-        GotoPage(targetLocation.pageno);
+        m_pending_jump = sanitized;
+        GotoPage(sanitized.pageno);
         return;
     }
 
-    const QPointF targetPixelPos = m_model->toPixelSpace(
-        targetLocation.pageno, {targetLocation.x, targetLocation.y});
+    const QPointF targetPixelPos
+        = m_model->toPixelSpace(sanitized.pageno, {sanitized.x, sanitized.y});
 
     const QPointF scenePos = pageItem->mapToScene(targetPixelPos);
 
     if (m_layout_mode == LayoutMode::SINGLE)
     {
-        if (m_pageno != targetLocation.pageno)
-            GotoPage(targetLocation.pageno);
+        if (m_pageno != sanitized.pageno)
+            GotoPage(sanitized.pageno);
     }
 
     m_gview->centerOn(scenePos);
