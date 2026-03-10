@@ -4,12 +4,15 @@
 
 ### Features
 
+- Finally added `Ctrl + Mouse Wheel` zooming!
 - Config option for `[zoom]` to choose whether zoom should be anchored at mouse position or center of the viewport. This can be configured with the `anchor_to_mouse` option. Otherwise, zoom will be anchored to the center of the viewport as it was before.
 - Added macOS support for LEKTRA. Check out [installation](https://dheerajshenoy.github.io/lektra/installation.html) instructions for more details. (Thanks to [@budingZou](https://codeberg.org/budingZou) for the PR!)
 - Added custom input dialog with text wrapping for annotation comment input, which allows for better user experience when adding comments to annotations, especially for longer comments that require more space. The dialog will automatically adjust its size based on the content and provide a more comfortable interface for entering annotation comments.
 
 ### Bug Fixes
 
+- Fix `selection_last` not working properly.
+- Handle failed to open file properly by showing an error message and closing the tab cleanly.
 - Fix file not focusing when opened from the recent files picker.
 - Fix viewport center anchor zoom not centering on the actual center of the viewport. (Feels more natural now)
 - Now pinch-zoom respects the mouse position anchor instead of the center of the viewport
@@ -53,11 +56,12 @@ backend = "auto" # "auto", "opengl", "raster"
 
 ### Optimizations
 
-
+- **Splitting view now takes you to the same page and location in the new split instead of the first page, which provides a more seamless experience when splitting the view to reference different parts of the same document side by side.**
 - Improved text selection. Text selection is now more responsive and accurate, especially for multi-columned layouts. It should now be less jumpy and more stable when selecting text across columns and pages.
 
 ### Bug Fixes
 
+- Fix Outline picker not going to the correct page and position when selecting an entry (if target location has NaN, then default to the center of the page)
 - Fix portals and preview docs appearing blurry due to not using the correct DPR for rendering
 - Fix remove item 0 warning in QGraphicsScene when closing document
 - Fix double memory free crash on DJVU files

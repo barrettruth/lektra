@@ -65,7 +65,7 @@ DocumentView::DocumentView(const Config &config, float dpr,
     m_model->setDPR(dpr);
 
     connect(m_model, &Model::openFileFailed, this,
-            [this]() { emit openFileFailed(this); });
+            &DocumentView::handleOpenFileFailed);
 
     connect(m_model, &Model::openFileFinished, this,
             &DocumentView::handleOpenFileFinished);
@@ -285,6 +285,19 @@ DocumentView::openAsync(const QString &filePath) noexcept
     QFuture<void> future = m_model->openAsync(QDir::cleanPath(filePath));
 
     m_open_future_watcher.setFuture(future);
+}
+
+void
+DocumentView::handleOpenFileFailed() noexcept
+{
+    m_spinner->stop();
+    m_spinner->hide();
+
+    QMessageBox::critical(this, tr("Error"),
+                          tr("Failed to open the file. Please check if the "
+                             "file exists and is a supported format."));
+
+    emit openFileFailed(this);
 }
 
 void
@@ -1227,46 +1240,57 @@ DocumentView::GotoLocation(const PageLocation &targetLocation) noexcept
     if (m_model->numPages() == 0)
         return;
 
+    // Sanitize NaN coordinates - default to center of page
+    PageLocation sanitized = targetLocation;
+    if (std::isnan(sanitized.x) || std::isnan(sanitized.y))
+    {
+        const auto pageDim = m_model->page_dimension_pts(sanitized.pageno);
+        if (std::isnan(sanitized.x))
+            sanitized.x = pageDim.width_pts / 2.0f;
+        if (std::isnan(sanitized.y))
+            sanitized.y = pageDim.height_pts / 2.0f;
+    }
+
     // HANDLE PENDING RENDERS
-    if (!m_page_items_hash.contains(targetLocation.pageno))
+    if (!m_page_items_hash.contains(sanitized.pageno))
     {
 #ifndef NDEBUG
         qDebug() << "DocumentView::GotoLocation(): Target page"
-                 << targetLocation.pageno
+                 << sanitized.pageno
                  << "not yet rendered. Deferring jump until render.";
 #endif
-        m_pending_jump = targetLocation;
-        GotoPage(targetLocation.pageno);
+        m_pending_jump = sanitized;
+        GotoPage(sanitized.pageno);
         return;
     }
 
 #ifndef NDEBUG
     qDebug() << "DocumentView::GotoLocation(): Requested "
                 "target location:"
-             << targetLocation.pageno << targetLocation.x << targetLocation.y
+             << sanitized.pageno << sanitized.x << sanitized.y
              << "in document with" << m_model->numPages() << "pages.";
 #endif
 
     // Continuous / LTR layouts
-    GraphicsImageItem *pageItem = m_page_items_hash[targetLocation.pageno];
+    GraphicsImageItem *pageItem = m_page_items_hash[sanitized.pageno];
     if (!pageItem)
         return;
     if (pageItem->data(0).toString() == "placeholder_page")
     {
-        m_pending_jump = targetLocation;
-        GotoPage(targetLocation.pageno);
+        m_pending_jump = sanitized;
+        GotoPage(sanitized.pageno);
         return;
     }
 
-    const QPointF targetPixelPos = m_model->toPixelSpace(
-        targetLocation.pageno, {targetLocation.x, targetLocation.y});
+    const QPointF targetPixelPos
+        = m_model->toPixelSpace(sanitized.pageno, {sanitized.x, sanitized.y});
 
     const QPointF scenePos = pageItem->mapToScene(targetPixelPos);
 
     if (m_layout_mode == LayoutMode::SINGLE)
     {
-        if (m_pageno != targetLocation.pageno)
-            GotoPage(targetLocation.pageno);
+        if (m_pageno != sanitized.pageno)
+            GotoPage(sanitized.pageno);
     }
 
     m_gview->centerOn(scenePos);
@@ -1856,8 +1880,15 @@ DocumentView::FileProperties() noexcept
     if (!m_model->success() || !m_model->supports_metadata())
         return;
 
+    const auto props = m_model->properties();
+    if (props.empty())
+    {
+        QMessageBox::information(
+            this, "No properties",
+            "No metadata properties available for this file.");
+        return;
+    }
     PropertiesWidget *propsWidget = new PropertiesWidget(this);
-    const auto props              = m_model->properties();
     propsWidget->setProperties(props);
     propsWidget->exec();
 }
@@ -2049,6 +2080,9 @@ DocumentView::ClearTextSelection() noexcept
         m_selection_path_item->setPath(QPainterPath());
         m_selection_path_item->hide();
     }
+
+    m_last_selection_start = m_selection_start;
+    m_last_selection_end   = m_selection_end;
 
     m_selection_start = QPointF();
     m_selection_end   = QPointF();
@@ -3043,11 +3077,12 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
     const bool annotModeActive
         = m_gview->mode() == GraphicsView::Mode::AnnotSelect
           || m_gview->mode() == GraphicsView::Mode::AnnotPopup;
-    const auto selectedAnnots = annotModeActive
-                                    ? getSelectedAnnotations()
-                                    : decltype(getSelectedAnnotations()){};
-    const bool hasAnnots      = !selectedAnnots.empty();
-    bool hasActions           = false;
+    const auto selectedAnnots
+        = annotModeActive && m_model->supports_annotations()
+              ? getSelectedAnnotations()
+              : decltype(getSelectedAnnotations()){};
+    const bool hasAnnots = !selectedAnnots.empty();
+    bool hasActions      = false;
 
     // if (selectionActive &&
     // m_selection_path_item->path().contains(scenePos))
@@ -3057,8 +3092,11 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
     {
         addAction("Copy Text", [this]() { YankSelection(true); });
         addAction("Copy Unformatted Text", [this]() { YankSelection(false); });
-        addAction("Highlight Text",
-                  &DocumentView::handleTextHighlightRequested);
+        if (m_model->supports_annotations())
+        {
+            addAction("Highlight Text",
+                      &DocumentView::handleTextHighlightRequested);
+        }
         hasActions = true;
     }
 
@@ -3845,11 +3883,7 @@ DocumentView::ensureSearchItemForPage(int pageno) noexcept
 void
 DocumentView::ReselectLastTextSelection() noexcept
 {
-    if (!m_selection_path_item || m_selection_path_item->path().isEmpty())
-        return;
-
-    m_selection_path_item->setVisible(false);
-    m_selection_path_item->setVisible(true);
+    handleTextSelection(m_last_selection_start, m_last_selection_end);
 }
 
 void

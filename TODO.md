@@ -1,11 +1,10 @@
-    # TODO
+# TODO
 
 ## This is a list of features and improvements that I want to implement in the future. The list is not exhaustive and is subject to change based on user feedback and my own priorities.
 
 ## HIGH PRIORITY
-- [ ] Outline widget not working
+
 - [ ] Exiting picker disables shortcut
-- [ ] Read file type from file content instead of extension
 - [ ] Scissor mode for cropping and copying specific regions of the PDF when zoomed in to a high level (high performance gain)
 - [ ] Text selection change pos on resize event
 - [ ] Picker strong key grab
@@ -16,15 +15,16 @@
 - [ ] Don't add connection to annotation when in non-annotatable mode
 - [ ] External search engine configuration
 - [ ] Crash when zoom out too much and then in
+- [ ] Search from current position instead of top of document
 
 ## MEDIUM PRIORITY
+- [ ] Show text highlight brush cursor when highlighting text
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
 - [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
 - [ ] Command Line Arguments
-    - [ ]
-- [ ] Read the docs page
+- [ ] lektra.readthedocs.io page
 
 ## LOW PRIORITY
 

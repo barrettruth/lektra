@@ -45,6 +45,22 @@ largest_size_in_line(fz_stext_line *line)
     return size;
 }
 
+#ifdef HAS_DJVU
+static void
+handle_messages(ddjvu_context_t *ctx, int wait)
+{
+    const ddjvu_message_t *msg;
+    if (wait)
+        ddjvu_message_wait(ctx);
+    while ((msg = ddjvu_message_peek(ctx)))
+    {
+        if (msg->m_any.tag == DDJVU_ERROR)
+            fprintf(stderr, "ddjvu error: %s\n", msg->m_error.message);
+        ddjvu_message_pop(ctx);
+    }
+}
+#endif
+
 // Helper: find the closest character index within a line to point q
 static int
 find_closest_in_line(fz_stext_line *line, int idx, fz_point q)
@@ -852,7 +868,7 @@ Model::openAsync(const QString &filePath) noexcept
     // Detect file type before launching the background task, so we can fail
     // fast for unsupported types without incurring the overhead of starting a
     // thread and cloning the context.
-    m_filetype = detectFileType(m_filepath);
+    m_filetype = getFileType(canonPath);
 
     if (m_filetype == FileType::NONE)
     {
@@ -1808,13 +1824,60 @@ Model::get_selected_text(int pageno, QPointF start, QPointF end,
     return QString::fromStdString(result);
 }
 
-std::vector<std::pair<QString, QString>>
+Model::Properties
 Model::properties() noexcept
 {
+#ifdef HAS_DJVU
+    if (m_filetype == FileType::DJVU)
+    {
+        if (!m_ddjvu_ctx || !m_ddjvu_doc)
+            return {};
+
+        Properties djvu_props;
+        djvu_props.reserve(5); // typical number of metadata entries
+
+        /* Fetch document-wide annotations.
+           compat=1 also searches the shared annotation chunk
+           so metadata is found in older files too. */
+        miniexp_t anno;
+        while ((anno = ddjvu_document_get_anno(m_ddjvu_doc, 1))
+               == miniexp_dummy)
+            handle_messages(m_ddjvu_ctx, 1);
+
+        if (anno == miniexp_nil || anno == miniexp_symbol("failed")
+            || anno == miniexp_symbol("stopped"))
+        {
+            return djvu_props;
+        }
+
+        /* Key/value metadata pairs */
+        miniexp_t *keys = ddjvu_anno_get_metadata_keys(anno);
+        if (keys)
+        {
+            for (int i = 0; keys[i]; i++)
+            {
+                const char *key = miniexp_to_name(keys[i]);
+                const char *val = ddjvu_anno_get_metadata(anno, keys[i]);
+                if (key && val)
+                    djvu_props.emplace_back(key, val);
+            }
+            free(keys);
+        }
+
+        /* XMP metadata blob (if present) */
+        const char *xmp = ddjvu_anno_get_xmp(anno);
+        if (xmp)
+            djvu_props.emplace_back("XMP", xmp);
+
+        ddjvu_miniexp_release(m_ddjvu_doc, anno);
+        return djvu_props;
+    }
+#endif
+
     if (!m_ctx || !m_doc)
         return {};
 
-    std::vector<std::pair<QString, QString>> props;
+    Properties props;
     props.reserve(16); // Typical number of PDF properties
 
     props.push_back(qMakePair("File Path", m_filepath));
@@ -4063,44 +4126,38 @@ Model::visual_line_index_at_pos(
 }
 
 Model::FileType
-Model::detectFileType(const QString &path) noexcept
+Model::getFileType(const QString &path) noexcept
 {
-    const QString ext = QFileInfo(path).suffix().toLower();
+    const QMimeType mime
+        = QMimeDatabase().mimeTypeForFile(path, QMimeDatabase::MatchContent);
+    const QString name = mime.name();
 
-    if (ext.isEmpty())
-        return FileType::NONE;
-
-    // ---- core formats ----
-    if (ext == "pdf")
+    if (name == "application/pdf")
         return FileType::PDF;
-    if (ext == "epub")
+    if (name == "application/epub+zip")
         return FileType::EPUB;
-    if (ext == "svg")
+    if (name == "image/svg+xml")
         return FileType::SVG;
-    if (ext == "xps" || ext == "oxps")
+    if (name == "application/vnd.ms-xpsdocument" || name == "application/oxps")
         return FileType::XPS;
-    if (ext == "mobi")
+    if (name == "application/x-mobipocket-ebook")
         return FileType::MOBI;
-
-    // ---- ebooks / archives ----
-    if (ext == "cbz" || ext == "cbt")
+    if (name == "application/vnd.comicbook+zip" || name == "application/x-cbz")
         return FileType::CBZ;
-
-    if (ext == "fb2" || ext == "fbz")
+    if (name == "application/x-tar")
+        return FileType::CBZ; // cbt
+    if (name == "application/x-fictionbook+xml"
+        || name == "application/x-fictionbook")
         return FileType::FB2;
-
-    // ---- images ----
-    if (ext == "jpg" || ext == "jpeg")
+    if (name == "image/jpeg")
         return FileType::JPG;
-
-    if (ext == "png")
+    if (name == "image/png")
         return FileType::PNG;
-
-    if (ext == "tif" || ext == "tiff")
+    if (name == "image/tiff")
         return FileType::TIFF;
-
 #ifdef HAS_DJVU
-    if (ext == "djvu" || ext == "djv")
+    if (name == "image/vnd.djvu" || name == "image/vnd.djvu+multipage"
+        || name == "image/x-djvu")
         return FileType::DJVU;
 #endif
 

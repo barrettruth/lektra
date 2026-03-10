@@ -59,6 +59,14 @@ public:
     using Id = uint32_t;
     DocumentView(const Config &config, const float dpr = 1.0f,
                  QWidget *parent = nullptr) noexcept;
+
+
+    DocumentView(const DocumentView &) = delete;
+    DocumentView &operator=(const DocumentView &) = delete;
+    DocumentView(DocumentView &&) = delete;
+    DocumentView &operator=(DocumentView &&) = delete;
+    DocumentView(DocumentView* sourceView) = delete;
+
     ~DocumentView() noexcept;
 
     inline Id id() const noexcept
@@ -386,6 +394,7 @@ private slots:
     void handleSynctexJumpRequested(QPointF scenePos) noexcept;
 #endif
     void handleOpenFileFinished() noexcept;
+    void handleOpenFileFailed() noexcept;
 
 protected:
     void handleContextMenuRequested(const QPoint &globalPos,
@@ -510,6 +519,7 @@ private:
     QHash<int, QGraphicsPathItem *> m_search_items;
     QPointF m_selection_start, m_selection_end;
     int m_selection_start_page{-1}, m_selection_end_page{-1};
+    QPointF m_last_selection_start, m_last_selection_end;
     int m_last_selection_page{-1};
     QGraphicsPathItem *m_selection_path_item{nullptr};
     QTimer *m_hq_render_timer{nullptr};
