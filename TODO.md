@@ -5,7 +5,6 @@
 ## HIGH PRIORITY
 
 - [ ] Exiting picker disables shortcut
-- [ ] Read file type from file content instead of extension
 - [ ] Scissor mode for cropping and copying specific regions of the PDF when zoomed in to a high level (high performance gain)
 - [ ] Text selection change pos on resize event
 - [ ] Picker strong key grab
