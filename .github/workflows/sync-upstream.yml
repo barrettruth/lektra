@@ -1,4 +1,4 @@
-name: Sync upstream
+name: Sync from Codeberg
 
 on:
   schedule:
@@ -15,16 +15,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch upstream
+      - name: Fetch Codeberg SSOT
         run: |
-          git remote add upstream https://github.com/dheerajshenoy/lektra.git
-          git fetch upstream
+          git remote add codeberg https://codeberg.org/lektra/lektra.git
+          git fetch codeberg
 
-      - name: Rebase onto upstream
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git rebase upstream/main
+      - name: Reset to Codeberg main
+        run: git reset --hard codeberg/main
 
       - name: Push
         run: git push --force-with-lease origin main
