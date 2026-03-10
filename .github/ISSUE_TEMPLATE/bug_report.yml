@@ -1,0 +1,98 @@
+name: Bug Report
+description: Report a reproducible bug.
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: reproduced
+    attributes:
+      label: Reproduced on latest main
+      description: Make sure the issue is reproducible on the latest `main` branch.
+      options:
+        - label: I have reproduced this on the latest `main` branch.
+          required: true
+
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Searched existing issues
+      description: Search existing issues to avoid duplicates.
+      options:
+        - label: I have searched existing issues for duplicates.
+          required: true
+
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Willing to contribute
+      options:
+        - label: I am willing to submit a pull request for this.
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: "e.g. Arch Linux 6.18, macOS 15.3"
+    validations:
+      required: true
+
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler
+      placeholder: "e.g. GCC 14.2, Clang 19"
+    validations:
+      required: true
+
+  - type: input
+    id: qt
+    attributes:
+      label: Qt version
+      description: "Run `qmake6 --version`"
+      placeholder: "e.g. 6.8.1"
+    validations:
+      required: true
+
+  - type: input
+    id: mupdf
+    attributes:
+      label: MuPDF version
+      description: "Run `grep FZ_VERSION thirdparty/mupdf/include/mupdf/fitz/version.h`"
+      placeholder: "e.g. 1.27.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a PDF with ...
+        2. Press ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      value: |
+        ```
+
+        ```
+    validations:
+      required: true
