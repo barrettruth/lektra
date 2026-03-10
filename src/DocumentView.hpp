@@ -519,6 +519,7 @@ private:
     QHash<int, QGraphicsPathItem *> m_search_items;
     QPointF m_selection_start, m_selection_end;
     int m_selection_start_page{-1}, m_selection_end_page{-1};
+    QPointF m_last_selection_start, m_last_selection_end;
     int m_last_selection_page{-1};
     QGraphicsPathItem *m_selection_path_item{nullptr};
     QTimer *m_hq_render_timer{nullptr};

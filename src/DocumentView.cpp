@@ -2074,6 +2074,9 @@ DocumentView::ClearTextSelection() noexcept
         m_selection_path_item->hide();
     }
 
+    m_last_selection_start = m_selection_start;
+    m_last_selection_end   = m_selection_end;
+
     m_selection_start = QPointF();
     m_selection_end   = QPointF();
 
@@ -3869,11 +3872,7 @@ DocumentView::ensureSearchItemForPage(int pageno) noexcept
 void
 DocumentView::ReselectLastTextSelection() noexcept
 {
-    if (!m_selection_path_item || m_selection_path_item->path().isEmpty())
-        return;
-
-    m_selection_path_item->setVisible(false);
-    m_selection_path_item->setVisible(true);
+    handleTextSelection(m_last_selection_start, m_last_selection_end);
 }
 
 void
