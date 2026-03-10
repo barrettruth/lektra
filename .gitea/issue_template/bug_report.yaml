@@ -23,6 +23,7 @@ body:
       label: Willing to contribute
       options:
         - label: I am willing to submit a pull request for this.
+          required: false
 
   - type: input
     attributes:
@@ -33,24 +34,15 @@ body:
 
   - type: input
     attributes:
-      label: Compiler
-      placeholder: "e.g. GCC 14.2, Clang 19"
-    validations:
-      required: true
-
-  - type: input
-    attributes:
       label: Qt version
-      description: "Run `qmake6 --version`"
-      placeholder: "e.g. 6.8.1"
+      placeholder: "qmake6 --version"
     validations:
       required: true
 
   - type: input
     attributes:
       label: MuPDF version
-      description: "Run `grep FZ_VERSION thirdparty/mupdf/include/mupdf/fitz/version.h`"
-      placeholder: "e.g. 1.27.0"
+      placeholder: "grep FZ_VERSION thirdparty/mupdf/include/mupdf/fitz/version.h"
     validations:
       required: true
 
@@ -79,9 +71,5 @@ body:
   - type: textarea
     attributes:
       label: Logs / screenshots
-      value: |
-        ```
-
-        ```
     validations:
       required: true
