@@ -1227,12 +1227,16 @@ DocumentView::GotoLocation(const PageLocation &targetLocation) noexcept
     if (m_model->numPages() == 0)
         return;
 
-    // Sanitize NaN coordinates - default to top-left of page
+    // Sanitize NaN coordinates - default to center of page
     PageLocation sanitized = targetLocation;
-    if (std::isnan(sanitized.x))
-        sanitized.x = 0.0f;
-    if (std::isnan(sanitized.y))
-        sanitized.y = 0.0f;
+    if (std::isnan(sanitized.x) || std::isnan(sanitized.y))
+    {
+        const auto pageDim = m_model->page_dimension_pts(sanitized.pageno);
+        if (std::isnan(sanitized.x))
+            sanitized.x = pageDim.width_pts / 2.0f;
+        if (std::isnan(sanitized.y))
+            sanitized.y = pageDim.height_pts / 2.0f;
+    }
 
     // HANDLE PENDING RENDERS
     if (!m_page_items_hash.contains(sanitized.pageno))
