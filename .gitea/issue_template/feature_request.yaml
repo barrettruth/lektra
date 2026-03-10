@@ -4,15 +4,22 @@ labels: ["enhancement"]
 body:
   - type: checkboxes
     attributes:
-      label: Pre-flight
+      label: Searched existing issues
+      description: Search existing issues to avoid duplicates.
       options:
         - label: I have searched existing issues for duplicates.
           required: true
 
+  - type: checkboxes
+    attributes:
+      label: Willing to contribute
+      options:
+        - label: I am willing to submit a pull request for this.
+          required: false
+
   - type: textarea
     attributes:
       label: Problem
-      description: What limitation or pain point does this address?
     validations:
       required: true
 
