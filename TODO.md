@@ -15,15 +15,16 @@
 - [ ] Don't add connection to annotation when in non-annotatable mode
 - [ ] External search engine configuration
 - [ ] Crash when zoom out too much and then in
+- [ ] Search from current position instead of top of document
 
 ## MEDIUM PRIORITY
+- [ ] Show text highlight brush cursor when highlighting text
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
 - [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
 - [ ] Command Line Arguments
-    - [ ]
-- [ ] readthedocs.io page
+- [ ] lektra.readthedocs.io page
 
 ## LOW PRIORITY
 
