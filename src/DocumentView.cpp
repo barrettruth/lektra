@@ -143,6 +143,7 @@ DocumentView::initGui() noexcept
             &DocumentView::handleDeferredResize);
 
     m_jump_marker = new JumpMarker(rgbaToQColor(m_config.jump_marker.color));
+    m_jump_marker->setFadeDuration(m_config.jump_marker.fade_duration);
     m_jump_marker->setZValue(ZVALUE_JUMP_MARKER);
     m_gscene->addItem(m_jump_marker);
 

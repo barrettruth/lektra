@@ -31,13 +31,19 @@ public:
         });
     }
 
-    inline QRectF boundingRect() const override
+    inline void setFadeDuration(float duration_s) noexcept
+    {
+        duration_s = std::max(0.0f, duration_s);
+        m_fade_animation->setDuration(duration_s * 1000); // convert to milliseconds
+    }
+
+    inline QRectF boundingRect() const noexcept override
     {
         return QRectF(-10, -10, 20, 20);
     }
 
     void paint(QPainter *p, const QStyleOptionGraphicsItem *,
-               QWidget *) override
+               QWidget *) noexcept override
     {
         p->setPen(Qt::NoPen);
         p->setBrush(m_color);
@@ -47,9 +53,7 @@ public:
     void showAt(float x, float y) noexcept
     {
         if (m_fade_animation->state() == QAbstractAnimation::Running)
-        {
             m_fade_animation->stop();
-        }
 
         setPos(x, y);
         setOpacity(1.0);

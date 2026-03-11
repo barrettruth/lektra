@@ -886,6 +886,7 @@ Lektra::initConfig() noexcept
     {
         set(jump_marker["enabled"], m_config.jump_marker.enabled);
         set_color(jump_marker["jump_marker"], m_config.jump_marker.color);
+        set(jump_marker["fade_duration"], m_config.jump_marker.fade_duration);
     }
 
     // Links

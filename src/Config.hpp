@@ -560,6 +560,12 @@ struct Config
         // @added 0.3.1
         uint32_t color{0xFF0000FF};
 
+        // @desc Jump marker fade duration in seconds
+        // @type float
+        // @default 1.0
+        // @added 0.6.7
+        float fade_duration{1.0f};
+
     } jump_marker{};
     // @endsection
 
