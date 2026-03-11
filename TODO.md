@@ -50,7 +50,6 @@
     - [ ] Use OpenGL for rendering using GPU for performance boost instead of QGraphicsView
 - [ ] Fix open containing folder
 - [ ] Navigate chapters, sections, subsections, etc. in the document
-- [ ] Auto-find current position in the outline
 - [ ] Narrow to region
 - [ ] Ruler
 - [ ] Try to generate outline if not present somehow
