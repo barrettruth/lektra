@@ -1,12 +1,9 @@
 name: Build AppImage
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - "**"
-    tags:
-      - "!**"
+  # On release creation, any tag should trigger the workflow, but not on push to branches. This allows us to create a release with a tag, and have the AppImage built and attached to the release as an artifact.
+  release:
+    types: [created]
 
 jobs:
   build:
