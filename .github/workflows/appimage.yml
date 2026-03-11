@@ -60,6 +60,7 @@ jobs:
         env:
           OUTPUT: Lektra-${{ steps.version.outputs.version }}-x86_64.AppImage
         run: |
+          export QMAKE=qmake6
           ./linuxdeploy-x86_64.AppImage \
             --appdir $GITHUB_WORKSPACE/AppDir \
             --plugin qt \
