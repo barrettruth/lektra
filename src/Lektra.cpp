@@ -305,17 +305,11 @@ Lektra::initMenubar() noexcept
     m_actionToggleOutline = m_toggleMenu->addAction(
         tr("Outline\t%1").arg(m_config.keybinds["picker_outline"]), this,
         &Lektra::Show_outline);
-    m_actionToggleOutline->setCheckable(true);
-    m_actionToggleOutline->setChecked(m_outline_picker
-                                      && !m_outline_picker->isHidden());
 
     m_actionToggleHighlightAnnotSearch = m_toggleMenu->addAction(
         tr("Highlight Annotation Search\t%1")
             .arg(m_config.keybinds["picker_highlight_search"]),
         this, &Lektra::Show_highlight_search);
-    m_actionToggleHighlightAnnotSearch->setCheckable(true);
-    m_actionToggleHighlightAnnotSearch->setChecked(
-        m_highlight_search_picker && !m_highlight_search_picker->isHidden());
 
     m_actionToggleMenubar = m_toggleMenu->addAction(
         tr("Menubar\t%1").arg(m_config.keybinds["menubar"]), this,
@@ -329,11 +323,11 @@ Lektra::initMenubar() noexcept
     m_actionToggleTabBar->setCheckable(true);
     m_actionToggleTabBar->setChecked(!m_tab_widget->tabBar()->isHidden());
 
-    m_actionTogglePanel = m_toggleMenu->addAction(
+    m_actionToggleStatusbar = m_toggleMenu->addAction(
         tr("Statusbar\t%1").arg(m_config.keybinds["statusbar"]), this,
-        &Lektra::TogglePanel);
-    m_actionTogglePanel->setCheckable(true);
-    m_actionTogglePanel->setChecked(!m_statusbar->isHidden());
+        &Lektra::ToggleStatusbar);
+    m_actionToggleStatusbar->setCheckable(true);
+    m_actionToggleStatusbar->setChecked(!m_statusbar->isHidden());
 
     m_actionInvertColor = m_viewMenu->addAction(
         tr("Invert Color\t%1").arg(m_config.keybinds["invert_color"]), this,
@@ -1255,7 +1249,7 @@ Lektra::initGui() noexcept
     m_menuBar    = this->menuBar();
     m_tab_widget = new TabWidget(centralWidget());
 
-    // Panel
+    // Statusbar
     m_statusbar = new Statusbar(m_config.statusbar, this);
     m_statusbar->hidePageInfo(true);
     m_statusbar->setMode(GraphicsView::Mode::TextSelection);
@@ -1517,13 +1511,13 @@ Lektra::ToggleFullscreen() noexcept
     m_actionFullscreen->setChecked(!isFullscreen);
 }
 
-// Toggles the panel
+// Toggles the statusbar
 void
-Lektra::TogglePanel() noexcept
+Lektra::ToggleStatusbar() noexcept
 {
     bool shown = !m_statusbar->isHidden();
     m_statusbar->setHidden(shown);
-    m_actionTogglePanel->setChecked(!shown);
+    m_actionToggleStatusbar->setChecked(!shown);
 }
 
 // Toggles the menubar
@@ -2084,7 +2078,7 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
             m_tab_widget->tabBar()->setTabText(tabIndex, m_config.tabs.full_path
                                                              ? doc->filePath()
                                                              : doc->fileName());
-        updatePanel();
+        updateStatusbar();
         updateUiEnabledState();
     }, Qt::SingleShotConnection);
 
@@ -2930,8 +2924,8 @@ Lektra::handleCurrentTabChanged(int index) noexcept
         updatePageNavigationActions();
         updateSelectionModeActions();
 
-        // Update panel if needed
-        updatePanel();
+        // Update statusbar if needed
+        updateStatusbar();
     }
 }
 
@@ -2988,7 +2982,7 @@ Lektra::handleTabDropReceived(const TabBar::TabData &data) noexcept
 
         // Restore fit mode
         m_doc->setFitMode(static_cast<DocumentView::FitMode>(data.fitMode));
-        // updatePanel();
+        // updateStatusbar();
     });
 }
 
@@ -3381,17 +3375,17 @@ Lektra::filePropertiesForIndex(int index) noexcept
 void
 Lektra::initTabConnections(DocumentView *docwidget) noexcept
 {
-    connect(docwidget, &DocumentView::panelNameChanged, this,
+    connect(docwidget, &DocumentView::statusbarNameChanged, this,
             [this](const QString &name) { m_statusbar->setFileName(name); });
 
     connect(docwidget, &DocumentView::openFileFinished, this,
             [this](DocumentView *doc, Model::FileType /* ft */)
     {
-        // Only update the panel if this view is the currently active one.
+        // Only update the statusbar if this view is the currently active one.
         // If it's a background split, don't clobber the active view's info.
         if (m_doc == doc)
         {
-            updatePanel();
+            updateStatusbar();
             // Also drive the tab title, which suffers the same timing
             // problem
             int index = m_tab_widget->currentIndex();
@@ -3430,7 +3424,7 @@ Lektra::initTabConnections(DocumentView *docwidget) noexcept
         // Update UI state if this was the current view
         if (wasCurrentView)
         {
-            updatePanel();
+            updateStatusbar();
             updateUiEnabledState();
         }
     });
@@ -3489,7 +3483,7 @@ Lektra::initTabConnections(DocumentView *docwidget) noexcept
     connect(docwidget, &DocumentView::searchCountChanged, m_search_bar,
             &SearchBar::setSearchCount);
 
-    // connect(docwidget, &DocumentView::searchModeChanged, m_panel,
+    // connect(docwidget, &DocumentView::searchModeChanged, m_statusbar,
     //         &SearchBar::setSearchMode);
 
     connect(docwidget, &DocumentView::searchIndexChanged, m_search_bar,
@@ -3535,9 +3529,9 @@ Lektra::insertFileToDB(const QString &fname, int pageno) noexcept
         qWarning() << "Failed to save recent files store";
 }
 
-// Update the panel info
+// Update the statusbar info
 void
-Lektra::updatePanel() noexcept
+Lektra::updateStatusbar() noexcept
 {
     if (m_doc)
     {
@@ -3897,7 +3891,7 @@ Lektra::initCommands() noexcept
     m_command_manager->reg("menubar", tr("Toggle menu bar"),
                            [this](const QStringList &) { ToggleMenubar(); });
     m_command_manager->reg("statusbar", tr("Toggle status bar"),
-                           [this](const QStringList &) { TogglePanel(); });
+                           [this](const QStringList &) { ToggleStatusbar(); });
     m_command_manager->reg("focus_mode", tr("Toggle focus mode"),
                            [this](const QStringList &) { ToggleFocusMode(); });
     m_command_manager->reg("visual_line_mode", tr("Toggle visual line mode"),
@@ -4916,7 +4910,7 @@ Lektra::setCurrentDocumentView(DocumentView *view) noexcept
                                                      : m_doc->fileName());
     updateUiEnabledState();
     updatePageNavigationActions();
-    updatePanel();
+    updateStatusbar();
 }
 
 void

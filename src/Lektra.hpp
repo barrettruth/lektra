@@ -77,7 +77,7 @@ public:
     void ToggleFocusMode() noexcept;
     void ToggleMenubar() noexcept;
     void ToggleTabBar() noexcept;
-    void TogglePanel() noexcept;
+    void ToggleStatusbar() noexcept;
     void ToggleFullscreen() noexcept;
     void ToggleTextSelection() noexcept;
     void ToggleTextHighlight() noexcept;
@@ -264,7 +264,7 @@ private:
     void handleCurrentTabChanged(int index) noexcept;
     void openInExplorerForIndex(int index) noexcept;
     void filePropertiesForIndex(int index) noexcept;
-    void updatePanel() noexcept;
+    void updateStatusbar() noexcept;
     QStringList getSessionFiles() noexcept;
     void insertFileToDB(const QString &fname, int pageno) noexcept;
     void clearKBHintsOverlay() noexcept;
@@ -327,7 +327,7 @@ private:
     QAction *m_actionToggleMenubar{nullptr};
     QAction *m_actionNoneMode{nullptr};
     QAction *m_actionVisualLineMode{nullptr};
-    QAction *m_actionTogglePanel{nullptr};
+    QAction *m_actionToggleStatusbar{nullptr};
     QAction *m_actionToggleOutline{nullptr};
     QAction *m_actionToggleHighlightAnnotSearch{nullptr};
     QAction *m_actionGotoPage{nullptr};
@@ -380,7 +380,7 @@ private:
     CommentSearchPicker *m_comment_search_picker{nullptr};
     RecentFilesPicker *m_recent_file_picker{nullptr};
     DocumentView *m_preview_view{nullptr}; // For link preview (Alt+click)
-    QWidget *m_preview_overlay{nullptr}; // Overlay for link preview
+    QWidget *m_preview_overlay{nullptr};   // Overlay for link preview
 
     // Used for lifetime management of portal-source
     struct PortalPair

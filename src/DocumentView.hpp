@@ -356,7 +356,7 @@ signals:
     void zoomChanged(double factor);
     void fitModeChanged(FitMode mode);
     void selectionModeChanged(GraphicsView::Mode mode);
-    void panelNameChanged(const QString &name);
+    void statusbarNameChanged(const QString &name);
     void fileNameChanged(const QString &name);
     void searchCountChanged(int count);
     void searchIndexChanged(int index);

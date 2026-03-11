@@ -3724,7 +3724,7 @@ DocumentView::setModified(bool modified) noexcept
 
     title = title.arg(this->fileName());
 
-    emit panelNameChanged(fileName);
+    emit statusbarNameChanged(fileName);
     this->setWindowTitle(title);
 }
 

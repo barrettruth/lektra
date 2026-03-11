@@ -19,6 +19,10 @@
 - Now pinch-zoom respects the mouse position anchor instead of the center of the viewport
 - Fix spawning multiple instances of `AboutDialog`
 
+### Core Changes
+
+- Rename `panel` to `statusbar`
+
 ## 0.6.6
 
 ### Features
