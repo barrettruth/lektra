@@ -85,6 +85,7 @@ Check out [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ### Thanks to all the contributors who have helped (and helping) make this project better (in no particular order):
 
+- [barrettruth](https://github.com/barrettruth) - For contributing the NixOS flake and issue report templates.
 - [techmanwalker](https://github.com/techmanwalker) - For initiating translations and contributing the Spanish translation.
 - [linwaytin](https://codeberg.org/linwaytin) - For providing valuable feedback and bug reports and feature-requesting annotation comment.
 - [douglarek](https://github.com/douglarek) - For packaging lektra to [gentoo-zh](https://github.com/microcai/gentoo-zh).
