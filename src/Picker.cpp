@@ -14,8 +14,6 @@ Picker::Picker(QWidget *parent) noexcept : QWidget(parent)
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
     setFocusPolicy(Qt::StrongFocus);
 
-    // Outer layout fills the full picker area — no margins, just holds the
-    // frame
     auto *outerLayout = new QVBoxLayout(this);
     outerLayout->setContentsMargins(12, 12, 12, 12); // room for shadow bleed
     outerLayout->setSpacing(0);
@@ -36,15 +34,14 @@ Picker::Picker(QWidget *parent) noexcept : QWidget(parent)
     innerLayout->setContentsMargins(8, 8, 8, 8);
     innerLayout->setSpacing(4);
 
-    m_searchBox = new QLineEdit(m_frame); // parent is frame, not this
+    m_searchBox = new QLineEdit(m_frame);
     m_searchBox->setPlaceholderText("Search...");
     m_searchBox->setClearButtonEnabled(true);
     innerLayout->addWidget(m_searchBox);
-    m_searchBox->installEventFilter(
-        this); // to prevent key events from propagating to picker
+    m_searchBox->installEventFilter(this);
 
     m_listView = new QTreeView(m_frame);
-    m_listView->setRootIsDecorated(false); // no expand arrows — looks flat
+    m_listView->setRootIsDecorated(false);
     m_listView->setItemsExpandable(false);
     m_listView->setUniformRowHeights(true);
     m_listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -64,7 +61,7 @@ Picker::Picker(QWidget *parent) noexcept : QWidget(parent)
             &Picker::onSearchChanged);
     connect(m_listView, &QTreeView::activated, this, &Picker::onItemActivated);
 
-    applyFrameStyle(); // called once, after everything is constructed
+    applyFrameStyle();
 
     parent->installEventFilter(this);
     hide();
@@ -339,7 +336,6 @@ Picker::itemAtProxyIndex(const QModelIndex &proxyIndex) const
         .value<Item>();
 }
 
-// picker.cpp
 void
 Picker::repopulate() noexcept
 {
