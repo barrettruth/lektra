@@ -4,6 +4,7 @@
 
 ### Features
 
+- Add `--list-commands` command line argument to print the list of available commands with their descriptions to the console and exit.
 - Added `fade_duration` to `[jump_marker]` config section to configure the duration of the fade out effect for the jump marker in seconds.
 - Finally added `Ctrl + Mouse Wheel` zooming!
 - Config option for `[zoom]` to choose whether zoom should be anchored at mouse position or center of the viewport. This can be configured with the `anchor_to_mouse` option. Otherwise, zoom will be anchored to the center of the viewport as it was before.
