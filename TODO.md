@@ -26,7 +26,6 @@
 - [ ] Shell Scripting
 - [ ] Command Line Arguments
 - [ ] lektra.readthedocs.io page
-- [ ] Man page
 
 ## LOW PRIORITY
 
