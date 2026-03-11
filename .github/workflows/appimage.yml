@@ -79,14 +79,14 @@ jobs:
         run: |
           APPDIR=$GITHUB_WORKSPACE/AppDir
           cat > $APPDIR/AppRun << 'EOF'
-#!/bin/bash
-HERE="$(dirname "$(readlink -f "$0")")"
-export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
-export QT_PLUGIN_PATH="$HERE/usr/plugins"
-export QT_QPA_PLATFORM_PLUGIN_PATH="$HERE/usr/plugins/platforms"
-export XDG_DATA_DIRS="$HERE/usr/share:$XDG_DATA_DIRS"
-exec "$HERE/usr/bin/lektra" "$@"
-EOF
+          #!/bin/bash
+          HERE="$(dirname "$(readlink -f "$0")")"
+          export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
+          export QT_PLUGIN_PATH="$HERE/usr/plugins"
+          export QT_QPA_PLATFORM_PLUGIN_PATH="$HERE/usr/plugins/platforms"
+          export XDG_DATA_DIRS="$HERE/usr/share:$XDG_DATA_DIRS"
+          exec "$HERE/usr/bin/lektra" "$@"
+          EOF
           chmod +x $APPDIR/AppRun
 
       - name: Add .desktop and icon
@@ -95,13 +95,13 @@ EOF
           mkdir -p $APPDIR/usr/share/applications $APPDIR/usr/share/icons/hicolor/256x256/apps
 
           cp $APPDIR/usr/share/applications/lektra.desktop $APPDIR/ 2>/dev/null || cat > $APPDIR/lektra.desktop << 'EOF'
-[Desktop Entry]
-Name=Lektra
-Exec=lektra
-Icon=lektra
-Type=Application
-Categories=Office;Viewer;
-EOF
+          [Desktop Entry]
+          Name=Lektra
+          Exec=lektra
+          Icon=lektra
+          Type=Application
+          Categories=Office;Viewer;
+          EOF
 
           cp $APPDIR/usr/share/icons/hicolor/256x256/apps/lektra.png $APPDIR/ 2>/dev/null || true
 
