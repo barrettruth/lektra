@@ -15,7 +15,7 @@ def extract_commands(path: str) -> list[tuple[str, str]]:
 
     # Match m_command_manager.reg("name", "description", ...)
     pattern = re.compile(
-            r'm_command_manager\.reg\(\s*"([^"]+)"\s*,\s*(?:tr\()?"([^"]*)"\)?\s*,',
+        r'm_command_manager->reg\(\s*"([^"]+)"\s*,\s*(?:tr\()?\"([^\"]*)\"\)?\s*,',
         re.MULTILINE,
     )
 
@@ -32,9 +32,13 @@ def main():
         return
 
     out = [{"name": name, "description": desc} for name, desc in commands]
-    with open("/home/dheeraj/Gits/dheerajshenoy.github.io/lektra/files/commands.json", "w") as f:
+    with open(
+        "/home/dheeraj/Gits/dheerajshenoy.github.io/lektra/files/commands.json", "w"
+    ) as f:
         f.write(json.dumps(out, indent=2))
 
+    with open("../docs/man/commands.json", "w") as f:
+        f.write(json.dumps(out, indent=2))
 
 
 if __name__ == "__main__":
