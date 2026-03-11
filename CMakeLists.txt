@@ -384,6 +384,16 @@ else()
 endif()
 #Install icons to correct freedesktop - compliant locations
 
+if(LINUX)
+    qt_import_plugins(${CMAKE_PROJECT_NAME}
+        INCLUDE
+            Qt6::QWaylandIntegrationPlugin      # Wayland support (libqwayland.so)
+            Qt6::QXcbIntegrationPlugin          # X11 support
+            Qt6::QEglFSIntegrationPlugin        # Embedded GL support
+    )
+endif()
+
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lektra-template.desktop.in
     ${CMAKE_CURRENT_BINARY_DIR}/lektra.desktop @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lektra.desktop DESTINATION share/applications)
