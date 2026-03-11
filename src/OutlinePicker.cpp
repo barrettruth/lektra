@@ -95,6 +95,7 @@ OutlinePicker::onItemAccepted(const Item &item)
 {
     const size_t i = item.data.toULongLong();
     if (i < m_entries.size())
+    {
         emit jumpToLocationRequested(m_entries[i].page, m_entries[i].location);
     }
 }
