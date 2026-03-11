@@ -404,6 +404,11 @@ install(DIRECTORY resources/hicolor DESTINATION share/icons FILES_MATCHING PATTE
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.pdf
     DESTINATION share/doc/${PROJECT_NAME})
 
+# Install man page
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra.1 DESTINATION share/man/man1)
+# install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-config.5 DESTINATION share/man/man5)
+# install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-commands.7 DESTINATION share/man/man7)
+
 if(ENABLE_LLM_SUPPORT)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/llm/role.txt DESTINATION share/${PROJECT_NAME}/)
 endif()
