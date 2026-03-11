@@ -4,6 +4,9 @@ OutlinePicker::OutlinePicker(const Config::Outline &config,
                              QWidget *parent) noexcept
     : Picker(parent), m_config(config)
 {
+    m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     // Configure the columns for the new populate() logic
     if (config.show_page_number)
     {
@@ -93,4 +96,27 @@ OutlinePicker::onItemAccepted(const Item &item)
     const size_t i = item.data.toULongLong();
     if (i < m_entries.size())
         emit jumpToLocationRequested(m_entries[i].page, m_entries[i].location);
+    }
+}
+
+void
+OutlinePicker::selectCurrentPage() noexcept
+{
+    if (m_entries.empty() || m_current_page < 0)
+        return;
+
+    int best_idx = 0;
+    for (size_t i = 0; i < m_entries.size(); ++i)
+    {
+        if (m_entries[i].page <= m_current_page)
+            best_idx = static_cast<int>(i);
+        else
+            break;
+    }
+
+    QModelIndex source_idx = m_proxy->sourceModel()->index(best_idx, 0);
+    QModelIndex proxy_idx  = m_proxy->mapFromSource(source_idx);
+    m_listView->setCurrentIndex(proxy_idx);
+    m_listView->scrollTo(proxy_idx, QAbstractItemView::PositionAtCenter);
+    m_listView->setFocus();
 }

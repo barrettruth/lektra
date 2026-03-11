@@ -1,8 +1,13 @@
 #pragma once
+
 #include "Config.hpp"
 #include "Picker.hpp"
 
+extern "C"
+{
 #include <mupdf/fitz.h>
+}
+
 #include <vector>
 
 class OutlinePicker : public Picker
@@ -20,6 +25,13 @@ public:
     {
         return !m_entries.empty();
     }
+
+    inline void setCurrentPage(int page) noexcept
+    {
+        m_current_page = page;
+    }
+
+    void selectCurrentPage() noexcept;
 
 signals:
     void jumpToLocationRequested(int page, const QPointF &pos);
@@ -42,4 +54,5 @@ private:
 
     std::vector<OutlineEntry> m_entries;
     const Config::Outline &m_config;
+    int m_current_page{-1};
 };
