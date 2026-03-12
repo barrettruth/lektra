@@ -10,7 +10,6 @@
 #include "ScrollBar.hpp"
 #include "WaitingSpinnerWidget.hpp"
 
-#include <QFutureWatcher>
 
 #ifdef HAS_SYNCTEX
 extern "C"
@@ -21,6 +20,7 @@ extern "C"
 }
 #endif
 
+#include <QFutureWatcher>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
 #include <QGraphicsItem>
