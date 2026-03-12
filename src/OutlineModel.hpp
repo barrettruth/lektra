@@ -40,11 +40,10 @@ public:
             while (current)
             {
                 const bool isHeading = current->down != nullptr;
-                // QString titleText    = QString::fromUtf8(
-                //     current->title ? current->title : "<no title>");
-                QByteArray rawData(current->title ? current->title
-                                                  : "Untitled");
-                QString titleText = QString::fromUtf8(rawData).trimmed();
+                const char *raw = current->title ? current->title : "Untitled";
+                QString titleText
+                    = QString::fromUtf8(raw, strlen(raw)).trimmed();
+
                 if (depth > 0)
                     titleText.prepend(QString(depth * 2, ' '));
 
