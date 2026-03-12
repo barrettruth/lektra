@@ -49,6 +49,6 @@ private:
     QLabel *m_progress_label        = new QLabel();
     QLabel *m_portal_label          = new QLabel("P");
     QPushButton *m_session_label    = new QPushButton();
-    QGridLayout *m_layout           = new QGridLayout();
+    QGridLayout *m_layout           = new QGridLayout(this);
     GraphicsView::Mode m_current_mode;
 };
