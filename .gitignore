@@ -13,3 +13,5 @@ scripts/*.pdf
 TAGS
 .envrc
 .direnv/
+pkg/
+*.tar.gz
