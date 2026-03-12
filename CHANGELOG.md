@@ -3,6 +3,7 @@
 ## 0.6.8
 
 ### Features
+- Add `open_config` command to open the config file in the default text editor for easy editing and customization of settings.
 
 ### Optimizations
 
