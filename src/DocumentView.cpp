@@ -1,13 +1,19 @@
 #include "DocumentView.hpp"
 
+// Annotations
 #include "Annotations/HighlightAnnotation.hpp"
 #include "Annotations/PopupAnnotation.hpp"
 #include "Annotations/RectAnnotation.hpp"
 #include "BrowseLinkItem.hpp"
+
+// Commands
+#include "Commands/AnnotColorCommand.hpp"
 #include "Commands/AnnotCommentCommand.hpp"
 #include "Commands/DeleteAnnotationsCommand.hpp"
 #include "Commands/RectAnnotationCommand.hpp"
 #include "Commands/TextAnnotationCommand.hpp"
+
+// Other
 #include "Config.hpp"
 #include "DocumentContainer.hpp"
 #include "GraphicsImageItem.hpp"
@@ -16,7 +22,6 @@
 #include "LinkHint.hpp"
 #include "PropertiesWidget.hpp"
 #include "WaitingSpinnerWidget.hpp"
-#include "mupdf/pdf/annot.h"
 #include "utils.hpp"
 
 #include <QClipboard>
@@ -3676,15 +3681,18 @@ DocumentView::renderAnnotations(
         connect(annot_item, &Annotation::annotColorChangeRequested, this,
                 [this, annot_item, pageno]()
         {
-            auto color = QColorDialog::getColor(
-                annot_item->data(3).value<QColor>(), this, "Highlight Color",
+            const auto newColor = QColorDialog::getColor(
+                annot_item->color(), this, "Highlight Color",
                 QColorDialog::ColorDialogOption::ShowAlphaChannel);
-            if (color.isValid())
-                m_model->annotChangeColor(pageno, annot_item->index(), color);
+            if (newColor.isValid())
+            {
+                m_model->undoStack()->push(
+                    new AnnotColorCommand(m_model, pageno, annot_item->index(),
+                                          annot_item->color(), newColor));
+            }
         });
 
         m_gscene->addItem(annot_item);
-
         m_page_annotations_hash[pageno].push_back(annot_item);
     }
 }

@@ -172,6 +172,7 @@ add_executable(${PROJECT_NAME}
     src/Commands/TextHighlightAnnotationCommand.hpp
     src/Commands/DeleteAnnotationsCommand.hpp
     src/Commands/AnnotCommentCommand.hpp
+    src/Commands/AnnotColorCommand.hpp
 )
 
 if(APPLE)
