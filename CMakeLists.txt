@@ -143,7 +143,7 @@ add_executable(${PROJECT_NAME}
     src/AppPaths.hpp
     src/GraphicsPixmapItem.hpp
     src/BrowseLinkItem.hpp
-    src/OutlineWidget.hpp
+    # src/OutlineWidget.hpp
     src/ElidableLabel.hpp
     src/FloatingOverlayWidget.hpp
     src/HighlightSearchPicker.hpp
