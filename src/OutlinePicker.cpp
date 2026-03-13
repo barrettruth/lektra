@@ -38,8 +38,16 @@ OutlinePicker::harvest(fz_outline *node, int depth) noexcept
 {
     for (fz_outline *n = node; n; n = n->next)
     {
+        const QString title
+            = QString::fromUtf8(n->title ? n->title : "<no title>")
+                  .remove(QChar::Null)
+                  .remove(QChar::ParagraphSeparator)
+                  .remove(QChar::LineSeparator)
+                  .remove(QChar(0xFFFD))
+                  .trimmed();
+
         m_entries.push_back({
-            .title     = QString::fromUtf8(n->title ? n->title : "<no title>"),
+            .title     = title,
             .depth     = depth,
             .page      = n->page.page,
             .location  = QPointF(n->x, n->y),
