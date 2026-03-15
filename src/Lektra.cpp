@@ -163,11 +163,11 @@ Lektra::initMenubar() noexcept
 
     m_actionSaveFile = fileMenu->addAction(
         tr("Save File\t%1").arg(m_config.keybinds["file_save"]), this,
-        &Lektra::SaveFile);
+        [this]() { Lektra::SaveFile(); });
 
     m_actionSaveAsFile = fileMenu->addAction(
         tr("Save As File\t%1").arg(m_config.keybinds["file_save_as"]), this,
-        &Lektra::SaveAsFile);
+        [this]() { Lektra::SaveAsFile(); });
 
     QMenu *sessionMenu = fileMenu->addMenu(tr("Session"));
 
@@ -446,7 +446,7 @@ Lektra::initMenubar() noexcept
 
     m_actionGotoPage = m_navMenu->addAction(
         tr("Goto Page\t%1").arg(m_config.keybinds["page_goto"]), this,
-        &Lektra::Goto_page);
+        [this]() { Lektra::Goto_page(); });
 
     m_actionFirstPage = m_navMenu->addAction(
         tr("First Page\t%1").arg(m_config.keybinds["page_first"]), this,
@@ -474,15 +474,15 @@ Lektra::initMenubar() noexcept
 
     m_actionSetMark = markMenu->addAction(
         tr("Set Mark\t%1").arg(m_config.keybinds["set_mark"]), this,
-        &Lektra::SetMark);
+        [this]() { Lektra::SetMark(); });
 
     m_actionGotoMark = markMenu->addAction(
         tr("Goto Mark\t%1").arg(m_config.keybinds["goto_mark"]), this,
-        &Lektra::GotoMark);
+        [this]() { Lektra::GotoMark(); });
 
     m_actionDeleteMark = markMenu->addAction(
         tr("Delete Mark\t%1").arg(m_config.keybinds["delete_mark"]), this,
-        &Lektra::DeleteMark);
+        [this]() { Lektra::DeleteMark(); });
 
     /* Help Menu */
     QMenu *helpMenu = m_menuBar->addMenu(tr("&Help"));
@@ -1562,30 +1562,34 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
 
     if (argparser.is_used("version"))
     {
-        qInfo() << "Lektra version: " << APP_VERSION;
+        QTextStream out(stdout);
+        out << "Lektra version: " << APP_VERSION;
         exit(0);
     }
 
     if (argparser.is_used("list-commands"))
     {
-        qInfo().noquote() << "Available commands:\n";
+        QTextStream out(stdout);
+        out << "Available commands:" << Qt::endl;
 
         initCommands();
 
         // Calculate the maximum width of command names for alignment
         int max_width = 0;
 
-        for (const auto &cmd : m_command_manager->commands())
-        {
-            max_width = std::max(max_width, static_cast<int>(cmd.name.size()));
-        }
+        auto commands = m_command_manager->commands();
+        std::sort(commands.begin(), commands.end(),
+                  [](Command a, Command b) { return a.name < b.name; });
 
-        for (const auto &cmd : m_command_manager->commands())
+        for (const auto &cmd : commands)
+            max_width = std::max(max_width, static_cast<int>(cmd.name.size()));
+
+        for (const auto &cmd : commands)
         {
-            QString line = QString("  %1  %2")
-                               .arg(cmd.name, -max_width)
-                               .arg(cmd.description);
-            qInfo().noquote() << line;
+            const QString line = QString("  %1  %2")
+                                     .arg(cmd.name, -max_width)
+                                     .arg(cmd.description);
+            out << line << Qt::endl;
         }
 
         exit(0);
@@ -1674,11 +1678,37 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
         return;
     }
 
+    // Build the list of CLI commands to run after a file loads
+    auto runCliCommands = [&]()
+    {
+        if (!argparser.is_used("command"))
+            return;
+
+        QTextStream err(stderr);
+        const std::string command_str = argparser.get<std::string>("--command");
+        const QStringList command_list = QString::fromStdString(command_str)
+                                             .split(';', Qt::SkipEmptyParts);
+        for (const QString &cmd : command_list)
+        {
+            QStringList parts = cmd.split(' ', Qt::SkipEmptyParts);
+            if (parts.isEmpty())
+                continue;
+
+            const QString cmd_name = parts[0];
+            const QStringList args = parts.mid(1);
+            PPRINT("Executing command from command line:", cmd_name, args);
+            if (auto *c = m_command_manager->find(cmd_name))
+                c->action(args);
+            else
+                err << "Unknown command from command line:" << cmd_name
+                    << Qt::endl;
+        }
+    };
+
     if (argparser.is_used("files"))
     {
         auto files = argparser.get<std::vector<std::string>>("files");
         m_config.behavior.open_last_visited = false;
-
         const int pageOverride = m_config.behavior.startpage_override;
 
         if (!files.empty())
@@ -1695,15 +1725,17 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
                     // If only one file is passed, open it in a new tab and go
                     // to the specified page (if any)
                     OpenFileInNewTab(QString::fromStdString(files[0]),
-                                     [pageOverride, this]()
+                                     [pageOverride, this, runCliCommands]()
                     {
                         if (pageOverride > 0)
                             gotoPage(pageOverride);
+                        runCliCommands();
                     });
                 }
                 else
                 {
                     OpenFiles(files);
+                    runCliCommands();
                 }
             }
         }
@@ -1828,18 +1860,23 @@ Lektra::ZoomIn() noexcept
 }
 
 void
-Lektra::Zoom_set() noexcept
+Lektra::Zoom_set(const QStringList &args) noexcept
 {
-    if (m_doc)
-    {
-        bool ok           = false;
-        const double zoom = QInputDialog::getDouble(
-            this, "Set Zoom",
-            "Enter zoom level (e.g. 1.5 for 150%):", m_doc->zoom(), 0.1, 10.0,
-            2, &ok);
-        if (ok)
-            m_doc->setZoom(zoom);
-    }
+    if (!m_doc)
+        return;
+
+    double zoom;
+    bool ok;
+
+    if (args.isEmpty())
+        zoom = QInputDialog::getDouble(this, "Set Zoom",
+                                       "Enter zoom level (e.g. 1.5 for 150%):",
+                                       m_doc->zoom(), 0.1, 10.0, 2, &ok);
+    else
+        double temp = args.at(0).toDouble(&ok);
+    if (!ok)
+        return;
+    m_doc->setZoom(zoom);
 }
 
 // Resets zoom
@@ -1852,26 +1889,36 @@ Lektra::ZoomReset() noexcept
 
 // Go to a particular page (asks user with a dialog)
 void
-Lektra::Goto_page() noexcept
+Lektra::Goto_page(const QStringList &args) noexcept
 {
     if (!m_doc || !m_doc->model())
         return;
 
-    int total = m_doc->model()->numPages();
-    if (total == 0)
-    {
-        QMessageBox::information(this, "Goto Page",
-                                 "This document has no pages");
-        return;
-    }
-
+    int pageno;
     bool ok;
-    int pageno = QInputDialog::getInt(
-        this, "Goto Page", tr("Enter page number (1 to %1)").arg(total),
-        m_doc->pageNo() + 1, 0, m_doc->numPages(), 1, &ok);
+    int total = m_doc->model()->numPages();
 
-    if (!ok)
-        return;
+    if (args.isEmpty())
+    {
+        if (total == 0)
+        {
+            QMessageBox::information(this, "Goto Page",
+                                     "This document has no pages");
+            return;
+        }
+
+        pageno = QInputDialog::getInt(
+            this, "Goto Page", tr("Enter page number (1 to %1)").arg(total),
+            m_doc->pageNo() + 1, 0, m_doc->numPages(), 1, &ok);
+        if (!ok)
+            return;
+    }
+    else
+    {
+        pageno = args.at(0).toInt(&ok);
+        if (!ok)
+            return;
+    }
 
     if (pageno <= 0 || pageno > total)
     {
@@ -2518,24 +2565,38 @@ Lektra::OpenFileInNewWindow(const QString &filePath,
 void
 Lektra::FileProperties() noexcept
 {
-    if (m_doc)
-        m_doc->FileProperties();
+    if (!m_doc)
+        return;
 }
 
 // Saves the current file
 void
-Lektra::SaveFile() noexcept
+Lektra::SaveFile(const QString &filename) noexcept
 {
-    if (m_doc)
+    if (!m_doc)
+        return;
+
+    if (filename.isEmpty())
         m_doc->SaveFile();
+    else
+    {
+        // TODO: Find the file if it's opened given by `filename` and save as it
+    }
 }
 
 // Saves the current file as a new file
 void
-Lektra::SaveAsFile() noexcept
+Lektra::SaveAsFile(const QString &filename) noexcept
 {
-    if (m_doc)
+    if (!m_doc)
+        return;
+
+    if (filename.isEmpty())
         m_doc->SaveAsFile();
+    else
+    {
+        // TODO: Find the file if it's opened given by `filename` and save it
+    }
 }
 
 // Fit the document to the width of the window
@@ -3973,16 +4034,18 @@ Lektra::initCommands() noexcept
     m_command_manager->reg("page_prev", tr("Go to previous page"),
                            [this](const QStringList &) { PrevPage(); });
     m_command_manager->reg("page_goto", tr("Jump to a specific page number"),
-                           [this](const QStringList &) { Goto_page(); });
+                           [this](const QStringList &args)
+    { Goto_page(args); });
 
     // Marks
     m_command_manager->reg("mark_set",
                            tr("Set a named mark at current position"),
-                           [this](const QStringList &) { SetMark(); });
+                           [this](const QStringList &args) { SetMark(args); });
     m_command_manager->reg("mark_delete", tr("Delete a named mark"),
-                           [this](const QStringList &) { DeleteMark(); });
+                           [this](const QStringList &args)
+    { DeleteMark(args); });
     m_command_manager->reg("mark_goto", tr("Jump to a named mark"),
-                           [this](const QStringList &) { GotoMark(); });
+                           [this](const QStringList &args) { GotoMark(args); });
 
     // Scrolling
     m_command_manager->reg("scroll_down", tr("Scroll down"),
@@ -4022,7 +4085,7 @@ Lektra::initCommands() noexcept
     m_command_manager->reg("zoom_reset", tr("Reset zoom to default"),
                            [this](const QStringList &) { ZoomReset(); });
     m_command_manager->reg("zoom_set", tr("Set zoom to a specific level"),
-                           [this](const QStringList &) { Zoom_set(); });
+                           [this](const QStringList &args) { Zoom_set(args); });
 
     // Splits
     m_command_manager->reg("split_horizontal", tr("Split view horizontally"),
@@ -4051,17 +4114,27 @@ Lektra::initCommands() noexcept
 
     // File operations
     m_command_manager->reg("file_open_tab", tr("Open file in new tab"),
-                           [this](const QStringList &) { OpenFileInNewTab(); });
+                           [this](const QStringList &args)
+    {
+        if (args.isEmpty())
+            OpenFileInNewTab();
+        else
+            OpenFileInNewTab(args.at(0));
+    });
     m_command_manager->reg("file_open_vsplit",
                            tr("Open file in vertical split"),
-                           [this](const QStringList &) { OpenFileVSplit(); });
+                           [this](const QStringList &args)
+    { OpenFileVSplit(args.isEmpty() ? "" : args.at(0)); });
     m_command_manager->reg("file_open_hsplit",
                            tr("Open file in horizontal split"),
-                           [this](const QStringList &) { OpenFileHSplit(); });
+                           [this](const QStringList &args)
+    { OpenFileHSplit(args.isEmpty() ? "" : args.at(0)); });
     m_command_manager->reg("file_open_dwim", tr("Open file (do what I mean)"),
-                           [this](const QStringList &) { OpenFileDWIM(); });
+                           [this](const QStringList &args)
+    { OpenFileDWIM(args.isEmpty() ? "" : args.at(0)); });
     m_command_manager->reg("file_close", tr("Close current file"),
-                           [this](const QStringList &) { CloseFile(); });
+                           [this](const QStringList &args)
+    { CloseFile(args.isEmpty() ? "" : args.at(0)); });
     m_command_manager->reg("file_save", tr("Save current file"),
                            [this](const QStringList &) { SaveFile(); });
     m_command_manager->reg("file_save_as",
@@ -4178,9 +4251,10 @@ Lektra::initCommands() noexcept
 
     // Search
     m_command_manager->reg("search", "Search document",
-                           [this](const QStringList &) { Search(); });
+                           [this](const QStringList &args) { Search(args); });
     m_command_manager->reg("search_regex", tr("Search document using regex"),
-                           [this](const QStringList &) { Search_regex(); });
+                           [this](const QStringList &args)
+    { Search_regex(args); });
     m_command_manager->reg("search_next", tr("Jump to next search result"),
                            [this](const QStringList &) { NextHit(); });
     m_command_manager->reg("search_prev", tr("Jump to previous search result"),
@@ -4542,10 +4616,10 @@ Lektra::updateTabbarVisibility() noexcept
 }
 
 void
-Lektra::search(const QString &term) noexcept
+Lektra::search(const QString &term, bool use_regex) noexcept
 {
     if (m_doc)
-        m_doc->Search(term, false);
+        m_doc->Search(term, use_regex);
 }
 
 void
@@ -4556,29 +4630,46 @@ Lektra::searchInPage(const int pageno, const QString &term) noexcept
 }
 
 void
-Lektra::Search() noexcept
+Lektra::Search(const QStringList &args) noexcept
 {
-    if (m_doc && m_doc->model()->supports_text_search())
+    if (!m_doc)
+        return;
+
+    if (args.isEmpty())
     {
-        m_search_bar->setVisible(true);
-        m_search_bar->focusSearchInput();
+        if (m_doc->model()->supports_text_search())
+        {
+            m_search_bar->setVisible(true);
+            m_search_bar->focusSearchInput();
+        }
+        else
+        {
+            QMessageBox::information(
+                this, tr("Search Not Supported"),
+                tr("The current document does not support text search."));
+        }
     }
     else
     {
-        QMessageBox::information(
-            this, tr("Search Not Supported"),
-            tr("The current document does not support text search."));
+        m_doc->Search(args.at(0), false);
     }
 }
 
 void
-Lektra::Search_regex() noexcept
+Lektra::Search_regex(const QStringList &args) noexcept
 {
-    if (m_doc)
+    if (!m_doc)
+        return;
+
+    if (args.isEmpty())
     {
         m_search_bar->setVisible(true);
         m_search_bar->setRegexMode(true);
         m_search_bar->focusSearchInput();
+    }
+    else
+    {
+        m_doc->Search(args.at(0), true);
     }
 }
 
@@ -4763,41 +4854,6 @@ Lektra::showTutorialFile() noexcept
                          tr("Not yet implemented for Windows"));
 #endif
 }
-
-// void
-// Lektra::SetMark() noexcept
-// {
-//     m_message_bar->showMessage("**SetMark**, Waiting for mark: ", -1);
-// }
-
-// void
-// Lektra::GotoMark() noexcept
-// {
-//     m_message_bar->showMessage("**GotoMark**, Waiting for mark: ", -1);
-//     // Wait for key input
-// }
-
-// void
-// Lektra::DeleteMark() noexcept
-// {
-//     m_message_bar->showMessage("**GotoMark**, Waiting for mark: ", -1);
-// }
-
-// void
-// Lektra::setMark(const QString &key, const int pageno,
-//               const DocumentView::PageLocation location) noexcept
-// {
-// }
-
-// void
-// Lektra::gotoMark(const QString &key) noexcept
-// {
-// }
-
-// void
-// Lektra::deleteMark(const QString &key) noexcept
-// {
-// }
 
 void
 Lektra::TabsCloseLeft() noexcept
@@ -4991,12 +5047,19 @@ Lektra::centerMouseInDocumentView(DocumentView *view) noexcept
 }
 
 void
-Lektra::CloseFile() noexcept
+Lektra::CloseFile(const QString &filename) noexcept
 {
-    if (m_doc)
+    if (!m_doc)
+        return;
+
+    if (filename.isEmpty())
     {
         int indexToClose = m_tab_widget->currentIndex();
         Tab_close(indexToClose);
+    }
+    else
+    {
+        // TODO: save the file given by filename (if it's opened)
     }
 }
 
@@ -5516,20 +5579,30 @@ Lektra::Reopen_last_closed_file() noexcept
 }
 
 void
-Lektra::SetMark() noexcept
+Lektra::SetMark(const QStringList &args) noexcept
 {
     if (!m_doc)
         return;
 
-    const QString key = QInputDialog::getText(
-        this, tr("Set Mark"),
-        tr("Enter mark key (a-z for local, A-Z for global):"));
+    QString key;
 
-    if (key.isEmpty())
+    if (args.isEmpty())
     {
-        QMessageBox::critical(this, tr("Set Mark"),
-                              tr("Mark key cannot be empty"));
-        return;
+
+        key = QInputDialog::getText(
+            this, tr("Set Mark"),
+            tr("Enter mark key (a-z for local, A-Z for global):"));
+
+        if (key.isEmpty())
+        {
+            QMessageBox::critical(this, tr("Set Mark"),
+                                  tr("Mark key cannot be empty"));
+            return;
+        }
+    }
+    else
+    {
+        key = args.at(0);
     }
 
     if (m_marks_manager->isGlobalKey(key))
@@ -5541,47 +5614,60 @@ Lektra::SetMark() noexcept
 }
 
 void
-Lektra::DeleteMark() noexcept
+Lektra::DeleteMark(const QStringList &args) noexcept
 {
     if (!m_doc)
         return;
 
-    const QStringList existingMarks = m_marks_manager->allKeys(m_doc->id());
-    const QString key               = QInputDialog::getItem(
-        this, tr("Delete Mark"), tr("Mark to delete:"), existingMarks, 0);
-
-    if (key.isEmpty())
+    QString key;
+    if (args.isEmpty())
     {
-        QMessageBox::critical(this, tr("Delete Mark"),
-                              tr("Mark key cannot be empty"));
-        return;
-    }
+        const QStringList existingMarks = m_marks_manager->allKeys(m_doc->id());
+        key = QInputDialog::getItem(this, tr("Delete Mark"),
+                                    tr("Mark to delete:"), existingMarks, 0);
 
-    if (m_marks_manager->isGlobalKey(key))
-    {
-        m_marks_manager->removeGlobalMark(key);
+        if (key.isEmpty())
+        {
+            QMessageBox::critical(this, tr("Delete Mark"),
+                                  tr("Mark key cannot be empty"));
+            return;
+        }
     }
     else
     {
-        m_marks_manager->removeLocalMark(key, m_doc->id());
+        key = args.at(0);
     }
+
+    if (m_marks_manager->isGlobalKey(key))
+        m_marks_manager->removeGlobalMark(key);
+    else
+        m_marks_manager->removeLocalMark(key, m_doc->id());
 }
 
 void
-Lektra::GotoMark() noexcept
+Lektra::GotoMark(const QStringList &args) noexcept
 {
     if (!m_doc)
         return;
 
-    const QStringList existingMarks = m_marks_manager->allKeys(m_doc->id());
-    const QString key               = QInputDialog::getItem(
-        this, tr("Goto Mark"), tr("Mark to go to:"), existingMarks, 0);
+    QString key;
 
-    if (key.isEmpty())
+    if (args.isEmpty())
     {
-        QMessageBox::critical(this, tr("Goto Mark"),
-                              tr("Mark key cannot be empty"));
-        return;
+        const QStringList existingMarks = m_marks_manager->allKeys(m_doc->id());
+        key = QInputDialog::getItem(this, tr("Goto Mark"), tr("Mark to go to:"),
+                                    existingMarks, 0);
+
+        if (key.isEmpty())
+        {
+            QMessageBox::critical(this, tr("Goto Mark"),
+                                  tr("Mark key cannot be empty"));
+            return;
+        }
+    }
+    else
+    {
+        key = args.at(0);
     }
 
     if (m_marks_manager->isGlobalKey(key))
