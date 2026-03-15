@@ -24,6 +24,12 @@ layout.
 
 Command line options are described below:
 
+`-h`, `--help`
+: Print a short usage summary and exit.
+
+`-v`, `--version`
+: Print the version string and exit.
+
 `FILE_PATH(s)`
 : One or more PDF files to open on startup.
 
@@ -75,11 +81,8 @@ Command line options are described below:
 
     **Only available when lektra is compiled with synctex support.**
 
-`-h`, `--help`
-: Print a short usage summary and exit.
-
-`-v`, `--version`
-: Print the version string and exit.
+`--command`
+: Specify one or more valid lektra commands (see `--list-commands`) chained togther by ; (semicolon). The commands are executed left to right.
 
 ## STARTUP BEHAVIOUR
 
@@ -135,6 +138,12 @@ Load a saved session:
 
 ```
 lektra --session research
+```
+
+Run command after opening a file
+
+```
+lektra --command "fullscreen; search hello; page_goto 4" document.pdf
 ```
 
 ## SEE ALSO
