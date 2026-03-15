@@ -26,6 +26,6 @@ public:
 
 private:
     const Config::Command_palette &m_config;
-    const std::vector<Command> &m_commands; // sorted, stable
+    const std::vector<Command> m_commands; // sorted, stable
     const ShortcutMap &m_shortcuts;
 };
