@@ -137,8 +137,6 @@ add_executable(${PROJECT_NAME}
     src/RecentFilesPicker.cpp
     src/OutlinePicker.cpp
     src/CommentSearchPicker.cpp
-    src/BookmarkManager.cpp
-    src/BookmarkPicker.cpp
 
     src/PageLocation.hpp
     src/Config.hpp
@@ -162,10 +160,6 @@ add_executable(${PROJECT_NAME}
     src/JumpMarker.hpp
     src/OutlinePicker.hpp
     src/InputDialog.hpp
-    src/BookmarkManager.hpp
-    src/BookmarkPicker.hpp
-    src/Bookmark.hpp
-
 
     # Annotations
     src/Annotations/RectAnnotation.hpp
