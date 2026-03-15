@@ -28,7 +28,12 @@ public:
         m_commands.push_back({name, description, std::move(action)});
     }
 
-    const std::vector<Command> &commands() const noexcept
+    const std::vector<Command> &const_commands() const noexcept
+    {
+        return m_commands;
+    }
+
+    const std::vector<Command> commands() const noexcept
     {
         return m_commands;
     }
@@ -37,9 +42,7 @@ public:
     {
         QStringList names;
         for (const auto &cmd : m_commands)
-        {
             names.push_back(cmd.name);
-        }
         return names;
     }
 
