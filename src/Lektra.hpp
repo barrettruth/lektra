@@ -92,7 +92,7 @@ public:
     void Fit_width() noexcept;
     void Fit_height() noexcept;
     void Fit_page() noexcept;
-    void Show_outline() noexcept;
+    void ShowOutline() noexcept;
     void InvertColor() noexcept;
     void TextSelectionMode() noexcept;
     void GoBackHistory() noexcept;
@@ -145,7 +145,7 @@ public:
     void Zoom_set(const QStringList &args = {}) noexcept;
     void Goto_page(const QStringList &args = {}) noexcept;
     void GotoLocation(int pageno, float x, float y) noexcept;
-    void GotoLocation(const DocumentView::PageLocation &loc) noexcept;
+    void GotoLocation(const PageLocation &loc) noexcept;
     void LoadSession(QString name = QString()) noexcept;
     void SaveSession() noexcept;
     void SaveAsSession(const QString &name = QString()) noexcept;

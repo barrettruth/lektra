@@ -6,6 +6,7 @@
 #include "DocumentView.hpp"
 #include "EditLastPagesWidget.hpp"
 #include "GraphicsView.hpp"
+#include "PageLocation.hpp"
 #include "SaveSessionDialog.hpp"
 #include "SearchBar.hpp"
 #include "StartupWidget.hpp"
@@ -304,7 +305,7 @@ Lektra::initMenubar() noexcept
 
     m_actionToggleOutline = m_toggleMenu->addAction(
         tr("Outline\t%1").arg(m_config.keybinds["picker_outline"]), this,
-        &Lektra::Show_outline);
+        &Lektra::ShowOutline);
 
     m_actionToggleHighlightAnnotSearch = m_toggleMenu->addAction(
         tr("Highlight Annotation Search\t%1")
@@ -2631,9 +2632,10 @@ Lektra::ToggleAutoResize() noexcept
         m_doc->ToggleAutoResize();
 }
 
+
 // Show or hide the outline panel
 void
-Lektra::Show_outline() noexcept
+Lektra::ShowOutline() noexcept
 {
     if (!m_doc || !m_doc->model())
         return;
@@ -4241,10 +4243,11 @@ Lektra::initCommands() noexcept
 
     // Pickers
     m_command_manager->reg("picker_outline", tr("Open document outline picker"),
-                           [this](const QStringList &) { Show_outline(); });
+                           [this](const QStringList &) { ShowOutline(); });
     m_command_manager->reg(
         "picker_highlight_search", tr("Search within highlights"),
         [this](const QStringList &) { Show_highlight_search(); });
+
     m_command_manager->reg(
         "picker_annot_comment_search", tr("Search annotation comments"),
         [this](const QStringList &) { Show_annot_comment_search(); });
@@ -4825,6 +4828,7 @@ Lektra::Show_command_picker() noexcept
                                              m_config.keybinds, this);
         m_command_picker->setKeybindings(m_picker_keybinds);
     }
+
     m_command_picker->launch();
 }
 

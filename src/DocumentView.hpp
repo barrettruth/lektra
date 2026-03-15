@@ -7,9 +7,9 @@
 #include "JumpMarker.hpp"
 #include "LinkHint.hpp"
 #include "Model.hpp"
+#include "PageLocation.hpp"
 #include "ScrollBar.hpp"
 #include "WaitingSpinnerWidget.hpp"
-
 
 #ifdef HAS_SYNCTEX
 extern "C"
@@ -20,9 +20,9 @@ extern "C"
 }
 #endif
 
-#include <QFutureWatcher>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
+#include <QFutureWatcher>
 #include <QGraphicsItem>
 #include <QHash>
 #include <QQueue>
