@@ -138,6 +138,11 @@ init_args(argparse::ArgumentParser &program)
         .help("Start with the tutorial file open")
         .flag();
 
+    program.add_argument("--command")
+        .help("Execute one or more valid lektra command (see `--list-commands`) on startup (separate multiple commands with ';')")
+        .default_value(std::string{})
+        .metavar("COMMAND(s)");
+
     program.add_argument("files").remaining().metavar("FILE_PATH(s)");
 }
 
