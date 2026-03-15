@@ -6,6 +6,7 @@
 - Annotation color change is now **undo-able**.
 - `--version` and `--list-commands` now output to stdout instead of stderr to be more consistent with standard command line tool behavior and to allow for easier parsing of the output when using these commands in scripts or other command line workflows.
 - Commands now accept arguments directly from the command line when using `--command` argument, allowing for more flexible and powerful command execution. For example, you can now execute a command with specific arguments directly from the command line like this: `lektra --command="page_goto 5;"` to go to page 5 immediately after launching LEKTRA.
+- `--list-commands` command line argument now prints the command in sorted order
 
 #### Commands:
     - `open_config` command to open the config file in the default text editor for easy editing and customization of settings.
