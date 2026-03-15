@@ -63,13 +63,12 @@ public:
     void Focus_split_right() noexcept;
     void Read_args_parser(const argparse::ArgumentParser &argparser) noexcept;
     // bool OpenFile(DocumentView *view) noexcept;
-    void Search() noexcept;
-    void Search_regex() noexcept;
-    void Search_in_page() noexcept;
+    void Search(const QStringList &args = {}) noexcept;
+    void Search_regex(const QStringList &args = {}) noexcept;
+    void Search_in_page(const QStringList &args = {}) noexcept;
     void Show_highlight_search() noexcept;
     void Show_annot_comment_search() noexcept;
     void Show_command_picker() noexcept;
-
     void Toggle_comment_markers() noexcept;
     void Toggle_none_mode() noexcept;
     void Toggle_visual_line_mode() noexcept;
@@ -86,11 +85,10 @@ public:
     void ToggleAnnotRect() noexcept;
     void ToggleAnnotSelect() noexcept;
     void ToggleAnnotPopup() noexcept;
-
     void FileProperties() noexcept;
-    void SaveFile() noexcept;
-    void SaveAsFile() noexcept;
-    void CloseFile() noexcept;
+    void SaveFile(const QString &filename = {}) noexcept;
+    void SaveAsFile(const QString &filename = {}) noexcept;
+    void CloseFile(const QString &filename = {}) noexcept;
     void Fit_width() noexcept;
     void Fit_height() noexcept;
     void Fit_page() noexcept;
@@ -102,27 +100,27 @@ public:
     void LastPage() noexcept;
     void NextPage() noexcept;
     void OpenContainingFolder() noexcept;
-    bool OpenFileDWIM(const QString &filename = QString()) noexcept;
+    bool OpenFileDWIM(const QString &filename = {}) noexcept;
     bool OpenFileInContainer(DocumentContainer *container,
-                             const QString &filename               = QString(),
+                             const QString &filename               = {},
                              const std::function<void()> &callback = {},
                              DocumentView *targetView = nullptr) noexcept;
-    void OpenFilesInVSplit(const std::vector<std::string> &files) noexcept;
-    void OpenFilesInHSplit(const std::vector<std::string> &files) noexcept;
+    void OpenFilesInVSplit(const std::vector<std::string> &files = {}) noexcept;
+    void OpenFilesInHSplit(const std::vector<std::string> &files = {}) noexcept;
 
-    void OpenFiles(const std::vector<std::string> &filenames) noexcept;
-    void OpenFilesInNewTab(const std::vector<std::string> &files) noexcept;
-    void OpenFilesInNewTab(const QList<QString> &files) noexcept;
-    DocumentView *OpenFileInNewTab(const QString &filename = QString(),
+    void OpenFiles(const std::vector<std::string> &filenames = {}) noexcept;
+    void OpenFilesInNewTab(const std::vector<std::string> &files = {}) noexcept;
+    void OpenFilesInNewTab(const QList<QString> &files = {}) noexcept;
+    DocumentView *OpenFileInNewTab(const QString &filename = {},
                                    const std::function<void()> &callback
                                    = {}) noexcept;
-    bool OpenFileInNewWindow(const QString &filename = QString(),
+    bool OpenFileInNewWindow(const QString &filename = {},
                              const std::function<void()> &callback
                              = {}) noexcept;
     void OpenFilesInNewWindow(const QStringList &filenames) noexcept;
-    DocumentView *OpenFileVSplit(const QString &filename = QString(),
+    DocumentView *OpenFileVSplit(const QString &filename               = {},
                                  const std::function<void()> &callback = {});
-    DocumentView *OpenFileHSplit(const QString &filename = QString(),
+    DocumentView *OpenFileHSplit(const QString &filename               = {},
                                  const std::function<void()> &callback = {});
     void PrevPage() noexcept;
     void FirstPage() noexcept;
@@ -144,8 +142,8 @@ public:
     void ZoomReset() noexcept;
     void ZoomIn() noexcept;
     void ZoomOut() noexcept;
-    void Zoom_set() noexcept;
-    void Goto_page() noexcept;
+    void Zoom_set(const QStringList &args = {}) noexcept;
+    void Goto_page(const QStringList &args = {}) noexcept;
     void GotoLocation(int pageno, float x, float y) noexcept;
     void GotoLocation(const DocumentView::PageLocation &loc) noexcept;
     void LoadSession(QString name = QString()) noexcept;
@@ -161,9 +159,9 @@ public:
     void TabMoveLeft() noexcept;
     void ReselectLastTextSelection() noexcept;
     void SetLayoutMode(DocumentView::LayoutMode mode) noexcept;
-    void SetMark() noexcept;
-    void GotoMark() noexcept;
-    void DeleteMark() noexcept;
+    void SetMark(const QStringList &args = {}) noexcept;
+    void GotoMark(const QStringList &args = {}) noexcept;
+    void DeleteMark(const QStringList &args = {}) noexcept;
     void EncryptDocument() noexcept;
     void DecryptDocument() noexcept;
     void Undo() noexcept;
@@ -253,7 +251,7 @@ private:
 
     void gotoPage(int pageno) noexcept;
     void setFocusMode(bool state) noexcept;
-    void search(const QString &term = {}) noexcept;
+    void search(const QString &term = {}, bool use_regex = false) noexcept;
     void searchInPage(const int pageno, const QString &term = {}) noexcept;
     void writeSessionToFile() noexcept;
 
