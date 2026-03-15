@@ -1310,8 +1310,7 @@ DocumentView::GotoLocation(const PageLocation &targetLocation) noexcept
 namespace
 {
 bool
-locationsEqual(const DocumentView::PageLocation &a,
-               const DocumentView::PageLocation &b) noexcept
+locationsEqual(const PageLocation &a, const PageLocation &b) noexcept
 {
     return a.pageno == b.pageno && a.x == b.x && a.y == b.y;
 }
@@ -3546,9 +3545,8 @@ DocumentView::renderLinks(int pageno,
                                        const BrowseLinkItem::PageLocation
                                            &sourceLocationOfLink)
                 {
-                    const DocumentView::PageLocation targetLocation{
-                        targetPageno, 0, 0};
-                    const DocumentView::PageLocation sourceLocation{
+                    const PageLocation targetLocation{targetPageno, 0, 0};
+                    const PageLocation sourceLocation{
                         pageno, sourceLocationOfLink.x, sourceLocationOfLink.y};
                     addToHistory(sourceLocation);
                     addToHistory(targetLocation);
@@ -3567,11 +3565,11 @@ DocumentView::renderLinks(int pageno,
                                        const BrowseLinkItem::PageLocation
                                            &sourceLocationOfLink)
                 {
-                    const DocumentView::PageLocation targetLocation{
-                        targetPageno, targetLocationOfLink.x,
-                        targetLocationOfLink.y};
+                    const PageLocation targetLocation{targetPageno,
+                                                      targetLocationOfLink.x,
+                                                      targetLocationOfLink.y};
 
-                    const DocumentView::PageLocation sourceLocation{
+                    const PageLocation sourceLocation{
                         pageno, sourceLocationOfLink.x, sourceLocationOfLink.y};
                     PageLocation target = targetLocation;
                     if (std::isnan(target.x))
@@ -4113,7 +4111,7 @@ DocumentView::changeColorOfSelectedAnnotations(const QColor &color) noexcept
 }
 
 // Returns the current location in the document that the user is viewing
-DocumentView::PageLocation
+PageLocation
 DocumentView::CurrentLocation() noexcept
 {
     if (m_page_items_hash.isEmpty())

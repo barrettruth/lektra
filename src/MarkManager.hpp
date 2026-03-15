@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DocumentView.hpp"
+#include "PageLocation.hpp"
 
 #include <QHash>
 #include <QObject>
@@ -14,13 +15,13 @@ public:
 
     struct LocalMark
     {
-        DocumentView::PageLocation plocation;
+        PageLocation plocation;
     };
 
     struct GlobalMark
     {
         DocumentView::Id docId;
-        DocumentView::PageLocation plocation;
+        PageLocation plocation;
     };
 
     // Lowercase — per document
@@ -39,7 +40,7 @@ public:
     }
 
     void addLocalMark(const QString &key, DocumentView::Id id,
-                      DocumentView::PageLocation location) noexcept
+                      PageLocation location) noexcept
     {
         m_local_marks[{id, key}] = LocalMark{location};
         emit markAdded(key);
@@ -68,7 +69,7 @@ public:
     }
 
     void addGlobalMark(const QString &key, DocumentView::Id id,
-                       DocumentView::PageLocation location) noexcept
+                       PageLocation location) noexcept
     {
         m_global_marks[key] = GlobalMark{id, location};
         emit markAdded(key);

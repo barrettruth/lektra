@@ -91,12 +91,6 @@ public:
         COUNT
     };
 
-    struct PageLocation
-    {
-        int pageno;
-        float x, y;
-    };
-
     inline const Config &config() const noexcept
     {
         return m_config;

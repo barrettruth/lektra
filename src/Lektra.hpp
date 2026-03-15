@@ -282,7 +282,7 @@ private:
     void handleEscapeKeyPressed() noexcept;
     void showTutorialFile() noexcept;
     void setMark(const QString &key, const int pageno,
-                 const DocumentView::PageLocation location) noexcept;
+                 const PageLocation location) noexcept;
     void gotoMark(const QString &key) noexcept;
     void deleteMark(const QString &key) noexcept;
     bool handleLinkHintEvent(QEvent *event) noexcept;

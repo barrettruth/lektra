@@ -1948,7 +1948,7 @@ Lektra::GotoLocation(int pageno, float x, float y) noexcept
 }
 
 void
-Lektra::GotoLocation(const DocumentView::PageLocation &loc) noexcept
+Lektra::GotoLocation(const PageLocation &loc) noexcept
 {
     if (m_doc)
         m_doc->GotoLocation(loc);
@@ -5257,8 +5257,8 @@ Lektra::handleCtrlLinkClickRequested(DocumentView *view,
     }
 
     // Create the location target data (copy values, not pointers)
-    DocumentView::PageLocation target{
-        linkItem->gotoPageNo(), linkItem->location().x, linkItem->location().y};
+    PageLocation target{linkItem->gotoPageNo(), linkItem->location().x,
+                        linkItem->location().y};
 
     if (std::isnan(target.x))
         target.x = 0;
@@ -5301,8 +5301,8 @@ Lektra::handleLinkPreviewRequested(DocumentView *view,
         return;
     }
 
-    DocumentView::PageLocation target{
-        linkItem->gotoPageNo(), linkItem->location().x, linkItem->location().y};
+    PageLocation target{linkItem->gotoPageNo(), linkItem->location().x,
+                        linkItem->location().y};
     if (std::isnan(target.x))
         target.x = 0;
     if (std::isnan(target.y))
