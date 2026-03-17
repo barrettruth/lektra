@@ -137,6 +137,7 @@ public:
         QString header;
         int role{Qt::DisplayRole}; // which data role to display
         int stretch{1};            // relative width weight
+        Qt::Alignment alignment{Qt::AlignLeft | Qt::AlignVCenter};
     };
 
     struct FrameStyle
@@ -193,6 +194,12 @@ public:
             if (c.isUpper())
                 return Qt::CaseSensitive;
         return Qt::CaseInsensitive;
+    }
+
+    inline void setScrollbarEnabled(bool enabled) noexcept
+    {
+        m_listView->setVerticalScrollBarPolicy(
+            enabled ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
     }
 
 signals:
