@@ -151,16 +151,26 @@ SearchBar::showEvent(QShowEvent *event)
 void
 SearchBar::setSearchCount(int count) noexcept
 {
-    if (count > 0)
+    if (count < 0)
     {
-        m_searchCountLabel->setText(QString::number(count));
-        m_searchCountLabel->show();
+        m_searchCountLabel->clear();
+        m_searchIndexLabel->clear();
+        return;
     }
+
+    m_searchCountLabel->setText(QString::number(count));
+    m_searchCountLabel->show();
 }
 
 void
 SearchBar::setSearchIndex(int index) noexcept
 {
+    if (index < 0)
+    {
+        m_searchIndexLabel->clear();
+        return;
+    }
+
     m_searchIndexLabel->setText(QString::number(index + 1));
     m_searchIndexLabel->show();
     m_searchSeparator->show();
