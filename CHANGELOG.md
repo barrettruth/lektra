@@ -3,6 +3,10 @@
 ## 0.6.8
 
 ### Features
+- Add **progressive searching** for search results. When a search query is entered, the search results will start showing up immediately as they are found, instead of waiting for the entire search to complete before showing any results. **This is enabled by default**.
+- Add `progressive` (bool) option in the `[search]` section of the config to enable/disable progressive searching.
+- Add `highlight_matches` (bool) option in the `[search]` section of the config to enable/disable highlighting of search matches in the document. When enabled, all search matches will be highlighted in the document, otherwise only the current search match will be highlighted.
+
 - Annotation color change is now **undo-able**.
 - `--version` and `--list-commands` now output to stdout instead of stderr to be more consistent with standard command line tool behavior and to allow for easier parsing of the output when using these commands in scripts or other command line workflows.
 - Commands now accept arguments directly from the command line when using `--command` argument, allowing for more flexible and powerful command execution. For example, you can now execute a command with specific arguments directly from the command line like this: `lektra --command="page_goto 5;"` to go to page 5 immediately after launching LEKTRA.
