@@ -631,7 +631,7 @@ DocumentView::handlePartialSearchResults(
 
     buildFlatSearchHitIndex();
 
-    emit searchCountChanged(m_model->searchMatchesCount());
+    emit searchCountChanged(m_search_hits.size());
 
     if (m_config.scrollbars.search_hits)
         renderSearchHitsInScrollbar();
@@ -1443,6 +1443,8 @@ DocumentView::clearSearchHits() noexcept
     m_search_items.clear();
     m_search_hits.clear();
     m_search_hit_flat_refs.clear();
+
+    m_hscroll->setSearchMarkers({});
     m_vscroll->setSearchMarkers({});
 }
 
@@ -1468,7 +1470,45 @@ DocumentView::Search(const QString &term, bool useRegex) noexcept
                                      [](QChar c) { return c.isUpper(); });
 
     emit searchBarSpinnerShow(true);
-    m_model->search(term, caseSensitive, useRegex);
+    m_model->search(term, caseSensitive, -1, useRegex);
+}
+
+void
+DocumentView::SearchCancel() noexcept
+{
+    if (!m_model->supports_text_search())
+        return;
+
+    m_model->searchCancel();
+    emit searchBarSpinnerShow(false);
+    clearSearchHits();
+    renderSearchHitsInScrollbar();
+    emit searchCountChanged(-1);
+    emit searchIndexChanged(-1);
+}
+
+void
+DocumentView::SearchFromHere(const QString &term, bool useRegex) noexcept
+{
+#ifndef NDEBUG
+    qDebug() << "DocumentView::SearchFromHere(): Searching for term:" << term;
+#endif
+    if (!m_model->supports_text_search())
+        return;
+
+    clearSearchHits();
+    if (term.isEmpty())
+    {
+        m_current_search_hit_item->setPath(QPainterPath());
+        return;
+    }
+
+    // Check if term has atleast one uppercase letter
+    bool caseSensitive = std::any_of(term.cbegin(), term.cend(),
+                                     [](QChar c) { return c.isUpper(); });
+
+    emit searchBarSpinnerShow(true);
+    m_model->search(term, caseSensitive, m_pageno, useRegex);
 }
 
 void
