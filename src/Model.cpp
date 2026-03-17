@@ -761,10 +761,23 @@ Model::Model(const Config &config, QObject *parent) noexcept
 
     connect(m_undo_stack, &QUndoStack::cleanChanged, this,
             [this](bool isClean) { emit undoStackCleanChanged(isClean); });
+
+    // m_render_synchronizer.setCancelOnWait(true);
 }
 
 Model::~Model() noexcept
 {
+#ifndef NDEBUG
+    PPRINT("Model destructor called");
+#endif
+    m_search_cancelled.store(true);
+    m_search_future.cancel();
+    m_search_future.waitForFinished();
+
+    m_render_cancelled.store(true);
+    waitForPendingRenders();
+    m_render_synchronizer.waitForFinished();
+
 #ifdef HAS_DJVU
     if (m_filetype == FileType::DJVU)
         cleanup_djvu();
@@ -807,9 +820,6 @@ Model::LRUEvictFunction(PageCacheEntry &entry) noexcept
 void
 Model::cleanup_mupdf() noexcept
 {
-    m_search_future.cancel();
-    m_render_future.cancel();
-
     fz_drop_outline(m_ctx, m_outline);
     m_outline = nullptr;
     fz_drop_document(m_ctx, m_doc);
@@ -833,9 +843,6 @@ Model::cleanup_mupdf() noexcept
 void
 Model::cleanup_djvu() noexcept
 {
-    m_search_future.cancel();
-    m_render_future.cancel();
-
     ddjvu_document_release(m_ddjvu_doc);
     ddjvu_context_release(m_ddjvu_ctx);
 
@@ -926,7 +933,7 @@ Model::openAsync_djvu(const QString &canonPath) noexcept
 
         QMetaObject::invokeMethod(this, [this, ctx, doc, page_count, w, h]()
         {
-            waitForRenders();
+            waitForPendingRenders();
             cleanup_mupdf(); // drops MuPDF state
             cleanup_djvu();  // drops any previous DjVu state
 
@@ -1075,7 +1082,7 @@ Model::_continueOpen(fz_context *ctx, fz_document *doc) noexcept
 
     QMetaObject::invokeMethod(this, [this, ctx, doc, page_count, w, h]
     {
-        waitForRenders();
+        waitForPendingRenders();
         cleanup_mupdf();
         fz_drop_context(m_ctx);
 
@@ -1208,8 +1215,8 @@ Model::buildPageCache_djvu(int pageno) noexcept
     ddjvu_format_t *fmt{nullptr};
     // DjVuLibre RGBMASK32: specify R/G/B masks and white background
     const unsigned int masks[3] = {0x00FF0000, 0x0000FF00, 0x000000FF};
-    fmt                         = ddjvu_format_create(DDJVU_FORMAT_RGBMASK32, 3,
-                                                      const_cast<unsigned int *>(masks));
+    fmt = ddjvu_format_create(DDJVU_FORMAT_RGBMASK32, 3,
+                              const_cast<unsigned int *>(masks));
     ddjvu_format_set_row_order(fmt, 1); // top-to-bottom
 
     const int ok = ddjvu_page_render(page, DDJVU_RENDER_COLOR, &prect, &rrect,
@@ -1577,7 +1584,7 @@ Model::reloadDocument() noexcept
         return false;
     }
 
-    waitForRenders();
+    waitForPendingRenders();
     cleanup_mupdf();
 
     // Flush the MuPDF store so cloned contexts won't serve stale entries
@@ -1702,8 +1709,8 @@ Model::computeTextSelectionQuad(int pageno, QPointF devStart,
         page_to_dev = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(page_bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
@@ -1789,8 +1796,8 @@ Model::get_selected_text(int pageno, QPointF start, QPointF end,
         page_to_dev      = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
@@ -2051,8 +2058,10 @@ Model::requestPageRender(
     connect(watcher, &QFutureWatcher<PageRenderResult>::finished, this,
             [this, watcher, callback, job]()
     {
-        PageRenderResult result = watcher->result();
         watcher->deleteLater();
+        if (m_render_cancelled.load())
+            return;
+        PageRenderResult result = watcher->result();
 
         // Deliver pixels + PDF links immediately — this fires GotoLocation
         if (callback)
@@ -2074,13 +2083,19 @@ Model::requestPageRender(
 
     auto future = QtConcurrent::run([this, job, callback]() -> PageRenderResult
     {
+        if (m_render_cancelled.load())
+            return {};
+
         ensurePageCached(job.pageno);
+
+        if (m_render_cancelled.load())
+            return {};
+
         return renderPageWithExtrasAsync(job);
     });
 
-    m_render_future = future;
-
-    watcher->setFuture(m_render_future);
+    m_render_synchronizer.addFuture(future);
+    watcher->setFuture(future);
 }
 
 Model::PageRenderResult
@@ -2441,8 +2456,8 @@ Model::highlight_text_selection(int pageno, QPointF start, QPointF end) noexcept
         page_to_dev      = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
@@ -2982,11 +2997,11 @@ Model::selectParagraphAt(int pageno, fz_point pt) noexcept
             bounds = {0, 0, w, h};
         }
 
-        fz_matrix page_to_dev       = fz_scale(scale, scale);
-        page_to_dev                 = fz_pre_rotate(page_to_dev, m_rotation);
-        const fz_rect dev_bounds    = fz_transform_rect(bounds, page_to_dev);
-        page_to_dev                 = fz_concat(page_to_dev,
-                                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        fz_matrix page_to_dev    = fz_scale(scale, scale);
+        page_to_dev              = fz_pre_rotate(page_to_dev, m_rotation);
+        const fz_rect dev_bounds = fz_transform_rect(bounds, page_to_dev);
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
         fz_point page_pt            = fz_transform_point(pt, dev_to_page);
         fz_stext_page *stext_page   = get_or_build_stext_page(m_ctx, pageno);
@@ -3079,19 +3094,29 @@ Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
 {
     if (m_search_future.isRunning())
     {
+        m_search_cancelled.store(true);
         m_search_future.cancel();
         m_search_future.waitForFinished();
     }
+    m_search_cancelled.store(false);
 
-    m_search_future = QtConcurrent::run([this, use_regex, term, caseSensitive]()
+    // Copy everything the lambda needs — no 'this' access in the thread
+    const int page_count   = m_page_count;
+    const bool progressive = m_config.search.progressive;
+
+    m_search_future = QtConcurrent::run(
+        [this, page_count, progressive, use_regex, term, caseSensitive]()
     {
+        if (m_search_cancelled.load())
+            return;
+
         if (term.isEmpty())
         {
-            emit searchResultsReady({});
+            if (!m_search_cancelled.load())
+                emit searchResultsReady({});
             return;
         }
 
-        // Validate and compile regex once up front
         QRegularExpression re;
         if (use_regex)
         {
@@ -3099,62 +3124,80 @@ Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
                 = QRegularExpression::UseUnicodePropertiesOption;
             if (!caseSensitive)
                 opts |= QRegularExpression::CaseInsensitiveOption;
-
             re = QRegularExpression(term, opts);
             if (!re.isValid())
-            {
-                // TODO: new signal for UI feedback for regex fail
-                // emit searchError(
-                //     re.errorString());
                 return;
-            }
             re.optimize();
         }
 
-        // Process in batches: build cache for N pages, search them,
-        // then move to the next batch. This bounds memory use and
-        // avoids overwhelming the thread pool on large documents.
         constexpr int BATCH = 64;
-
         QMap<int, std::vector<SearchHit>> results;
         int total = 0;
 
         for (int batch_start = 0;
-             batch_start < m_page_count && !m_search_future.isCanceled();
+             batch_start < page_count && !m_search_cancelled.load();
              batch_start += BATCH)
         {
+            const int batch_end = std::min(batch_start + BATCH, page_count);
 
-            const int batch_end = std::min(batch_start + BATCH, m_page_count);
-
-            // Pre-warm text cache for this batch serially (safe, single
-            // thread)
             std::set<int> batchPages;
             for (int p = batch_start; p < batch_end; ++p)
                 batchPages.insert(p);
+
             buildTextCacheForPages(batchPages);
 
-            // Search this batch in parallel
+            if (m_search_cancelled.load())
+                return;
+
             QList<int> batchList(batchPages.begin(), batchPages.end());
             auto future
                 = QtConcurrent::mapped(batchList, [this, use_regex, re, term,
                                                    caseSensitive](int pageno)
             {
+                if (m_search_cancelled.load())
+                    return std::vector<SearchHit>{};
                 return use_regex ? searchHelperRegex(pageno, re)
                                  : searchHelper(pageno, term, caseSensitive);
             });
-            future.waitForFinished();
 
-            // Merge batch results in page order
+            while (!future.isFinished())
+            {
+                if (m_search_cancelled.load())
+                {
+                    future.cancel();
+                    future.waitForFinished();
+                    return;
+                }
+                QThread::msleep(5);
+            }
+
+            if (m_search_cancelled.load())
+                return;
+
+            QMap<int, std::vector<SearchHit>> batchResults;
             for (int i = 0; i < batchList.size(); ++i)
             {
                 auto hits = future.resultAt(i);
                 if (!hits.empty())
                 {
                     total += static_cast<int>(hits.size());
-                    results.insert(batchList[i], std::move(hits));
+                    batchResults.insert(batchList[i], std::move(hits));
                 }
             }
+
+            for (auto it = batchResults.cbegin(); it != batchResults.cend();
+                 ++it)
+                results.insert(it.key(), it.value());
+
+            if (m_search_cancelled.load())
+                return;
+
+            if (progressive && !batchResults.isEmpty())
+                emit searchPartialResultsReady(batchResults);
         }
+
+        if (m_search_cancelled.load())
+            return;
 
         m_search_match_count = total;
         emit searchResultsReady(results);
@@ -3629,8 +3672,8 @@ Model::getTextInArea(const int pageno, QPointF start, QPointF end) noexcept
         fz_matrix page_to_dev     = fz_scale(scale, scale);
         page_to_dev               = fz_pre_rotate(page_to_dev, m_rotation);
         const fz_rect dev_bounds  = fz_transform_rect(page_bounds, page_to_dev);
-        page_to_dev               = fz_concat(page_to_dev,
-                                              fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
         fz_point p1 = fz_transform_point(
@@ -4232,4 +4275,11 @@ Model::get_obj_num_at_rect(int pageno, fz_rect targetRect) noexcept
     fz_drop_page(m_ctx, (fz_page *)page);
 #endif
     return foundObjNum;
+}
+
+void
+Model::waitForPendingRenders() noexcept
+{
+    for (auto &f : m_render_synchronizer.futures())
+        f.cancel();
 }

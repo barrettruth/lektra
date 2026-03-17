@@ -339,6 +339,7 @@ public:
     void rotateHelper() noexcept;
 
 signals:
+    void allRendersFinished();
     void linkPreviewRequested(DocumentView *view,
                               const BrowseLinkItem *linkItem);
     void ctrlLinkClickRequested(DocumentView *view,
