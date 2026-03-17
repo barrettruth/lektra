@@ -4266,6 +4266,9 @@ Lektra::initCommands() noexcept
     m_command_manager->reg(
         "search_args", tr("Search with inline query argument"),
         [this](const QStringList &args) { search(args.join(" ")); });
+    m_command_manager->reg("search_cancel",
+                           tr("Cancel current search and clear highlights"),
+                           [this](const QStringList &) { searchCancel(); });
 
     // Layout modes
     m_command_manager->reg("layout_single", tr("Single page layout"),
@@ -4627,6 +4630,15 @@ Lektra::search(const QString &term, bool use_regex) noexcept
 }
 
 void
+Lektra::searchCancel() noexcept
+{
+    if (m_doc)
+    {
+        m_doc->SearchCancel();
+    }
+}
+
+void
 Lektra::searchInPage(const int pageno, const QString &term) noexcept
 {
     if (m_doc)
@@ -4660,7 +4672,7 @@ Lektra::Search(const QStringList &args) noexcept
 }
 
 void
-Lektra::Search_regex(const QStringList &args) noexcept
+Lektra::SearchRegex(const QStringList &args) noexcept
 {
     if (!m_doc)
         return;
@@ -4674,6 +4686,23 @@ Lektra::Search_regex(const QStringList &args) noexcept
     else
     {
         m_doc->Search(args.at(0), true);
+    }
+}
+
+void
+Lektra::SearchFromHere(const QStringList &args) noexcept
+{
+    if (!m_doc)
+        return;
+
+    if (args.isEmpty())
+    {
+        m_search_bar->setVisible(true);
+        m_search_bar->focusSearchInput();
+    }
+    else
+    {
+        m_doc->SearchFromHere(args.at(0), false);
     }
 }
 
