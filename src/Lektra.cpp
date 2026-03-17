@@ -1478,20 +1478,16 @@ Lektra::setupMousebinding(const QString &action_str,
     }
 
     // Resolve action string to actual command
-    // TODO: Do this properly
     GraphicsView::MouseAction action;
+
     if (action_str == "portal")
-    {
         action = GraphicsView::MouseAction::Portal;
-    }
+
     else if (action_str == "synctex_jump")
-    {
         action = GraphicsView::MouseAction::SynctexJump;
-    }
+
     else if (action_str == "preview")
-    {
         action = GraphicsView::MouseAction::Preview;
-    }
     else
     {
         qWarning() << "Unknown action for mouse binding:" << action_str;
@@ -2568,30 +2564,23 @@ Lektra::FileProperties() noexcept
 void
 Lektra::SaveFile(const QString &filename) noexcept
 {
+    Q_UNUSED(filename);
+
     if (!m_doc)
         return;
 
-    if (filename.isEmpty())
-        m_doc->SaveFile();
-    else
-    {
-        // TODO: Find the file if it's opened given by `filename` and save as it
-    }
+    m_doc->SaveFile();
 }
 
 // Saves the current file as a new file
 void
 Lektra::SaveAsFile(const QString &filename) noexcept
 {
+    Q_UNUSED(filename);
     if (!m_doc)
         return;
 
-    if (filename.isEmpty())
-        m_doc->SaveAsFile();
-    else
-    {
-        // TODO: Find the file if it's opened given by `filename` and save it
-    }
+    m_doc->SaveAsFile();
 }
 
 // Fit the document to the width of the window
@@ -5080,18 +5069,13 @@ Lektra::centerMouseInDocumentView(DocumentView *view) noexcept
 void
 Lektra::CloseFile(const QString &filename) noexcept
 {
+    Q_UNUSED(filename);
+
     if (!m_doc)
         return;
 
-    if (filename.isEmpty())
-    {
-        int indexToClose = m_tab_widget->currentIndex();
-        Tab_close(indexToClose);
-    }
-    else
-    {
-        // TODO: save the file given by filename (if it's opened)
-    }
+    int indexToClose = m_tab_widget->currentIndex();
+    Tab_close(indexToClose);
 }
 
 void
