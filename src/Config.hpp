@@ -96,7 +96,6 @@ struct Config
     // @section_added 0.6.5
     struct Annotations
     {
-
         // @section Annotations.[Type]
         // @section_desc {
         // Base annotation options struct (common to all annotation types)
