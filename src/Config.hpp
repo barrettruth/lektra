@@ -69,6 +69,24 @@ struct Config
         // @default "#55FF0055"
         // @added 0.6.5
         uint32_t index_color{0x55FF0055};
+
+        // @desc {
+        // Progressive search (renders results progressively when enabled,
+        // which can speed up search on large documents)
+        // }
+        // @type bool
+        // @default true
+        // @added 0.6.8
+        bool progressive{true};
+
+        // @desc {
+        // Highlight all search matches (if false, only the current match
+        // is highlighted)
+        // }
+        // @type bool
+        // @default true
+        // @added 0.6.8
+        bool highlight_matches{true};
     } search{};
     // @endsection
 
