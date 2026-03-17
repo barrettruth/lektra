@@ -6,6 +6,8 @@
 - Add **progressive searching** for search results. When a search query is entered, the search results will start showing up immediately as they are found, instead of waiting for the entire search to complete before showing any results. **This is enabled by default**.
 - Add `progressive` (bool) option in the `[search]` section of the config to enable/disable progressive searching.
 - Add `highlight_matches` (bool) option in the `[search]` section of the config to enable/disable highlighting of search matches in the document. When enabled, all search matches will be highlighted in the document, otherwise only the current search match will be highlighted.
+- New command `search_from_here` to start a search from the current page and position instead of the beginning of the document, which is useful for long documents when you want to search for something that appears after your current location without having to scroll all the way back to the beginning to start the search.
+- New command `search_cancel` to cancel an ongoing search operation
 
 - Annotation color change is now **undo-able**.
 - `--version` and `--list-commands` now output to stdout instead of stderr to be more consistent with standard command line tool behavior and to allow for easier parsing of the output when using these commands in scripts or other command line workflows.
