@@ -471,7 +471,8 @@ public:
     void invalidatePageCaches() noexcept;
     void invalidatePageCache(int pageno) noexcept;
     void search(const QString &term, bool caseSensitive = false,
-                bool useRegex = false) noexcept;
+                int pageFrom = -1, bool useRegex = false) noexcept;
+    void searchCancel() noexcept;
     void searchInPage(const int pageno, const QString &term,
                       bool caseSensitive = false) noexcept;
     std::vector<Model::SearchHit> searchHelper(int pageno, const QString &term,
