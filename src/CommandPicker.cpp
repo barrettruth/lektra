@@ -2,7 +2,7 @@
 
 #include "Picker.hpp"
 
-CommandPicker::CommandPicker(const Config::Command_palette &config,
+CommandPicker::CommandPicker(const Config::CommandPalette &config,
                              const std::vector<Command> &commands,
                              const ShortcutMap &shortcuts,
                              QWidget *parent) noexcept
@@ -10,11 +10,16 @@ CommandPicker::CommandPicker(const Config::Command_palette &config,
       m_shortcuts(shortcuts)
 {
     QList<Column> cols;
-    cols.append({.header = "Command", .stretch = 1});
+    cols.append({.header    = "Command",
+                 .stretch   = 1,
+                 .alignment = Qt::AlignLeft | Qt::AlignVCenter});
     if (m_config.description)
         cols.append({.header = "Description", .stretch = 2});
     if (m_config.shortcuts)
-        cols.append({.header = "Shortcut", .stretch = 0});
+        cols.append({.header    = "Shortcut",
+                     .stretch   = 0,
+                     .alignment = Qt::AlignRight | Qt::AlignVCenter});
+    setScrollbarEnabled(m_config.vscrollbar);
     setColumns(cols);
 }
 
