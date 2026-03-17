@@ -20,7 +20,6 @@
 
 ## MEDIUM PRIORITY
 
-- [ ] Add `open_config` command to open the configuration file in the default editor using $EDITOR or similar on macOS
 - [ ] Show text highlight brush cursor when highlighting text
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
