@@ -22,7 +22,7 @@ show_page_numbers = true
 
 [statusbar]
 visible = true
-padding = [ 5, 5, 5, 5 ]
+padding = [ 2, 0, 2, 0 ]
 show_session_name = true
 show_mode = true
 show_page_number = true
@@ -124,7 +124,7 @@ horizontal = true
 vertical = true
 auto_hide = true
 search_hits = true # show/hide search hits on scrollbar
-size = 30 # scrollbar thickness in pixels
+size = 10 # scrollbar thickness in pixels
 hide_timeout = 4 # time in s to hide scrollbars when auto_hide is true
 
 [jump_marker]
@@ -153,6 +153,8 @@ full_path = false # show full file path in tab title
 lazy_load = true # load tab content only when activated
 
 [search]
+highlight_matches = true
+progressive = true
 match_color = "#55500033"
 index_color = "#55FF0055"
 
@@ -267,6 +269,8 @@ layout_single = "Ctrl+Shift+1"
 layout_top_to_bottom = "Ctrl+Shift+2"
 layout_left_to_right = "Ctrl+Shift+3"
 layout_book = "Ctrl+Shift+4"
+highlight_selection = "x"
+files_recent = "Ctrl+Shift+O"
 
 [mousebindings]
 # LeftButton, RightButton, MiddleButton
