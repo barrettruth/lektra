@@ -3090,7 +3090,19 @@ Model::buildPageTransforms(int pageno) const noexcept
 }
 
 void
-Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
+Model::searchCancel() noexcept
+{
+    if (m_search_future.isRunning())
+    {
+        m_search_cancelled.store(true);
+        m_search_future.cancel();
+        m_search_future.waitForFinished();
+    }
+}
+
+void
+Model::search(const QString &term, bool caseSensitive, int pageFrom,
+              bool use_regex) noexcept
 {
     if (m_search_future.isRunning())
     {
@@ -3101,11 +3113,11 @@ Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
     m_search_cancelled.store(false);
 
     // Copy everything the lambda needs — no 'this' access in the thread
-    const int page_count   = m_page_count;
-    const bool progressive = m_config.search.progressive;
 
-    m_search_future = QtConcurrent::run(
-        [this, page_count, progressive, use_regex, term, caseSensitive]()
+    m_search_future
+        = QtConcurrent::run([this, &pageFrom, page_count = m_page_count,
+                             progressive = m_config.search.progressive,
+                             use_regex, term, caseSensitive]()
     {
         if (m_search_cancelled.load())
             return;
@@ -3134,7 +3146,9 @@ Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
         QMap<int, std::vector<SearchHit>> results;
         int total = 0;
 
-        for (int batch_start = 0;
+        if (pageFrom == -1)
+            pageFrom = 0;
+        for (int batch_start = pageFrom;
              batch_start < page_count && !m_search_cancelled.load();
              batch_start += BATCH)
         {
@@ -3193,7 +3207,9 @@ Model::search(const QString &term, bool caseSensitive, bool use_regex) noexcept
                 return;
 
             if (progressive && !batchResults.isEmpty())
+            {
                 emit searchPartialResultsReady(batchResults);
+            }
         }
 
         if (m_search_cancelled.load())
