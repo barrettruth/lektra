@@ -15,7 +15,8 @@ class HighlightSearchPicker : public Picker
 {
     Q_OBJECT
 public:
-    explicit HighlightSearchPicker(QWidget *parent) noexcept;
+    explicit HighlightSearchPicker(const Config::HighlightSearch &config,
+                                   QWidget *parent) noexcept;
 
     inline void setModel(Model *model) noexcept
     {
@@ -23,7 +24,7 @@ public:
     }
 
     void refresh() noexcept;
-    void launch() noexcept;
+    void launch() noexcept override;
 
 signals:
     void gotoLocationRequested(int page, float x, float y);
@@ -46,7 +47,7 @@ private:
     void setLoading(bool state) noexcept;
     QList<Item> buildItems(const QString &term) const noexcept;
 
-    Model* m_model{nullptr};
+    Model *m_model{nullptr};
     QFutureWatcher<std::vector<Model::HighlightText>> m_watcher;
     std::vector<Model::HighlightText> m_entries;
 
@@ -54,4 +55,5 @@ private:
     WaitingSpinnerWidget *m_spinner{nullptr};
     QPushButton *m_refreshButton{nullptr};
     QLabel *m_countLabel{nullptr};
+    const Config::HighlightSearch &m_config;
 };

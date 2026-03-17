@@ -10,7 +10,6 @@
 
 struct Config
 {
-
     struct MouseBinding
     {
         Qt::MouseButton button           = Qt::NoButton;
@@ -98,11 +97,13 @@ struct Config
     struct Annotations
     {
 
-        // @section Annotations.Popup
-        // @section_desc Popup annotation options struct
+        // @section Annotations.[Type]
+        // @section_desc {
+        // Base annotation options struct (common to all annotation types)
+        // }
         // @section_type struct
         // @section_added 0.6.5
-        struct Popup
+        struct Base
         {
             // @desc Enable hover effect (e.g., glow on highlight)
             // @type bool
@@ -134,7 +135,15 @@ struct Config
             // @default 12
             // @added 0.6.5
             int comment_font_size{12};
+        };
+        // @endsection
 
+        // @section Annotations.Popup
+        // @section_desc Popup annotation options struct
+        // @section_type struct
+        // @section_added 0.6.5
+        struct Popup : public Base
+        {
         } popup{};
         // @endsection
 
@@ -142,51 +151,19 @@ struct Config
         // @section_desc Rect annotation options struct
         // @section_type struct
         // @section_added 0.6.5
-        struct Rect
+        struct Rect : public Base
         {
-            // @desc Enable hover effect (e.g., glow on highlight)
-            // @type bool
-            // @default true
-            // @added 0.6.5
-            bool hover_glow{true};
-
-            // @desc Annotation glow color (on hover)
-            // @type str
-            // @default "#FF5000AA"
-            // @added 0.6.5
-            uint32_t glow_color{0xFF5000AA};
-
-            // @desc Rect annotation color
-            // @type str
-            // @default "#55FF5588"
-            // @added 0.6.5
-            uint32_t color{0x55FF5588};
-
-            // @desc Glow width in pixels
-            // @type int
-            // @default 5
-            // @added 0.6.5
-            int glow_width{5};
-
-            // @desc { Show comment text in tooltip on hover (if comment
-            // exists) }
-            // @type bool
-            // @default true
-            // @added 0.6.5
-            bool comment{true};
-
-            // @desc Font size for the comment tooltip (in points)
-            // @type int
-            // @default 12
-            // @added 0.6.5
-            int comment_font_size{12};
-
             // @desc Show marker in the corner of the rect (if comment exists)
             // @type bool
             // @default true
             // @added 0.6.5
             bool comment_marker{true};
 
+            // @desc Fill color for rect annotations
+            // @type str
+            // @default "#55FF5588"
+            // @added 0.6.5
+            uint32_t color{0x55FF5588};
         } rect{};
         // @endsection
 
@@ -194,51 +171,19 @@ struct Config
         // @section_desc Highlight annotation options struct
         // @section_type struct
         // @section_added 0.6.5
-        struct Highlight
+        struct Highlight : public Base
         {
-            // @desc { Show comment text in tooltip on hover (if commentb
-            // exists) }
-            // @type bool
-            // @default true
-            // @added 0.6.5
-            bool comment{true};
-
-            // @desc Font size for the comment tooltip (in points)
-            // @type int
-            // @default 12
-            // @added 0.6.5
-            int comment_font_size{12};
-
-            // @desc Annotation glow color (on hover)
-            // @type str
-            // @default "#FF5000AA"
-            // @added 0.6.5
-            uint32_t glow_color{0xFF5000AA};
-
-            // @desc Highlight annotation color
-            // @type str
-            // @default "#55FF0055"
-            // @added 0.6.5
-            uint32_t color{0x55FF0055};
-
-            // @desc Glow width in pixels
-            // @type int
-            // @default 5
-            // @added 0.6.5
-            int glow_width{5};
-
-            // @desc Enable hover effect (e.g., glow on highlight)
-            // @type bool
-            // @default true
-            // @added 0.6.5
-            bool hover_glow{true};
-
-            // @desc Show marker at the highlight (if comment exists)
+            // @desc Show marker in the corner of the rect (if comment exists)
             // @type bool
             // @default true
             // @added 0.6.5
             bool comment_marker{true};
 
+            // @desc Fill color for rect annotations
+            // @type str
+            // @default "#55FF5588"
+            // @added 0.6.5
+            uint32_t color{0x55FF5588};
         } highlight{};
         // @endsection
 
@@ -706,81 +651,8 @@ struct Config
     } tabs{};
     // @endsection
 
-    // @section Outline
-    // @section_desc Outline options struct
-    // @section_type struct
-    // @section_added 0.5.3
-    struct Outline
-    {
-        // @desc Indent width
-        // @type int
-        // @default 10
-        // @added 0.6.5
-        int indent_width{10};
-
-        // @desc Show page numbers
-        // @type bool
-        // @default true
-        // @added 0.6.5
-        bool show_page_number{true};
-    } outline{};
-    // @endsection
-
-    // @section Highlight
-    // @section_desc Highlight Search options struct
-    // @section_type struct
-    // @section_added 0.5.3
-    struct HighlightSearch
-    {
-    } highlight_search{};
-    // @endsection
-
-    // @section Command Palette
-    // @section_desc Command Palette options struct
-    // @section_type struct
-    // @section_added 0.5.4
-    struct CommandPalette
-    {
-        // @desc Width of the command palette picker
-        // @type int
-        // @default 500
-        // @added 0.5.4
-        int width{500};
-
-        // @desc Height of the command palette picker
-        // @type int
-        // @default 300
-        // @added 0.5.4
-        int height{300};
-
-        // @desc Placeholder text for the input field
-        // @type str
-        // @default "Type a command..."
-        // @added 0.5.4
-        QString placeholder_text{"Type a command..."};
-
-        // @desc Show the vertical scrollbar in the picker
-        // @type bool
-        // @default true
-        // @added 0.5.4
-        bool vscrollbar{true};
-
-        // @desc Show shortcuts
-        // @type bool
-        // @default true
-        // @added 0.5.4
-        bool shortcuts{true};
-
-        // @desc Show command description
-        // @type bool
-        // @default false
-        // @added 0.6.5
-        bool description{false};
-    } command_palette{};
-    // @endsection
-
     // @section Picker
-    // @section_desc Split options struct
+    // @section_desc Picker options struct
     // @section_type struct
     // @section_added 0.6.0
     struct Picker
@@ -790,6 +662,12 @@ struct Config
         // @default true
         // @added 0.6.0
         bool border{true};
+
+        // @desc Enable alternating row colors in the picker list
+        // @type bool
+        // @default true
+        // @added 0.6.8
+        bool alternating_row_color{true};
 
         // @section Picker.Shadow
         // @section_desc Picker shadow struct
@@ -828,6 +706,79 @@ struct Config
             int opacity{120};
         } shadow{};
     } picker{};
+    // @endsection
+
+    // @section Outline
+    // @section_desc Outline options struct
+    // @section_type struct
+    // @section_added 0.5.3
+    struct Outline : public Picker
+    {
+        // @desc Indent width
+        // @type int
+        // @default 10
+        // @added 0.6.5
+        int indent_width{10};
+
+        // @desc Show page numbers
+        // @type bool
+        // @default true
+        // @added 0.6.5
+        bool show_page_number{true};
+    } outline{};
+    // @endsection
+
+    // @section Highlight
+    // @section_desc Highlight Search options struct
+    // @section_type struct
+    // @section_added 0.5.3
+    struct HighlightSearch : public Picker
+    {
+    } highlight_search{};
+    // @endsection
+
+    // @section Command Palette
+    // @section_desc Command Palette options struct
+    // @section_type struct
+    // @section_added 0.5.4
+    struct CommandPalette : public Picker
+    {
+        // @desc Width of the command palette picker
+        // @type int
+        // @default 500
+        // @added 0.5.4
+        int width{500};
+
+        // @desc Height of the command palette picker
+        // @type int
+        // @default 300
+        // @added 0.5.4
+        int height{300};
+
+        // @desc Placeholder text for the input field
+        // @type str
+        // @default "Type a command..."
+        // @added 0.5.4
+        QString placeholder_text{"Type a command..."};
+
+        // @desc Show the vertical scrollbar in the picker
+        // @type bool
+        // @default true
+        // @added 0.5.4
+        bool vscrollbar{true};
+
+        // @desc Show shortcuts
+        // @type bool
+        // @default true
+        // @added 0.5.4
+        bool shortcuts{true};
+
+        // @desc Show command description
+        // @type bool
+        // @default false
+        // @added 0.6.5
+        bool description{false};
+    } command_palette{};
     // @endsection
 
 #ifdef ENABLE_LLM_SUPPORT

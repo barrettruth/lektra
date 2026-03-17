@@ -15,7 +15,8 @@ class CommentSearchPicker : public Picker
 {
     Q_OBJECT
 public:
-    explicit CommentSearchPicker(QWidget *parent) noexcept;
+    explicit CommentSearchPicker(const Config::Picker &config,
+                                 QWidget *parent) noexcept;
 
     inline void setModel(Model *model) noexcept
     {
@@ -23,7 +24,7 @@ public:
     }
 
     void refresh() noexcept;
-    void launch() noexcept;
+    void launch() noexcept override;
 
 signals:
     void gotoLocationRequested(int pageno, float x, float y);
@@ -53,4 +54,5 @@ private:
     WaitingSpinnerWidget *m_spinner{nullptr};
     QPushButton *m_refreshButton{nullptr};
     QLabel *m_countLabel{nullptr};
+    const Config::Picker &m_config;
 };

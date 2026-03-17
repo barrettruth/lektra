@@ -1,11 +1,14 @@
 #pragma once
+
+#include "Config.hpp"
 #include "Picker.hpp"
 
 class RecentFilesPicker : public Picker
 {
     Q_OBJECT
 public:
-    explicit RecentFilesPicker(QWidget *parent = nullptr);
+    explicit RecentFilesPicker(const Config::Picker &config,
+                               QWidget *parent = nullptr);
 
     QList<Item> collectItems() override;
     void onItemAccepted(const Item &item) override;

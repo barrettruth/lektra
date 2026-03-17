@@ -7,7 +7,8 @@
 #include <QStandardItem>
 #include <QVBoxLayout>
 
-Picker::Picker(QWidget *parent) noexcept : QWidget(parent)
+Picker::Picker(const Config::Picker &config, QWidget *parent) noexcept
+    : QWidget(parent), m_config(config)
 {
     setWindowFlags(Qt::Widget);
     setAttribute(Qt::WA_StyledBackground, true);

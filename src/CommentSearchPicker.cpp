@@ -8,10 +8,12 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent>
 
-CommentSearchPicker::CommentSearchPicker(QWidget *parent) noexcept
-    : Picker(parent)
+CommentSearchPicker::CommentSearchPicker(const Config::Picker &config,
+                                         QWidget *parent) noexcept
+    : Picker(config, parent), m_config(config)
 {
-    setColumns({{.header = "Annot Comments", .stretch = 1}}); // ← add this first
+    setColumns(
+        {{.header = "Annot Comments", .stretch = 1}}); // ← add this first
 
     m_spinner = new WaitingSpinnerWidget(this, false, false);
     m_spinner->setInnerRadius(5);

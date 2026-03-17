@@ -28,6 +28,11 @@
 - Fix picker hide on mainwindow with no tabs open. It caused no shortcuts to work because the mainwindow was no longer focused after the picker was shown once and then hidden.
 - For real this time, fix the statusbar 0 padding
 
+### Core Changes
+
+- Make different types of Picker (e.g. outline picker, search highlights picker, recent files picker, etc.) inherit **configuration** options from the common base `Picker` class **configuration** to reduce code duplication and improve maintainability of the codebase.
+- Make the same inheriting structure for `Annotation` **configuration**
+
 ## 0.6.7
 
 ### Features

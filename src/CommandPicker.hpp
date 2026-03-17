@@ -28,4 +28,5 @@ private:
     const Config::CommandPalette &m_config;
     const std::vector<Command> m_commands; // sorted, stable
     const ShortcutMap &m_shortcuts;
+
 };

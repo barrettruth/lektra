@@ -1,4 +1,6 @@
 #pragma once
+#include "Config.hpp"
+
 #include <QLineEdit>
 #include <QShortcut>
 #include <QSortFilterProxyModel>
@@ -118,6 +120,7 @@ class Picker : public QWidget
     Q_OBJECT
 public:
     explicit Picker(
+        const Config::Picker &config,
         QWidget *parent) noexcept; // parent is REQUIRED — must be the main
                                    // window's central widget
 
@@ -202,6 +205,11 @@ public:
             enabled ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
     }
 
+    inline void setAlternatingRowColors(bool enabled) noexcept
+    {
+        m_listView->setAlternatingRowColors(enabled);
+    }
+
 signals:
     void itemSelected(const Item &item);
 
@@ -213,6 +221,7 @@ protected:
     QLineEdit *m_searchBox;
     void populate(const QList<Item> &items);
     void reposition();
+    const Config::Picker &m_config;
 
 private slots:
     void onSearchChanged(const QString &text);

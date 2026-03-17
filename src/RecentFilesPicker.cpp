@@ -2,9 +2,12 @@
 
 #include <QFileInfo>
 
-RecentFilesPicker::RecentFilesPicker(QWidget *parent) : Picker(parent)
+RecentFilesPicker::RecentFilesPicker(const Config::Picker &config,
+                                     QWidget *parent)
+    : Picker(config, parent)
 {
-    setColumns({{.header = "Name", .stretch = 2}, {.header = "Path", .stretch = 0}});
+    setColumns(
+        {{.header = "Name", .stretch = 2}, {.header = "Path", .stretch = 0}});
 }
 
 QList<Picker::Item>

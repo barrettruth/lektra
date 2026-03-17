@@ -835,9 +835,8 @@ Lektra::initConfig() noexcept
     if (auto picker = toml["picker"])
     {
         set(picker["border"], m_config.picker.border);
-        // set(picker["alternate_row_color"],
-        // m_config.picker.alternate_row_color); TODO: Implement alternate row
-        // color in pickers
+        set(picker["alternating_row_color"],
+            m_config.picker.alternating_row_color);
 
         if (auto picker_shadow = picker["shadow"])
         {
@@ -2676,7 +2675,8 @@ Lektra::Show_highlight_search() noexcept
 
     if (!m_highlight_search_picker)
     {
-        m_highlight_search_picker = new HighlightSearchPicker(this);
+        m_highlight_search_picker
+            = new HighlightSearchPicker(m_config.highlight_search, this);
         m_highlight_search_picker->setKeybindings(m_picker_keybinds);
 
         connect(m_highlight_search_picker,
@@ -2697,7 +2697,8 @@ Lektra::Show_annot_comment_search() noexcept
 
     if (!m_comment_search_picker)
     {
-        m_comment_search_picker = new CommentSearchPicker(this);
+        m_comment_search_picker
+            = new CommentSearchPicker(m_config.picker, this);
         m_comment_search_picker->setKeybindings(m_picker_keybinds);
 
         connect(m_comment_search_picker,
@@ -5549,7 +5550,7 @@ Lektra::Show_recent_files_picker() noexcept
 
     if (!m_recent_file_picker)
     {
-        m_recent_file_picker = new RecentFilesPicker(this);
+        m_recent_file_picker = new RecentFilesPicker(m_config.picker, this);
         m_recent_file_picker->setKeybindings(m_picker_keybinds);
 
         connect(m_recent_file_picker, &RecentFilesPicker::fileRequested, this,

@@ -8,8 +8,9 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent>
 
-HighlightSearchPicker::HighlightSearchPicker(QWidget *parent) noexcept
-    : Picker(parent)
+HighlightSearchPicker::HighlightSearchPicker(
+    const Config::HighlightSearch &config, QWidget *parent) noexcept
+    : Picker(config, parent), m_config(config)
 {
     setColumns({{.header = "Highlight", .stretch = 1}}); // ← add this first
 

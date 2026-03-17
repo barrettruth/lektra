@@ -2,7 +2,7 @@
 
 OutlinePicker::OutlinePicker(const Config::Outline &config,
                              QWidget *parent) noexcept
-    : Picker(parent), m_config(config)
+    : Picker(config, parent), m_config(config)
 {
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
     m_listView->setSelectionBehavior(QAbstractItemView::SelectRows);

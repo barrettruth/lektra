@@ -6,7 +6,7 @@ CommandPicker::CommandPicker(const Config::CommandPalette &config,
                              const std::vector<Command> &commands,
                              const ShortcutMap &shortcuts,
                              QWidget *parent) noexcept
-    : Picker(parent), m_config(config), m_commands(commands),
+    : Picker(config, parent), m_config(config), m_commands(commands),
       m_shortcuts(shortcuts)
 {
     QList<Column> cols;
