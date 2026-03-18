@@ -698,7 +698,7 @@ DocumentView::handleClickSelection(int clickType, QPointF scenePos) noexcept
             m_visual_line_index
                 = m_model->visual_line_index_at_pos(modelPos, m_visual_lines);
             m_pageno = pageIndex;
-            snap_visual_line(false);
+            snapVisualLine(false);
             return;
         }
     }
@@ -1388,7 +1388,7 @@ DocumentView::GotoPage(int pageno) noexcept
     {
         // m_visual_lines      = m_model->get_text_lines(m_pageno);
         m_visual_line_index = -1;
-        snap_visual_line();
+        snapVisualLine();
     }
 }
 
@@ -2492,7 +2492,7 @@ DocumentView::renderPages() noexcept
 
     if (m_visual_line_mode)
     {
-        snap_visual_line(false);
+        snapVisualLine(false);
     }
 }
 
@@ -2633,6 +2633,7 @@ DocumentView::startNextRenderJob() noexcept
                     renderAnnotations(pageno, result.annotations);
                     renderSearchHitsForPage(pageno);
                     updateCurrentHitHighlight();
+                    snapVisualLine();
                 }
                 setUpdatesEnabled(true);
                 m_gscene->blockSignals(false);
@@ -3319,7 +3320,7 @@ DocumentView::updateCurrentPage() noexcept
     if (m_visual_line_mode)
     {
         m_visual_line_index = -1;
-        snap_visual_line(false);
+        snapVisualLine(false);
     }
 }
 
@@ -4861,11 +4862,11 @@ DocumentView::visual_line_move(Direction direction) noexcept
         break;
     }
 
-    snap_visual_line();
+    snapVisualLine();
 }
 
 void
-DocumentView::snap_visual_line(bool centerView) noexcept
+DocumentView::snapVisualLine(bool centerView) noexcept
 {
     // Ensure we have lines for the current page
     if (m_visual_lines.empty() || m_visual_lines.front().pageno != m_pageno)
@@ -4944,7 +4945,7 @@ DocumentView::set_visual_line_mode(bool state) noexcept
     if (m_visual_line_mode)
     {
         m_gview->setMode(GraphicsView::Mode::VisualLine);
-        snap_visual_line();
+        snapVisualLine();
     }
     else
     {
