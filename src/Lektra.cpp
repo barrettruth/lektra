@@ -3262,6 +3262,17 @@ Lektra::eventFilter(QObject *object, QEvent *event)
 }
 
 void
+Lektra::dragEnterEvent(QDragEnterEvent *e) noexcept
+{
+    const QMimeData *mime = e->mimeData();
+
+    if (mime->hasFormat(TabBar::MIME_TYPE) || mime->hasUrls())
+        e->acceptProposedAction();
+    else
+        e->ignore();
+}
+
+void
 Lektra::dropEvent(QDropEvent *e) noexcept
 {
     const QMimeData *mime = e->mimeData();

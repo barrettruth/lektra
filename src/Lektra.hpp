@@ -186,6 +186,8 @@ protected:
     void closeEvent(QCloseEvent *e) override;
     bool eventFilter(QObject *object, QEvent *event) override;
     void dropEvent(QDropEvent *event) noexcept override;
+    void dragEnterEvent(QDragEnterEvent *event) noexcept override;
+
 
 private:
     enum class LinkHintMode
