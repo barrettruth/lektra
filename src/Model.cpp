@@ -1729,12 +1729,6 @@ Model::computeTextSelectionQuad(int pageno, QPointF devStart,
         if (!stext_page)
             fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to build text page");
 
-        // fz_snap_selection(m_ctx, stext_page, &a, &b, FZ_SELECT_CHARS);
-
-        // Re-store snapped endpoints so callers get the corrected range
-        // m_selection_start = a;
-        // m_selection_end   = b;
-
         count = highlight_selection(stext_page, a, b, hits.data(), MAX_HITS);
     }
     fz_always(m_ctx)
