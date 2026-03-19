@@ -2633,7 +2633,6 @@ DocumentView::startNextRenderJob() noexcept
                     renderAnnotations(pageno, result.annotations);
                     renderSearchHitsForPage(pageno);
                     updateCurrentHitHighlight();
-                    snapVisualLine();
                 }
                 setUpdatesEnabled(true);
                 m_gscene->blockSignals(false);
@@ -4660,7 +4659,9 @@ DocumentView::repositionPages()
     }
 
     renderSearchHitsInScrollbar();
-    // renderPages();
+
+    if (m_visual_line_mode)
+        snapVisualLine(false);
 }
 
 void
@@ -4869,6 +4870,9 @@ void
 DocumentView::snapVisualLine(bool centerView) noexcept
 {
     // Ensure we have lines for the current page
+    if (!m_visual_line_mode)
+        return;
+
     if (m_visual_lines.empty() || m_visual_lines.front().pageno != m_pageno)
     {
         m_visual_lines = m_model->get_text_lines(m_pageno);
@@ -4895,10 +4899,21 @@ DocumentView::snapVisualLine(bool centerView) noexcept
             return;
 
         const float scale = m_model->logicalScale();
-        QRectF scaledBbox(info.bbox.x() * scale, info.bbox.y() * scale,
-                          info.bbox.width() * scale,
-                          info.bbox.height() * scale);
-        QRectF sceneBbox = pageItem->mapRectToScene(scaledBbox);
+
+        // Map bbox in item-local pixel coords through the full item transform.
+        // Do NOT pre-multiply by scale if the item itself carries a scale()
+        // factor — mapRectToScene already accounts for it. Instead, work in
+        // the item's own coordinate system (pixels at render resolution) and
+        // let Qt composite the transform.
+        QRectF itemBbox(info.bbox.x() * scale, info.bbox.y() * scale,
+                        info.bbox.width() * scale, info.bbox.height() * scale);
+
+        QRectF sceneBbox = pageItem->mapRectToScene(QRectF(
+            itemBbox.x() / pageItem->scale(), itemBbox.y() / pageItem->scale(),
+            itemBbox.width() / pageItem->scale(),
+            itemBbox.height() / pageItem->scale()));
+
+        // QRectF sceneBbox = pageItem->mapRectToScene(scaledBbox);
 
         QPainterPath path;
         path.addRect(sceneBbox);
