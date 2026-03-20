@@ -209,7 +209,11 @@ public:
 
     inline bool supports_metadata() const noexcept
     {
+#ifdef HAS_DJVU
         return supports_outline() || m_filetype == FileType::DJVU;
+#else
+        return supports_outline();
+#endif
     }
 
     inline bool supports_annotations() const noexcept
@@ -744,7 +748,6 @@ private:
     std::atomic<bool> m_render_cancelled{false};
     std::atomic<int> m_search_match_count{0};
     std::atomic<bool> m_search_cancelled{false};
-
 
     const Config &m_config;
 };
