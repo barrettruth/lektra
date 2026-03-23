@@ -4254,7 +4254,7 @@ Lektra::initCommands() noexcept
         [this](const QStringList &) { Show_annot_comment_search(); });
 
     // Search
-    m_command_manager->reg("search", "Search document",
+    m_command_manager->reg("search", tr("Search document"),
                            [this](const QStringList &args) { Search(args); });
     m_command_manager->reg("search_regex", tr("Search document using regex"),
                            [this](const QStringList &args)

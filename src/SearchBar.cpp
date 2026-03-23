@@ -13,7 +13,7 @@ SearchBar::SearchBar(QWidget *parent) : QWidget(parent)
 
     // Set color based on the current palette's text color
     m_spinner->setColor(palette().color(QPalette::Text));
-    m_label            = new QLabel("Search:", this);
+    m_label            = new QLabel(tr("Search:"), this);
     m_searchInput      = new QLineEdit(this);
     m_prevButton       = new QPushButton(this);
     m_nextButton       = new QPushButton(this);
@@ -23,14 +23,14 @@ SearchBar::SearchBar(QWidget *parent) : QWidget(parent)
 
     m_searchInput->setFocusPolicy(Qt::ClickFocus);
 
-    m_regexButton->setToolTip("Regular Expression");
+    m_regexButton->setToolTip(tr("Regular Expression"));
     m_regexButton->setCheckable(true);
     m_regexButton->setFixedWidth(28);
     m_regexButton->setFocusPolicy(Qt::NoFocus);
 
-    m_nextButton->setToolTip("Goto Next Hit");
-    m_prevButton->setToolTip("Goto Previous Hit");
-    m_closeButton->setToolTip("Close Search Bar");
+    m_nextButton->setToolTip(tr("Goto Next Hit"));
+    m_prevButton->setToolTip(tr("Goto Previous Hit"));
+    m_closeButton->setToolTip(tr("Close Search Bar"));
 
     m_nextButton->setIcon(style()->standardIcon(QStyle::SP_ArrowForward));
     m_prevButton->setIcon(style()->standardIcon(QStyle::SP_ArrowBack));
@@ -52,7 +52,7 @@ SearchBar::SearchBar(QWidget *parent) : QWidget(parent)
                                       QSizePolicy::Preferred);
     m_searchInput->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Preferred);
-    m_searchInput->setPlaceholderText("Search");
+    m_searchInput->setPlaceholderText(tr("Search query…"));
     m_searchIndexLabel->hide();
     m_searchSeparator->hide();
     m_searchCountLabel->hide();
@@ -79,8 +79,8 @@ SearchBar::initConnections() noexcept
             emit searchIndexChangeRequested(index - 1);
         else
         {
-            QMessageBox::warning(this, "Invalid Index",
-                                 "Please enter a valid search index.");
+            QMessageBox::warning(this, tr("Invalid Index"),
+                                 tr("Please enter a valid search index."));
         }
     });
 
