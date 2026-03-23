@@ -1,5 +1,21 @@
 # LEKTRA CHANGELOG
 
+## 0.6.9
+
+### Features
+
+### Config Options
+
+### Breaking Changes
+
+- `dim_inactive` is now disabled by default (which was enabled previously out of the box)
+
+### Bug Fixes
+
+### Core Changes
+
+
+
 ## 0.6.8
 
 ### Features

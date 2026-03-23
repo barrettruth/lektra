@@ -452,7 +452,7 @@ struct Config
         // @type bool
         // @default true
         // @added 0.6.2
-        bool dim_inactive{true};
+        bool dim_inactive{false};
 
         // @desc Set the inactive split dim opacity [0-1]
         // @type float
