@@ -14,6 +14,22 @@
 
 ### Config Options
 
+- Ability to define multiple keybindings for same action using [TOML array](https://toml.io/en/v1.0.0#array)
+
+Example: 
+```toml
+[picker.keys]
+up = [ "Ctrl+k", "Up" ]
+down = [ "Ctrl+j", "Down" ]
+
+[keybindings]
+command_palette = [ ":", "Ctrl+P" ]
+```
+
+> ![NOTE]
+> Notice that multiple keybindings use `[]` square brackets and not `{}` curly braces,
+> which have a different meaning in [TOML](https://toml.io/en/v1.0.0#inline-table)
+
 ### Breaking Changes
 
 - `dim_inactive` is now disabled by default (which was enabled previously out of the box)
