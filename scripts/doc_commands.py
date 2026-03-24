@@ -37,9 +37,5 @@ def main():
     ) as f:
         f.write(json.dumps(out, indent=2))
 
-    with open("../docs/man/commands.json", "w") as f:
-        f.write(json.dumps(out, indent=2))
-
-
 if __name__ == "__main__":
     main()
