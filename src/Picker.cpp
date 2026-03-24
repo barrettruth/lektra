@@ -103,30 +103,24 @@ Picker::eventFilter(QObject *watched, QEvent *event)
 
     if (watched == m_searchBox)
     {
-        if (m_keys.dismiss == QKeyCombination(Qt::Key_Escape))
+        if (event->type() == QEvent::KeyRelease)
         {
-            if (event->type() == QEvent::KeyRelease)
+            auto *keyEvent = static_cast<QKeyEvent *>(event);
+            if (m_keys.dismiss.contains(keyEvent->keyCombination()))
             {
-                auto *keyEvent = static_cast<QKeyEvent *>(event);
-                if (keyEvent->keyCombination() == m_keys.dismiss)
-                {
-                    hide();
-                    // Focus the parent
-                    if (parentWidget())
-                        parentWidget()->setFocus();
-                    return true;
-                }
+                hide();
+                if (parentWidget())
+                    parentWidget()->setFocus();
+                return true;
             }
         }
-
-        if (event->type() == QEvent::KeyPress)
+        else if (event->type() == QEvent::KeyPress)
         {
             auto *keyEvent = static_cast<QKeyEvent *>(event);
             const auto key = keyEvent->keyCombination();
-
-            if (key == m_keys.moveDown || key == m_keys.moveUp
-                || key == m_keys.pageDown || key == m_keys.pageUp
-                || key == m_keys.accept)
+            if (m_keys.moveDown.contains(key) || m_keys.moveUp.contains(key)
+                || m_keys.pageDown.contains(key) || m_keys.pageUp.contains(key)
+                || m_keys.accept.contains(key))
             {
                 keyPressEvent(keyEvent);
                 return true;
@@ -143,13 +137,13 @@ Picker::keyPressEvent(QKeyEvent *event)
     const QKeyCombination key = event->keyCombination();
     const int row             = m_listView->currentIndex().row();
 
-    if (key == m_keys.moveDown)
+    if (m_keys.moveDown.contains(key))
     {
         m_listView->setCurrentIndex(
             m_proxy->index(qMin(row + 1, m_proxy->rowCount() - 1), 0));
         event->accept();
     }
-    else if (key == m_keys.pageDown)
+    else if (m_keys.pageDown.contains(key))
     {
         m_listView->setCurrentIndex(
             m_proxy->index(qMin(row
@@ -159,12 +153,12 @@ Picker::keyPressEvent(QKeyEvent *event)
                            0));
         event->accept();
     }
-    else if (key == m_keys.moveUp)
+    else if (m_keys.moveUp.contains(key))
     {
         m_listView->setCurrentIndex(m_proxy->index(qMax(row - 1, 0), 0));
         event->accept();
     }
-    else if (key == m_keys.pageUp)
+    else if (m_keys.pageUp.contains(key))
     {
         m_listView->setCurrentIndex(
             m_proxy->index(qMax(row
@@ -174,7 +168,7 @@ Picker::keyPressEvent(QKeyEvent *event)
                            0));
         event->accept();
     }
-    else if (key == m_keys.accept)
+    else if (m_keys.accept.contains(key))
     {
         if (m_listView->currentIndex().isValid())
             onItemActivated(m_listView->currentIndex());

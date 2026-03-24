@@ -124,15 +124,14 @@ public:
         QWidget *parent) noexcept; // parent is REQUIRED — must be the main
                                    // window's central widget
 
-    // Keep PickerKeyBindings in the header since Config needs to produce one
     struct Keybindings
     {
-        QKeyCombination moveDown{Qt::Key_Down};
-        QKeyCombination pageDown{Qt::Key_PageDown};
-        QKeyCombination moveUp{Qt::Key_Up};
-        QKeyCombination pageUp{Qt::Key_PageUp};
-        QKeyCombination accept{Qt::Key_Return};
-        QKeyCombination dismiss{Qt::Key_Escape};
+        QList<QKeyCombination> moveDown = {Qt::Key_Down};
+        QList<QKeyCombination> pageDown = {Qt::Key_PageDown};
+        QList<QKeyCombination> moveUp   = {Qt::Key_Up};
+        QList<QKeyCombination> pageUp   = {Qt::Key_PageUp};
+        QList<QKeyCombination> accept   = {Qt::Key_Return};
+        QList<QKeyCombination> dismiss  = {Qt::Key_Escape};
     };
 
     struct Column

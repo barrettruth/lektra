@@ -851,31 +851,56 @@ Lektra::initConfig() noexcept
         // Picker.Keys
         if (auto picker_keys = picker["keys"])
         {
-            // Member: m_pickers
             if (picker_keys.is_table())
             {
                 const auto &keys = *picker_keys.as_table();
-                const auto get
-                    = [&](std::string_view field, QKeyCombination fallback)
+                const Picker::Keybindings defaults{};
+
+                const auto parse
+                    = [](const std::string &s) -> std::optional<QKeyCombination>
+                {
+                    const auto seq = QKeySequence::fromString(
+                        QString::fromStdString(s), QKeySequence::PortableText);
+                    if (seq.isEmpty())
+                        return std::nullopt;
+                    return seq[0];
+                };
+
+                const auto get = [&](std::string_view field,
+                                     const QList<QKeyCombination> &fallback)
+                    -> QList<QKeyCombination>
                 {
                     const auto *node = keys.get(field);
-                    if (!node || !node->is_string())
+                    if (!node)
                         return fallback;
-                    const auto seq = QKeySequence::fromString(
-                        QString::fromStdString(
-                            std::string(node->as_string()->get())),
-                        QKeySequence::PortableText);
-                    return seq.isEmpty() ? fallback : seq[0];
+
+                    if (node->is_string())
+                    {
+                        if (auto kc
+                            = parse(std::string(node->as_string()->get())))
+                            return {*kc};
+                        return fallback;
+                    }
+                    else if (node->is_array())
+                    {
+                        QList<QKeyCombination> result;
+                        for (const auto &elem : *node->as_array())
+                            if (auto s = elem.value<std::string>())
+                                if (auto kc = parse(*s))
+                                    result << *kc;
+                        return result.isEmpty() ? fallback : result;
+                    }
+
+                    return fallback;
                 };
 
                 m_picker_keybinds = Picker::Keybindings{
-                    .moveDown = get("down", Picker::Keybindings{}.moveDown),
-                    .pageDown
-                    = get("page_down", Picker::Keybindings{}.pageDown),
-                    .moveUp  = get("up", Picker::Keybindings{}.moveUp),
-                    .pageUp  = get("page_up", Picker::Keybindings{}.pageUp),
-                    .accept  = get("accept", Picker::Keybindings{}.accept),
-                    .dismiss = get("dismiss", Picker::Keybindings{}.dismiss),
+                    .moveDown = get("down", defaults.moveDown),
+                    .pageDown = get("page_down", defaults.pageDown),
+                    .moveUp   = get("up", defaults.moveUp),
+                    .pageUp   = get("page_up", defaults.pageUp),
+                    .accept   = get("accept", defaults.accept),
+                    .dismiss  = get("dismiss", defaults.dismiss),
                 };
             }
         }
@@ -1074,17 +1099,28 @@ Lektra::initConfig() noexcept
         set(behavior["cache_pages"], m_config.behavior.cache_pages);
     }
 
-    if (auto keys = toml["keybindings"])
+    if (auto keybindings = toml["keybindings"])
     {
-        if (keys["load_defaults"].value_or(true))
+        if (keybindings["load_defaults"].value_or(true))
             initDefaultKeybinds();
 
-        for (auto &[action, value] : *keys.as_table())
+        for (auto &[action, value] : *keybindings.as_table())
         {
             if (value.is_value())
                 setupKeybinding(
                     QString::fromStdString(std::string(action.str())),
                     QString::fromStdString(value.value_or<std::string>("")));
+            else if (value.is_array())
+            {
+                QStringList keys;
+                for (const auto &elem : *value.as_array())
+                {
+                    if (auto s = elem.value<std::string>())
+                        keys << QString::fromStdString(*s);
+                }
+                setupKeybinding(
+                    QString::fromStdString(std::string(action.str())), keys);
+            }
         }
     }
 
@@ -1392,23 +1428,32 @@ Lektra::updateUiEnabledState() noexcept
 void
 Lektra::setupKeybinding(const QString &action, const QString &key) noexcept
 {
-    if (const Command *command = m_command_manager->find(action))
+    setupKeybinding(action, QStringList{key});
+}
+
+void
+Lektra::setupKeybinding(const QString &action, const QStringList &keys) noexcept
+{
+    const Command *command = m_command_manager->find(action);
+    if (!command)
+        return;
+
+    const auto existing = findChildren<QShortcut *>(action);
+    for (QShortcut *s : existing)
+        delete s;
+
+    for (const QString &key : keys)
     {
+        if (key.isEmpty())
+            continue;
+
+        QShortcut *shortcut = new QShortcut(QKeySequence(key), this);
+        shortcut->setObjectName(action);
+        connect(shortcut, &QShortcut::activated,
+                [command]() { command->action({}); });
 #ifndef NDEBUG
         qDebug() << "Keybinding set:" << action << "->" << key;
 #endif
-        QShortcut *shortcut = findChild<QShortcut *>(action);
-        if (shortcut)
-        {
-            shortcut->setKey(QKeySequence(key));
-        }
-        else
-        {
-            shortcut = new QShortcut(QKeySequence(key), this);
-            shortcut->setObjectName(action);
-            connect(shortcut, &QShortcut::activated,
-                    [command]() { command->action({}); });
-        }
         m_config.keybinds[action] = key;
     }
 }

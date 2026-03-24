@@ -231,6 +231,8 @@ private:
     void initDefaultKeybinds() noexcept;
     void warnShortcutConflicts() noexcept;
     void setupKeybinding(const QString &action, const QString &key) noexcept;
+    void setupKeybinding(const QString &action,
+                         const QStringList &keys) noexcept;
     void setupMousebinding(const QString &action,
                            const QString &trigger) noexcept;
     void populateRecentFiles() noexcept;
