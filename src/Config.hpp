@@ -668,6 +668,35 @@ struct Config
         // @added 0.6.8
         bool alternating_row_color{true};
 
+        // clang-format off
+        // @section Picker.Keys
+        // @section_type struct
+        // @section_added 0.6.0
+        // @section_desc {
+        //   <p>Picker keyboard binding options struct.</p>
+        // <p> Valid actions are:</p>
+        // <ul>
+        // <li><code class="inline">up</code></li>
+        // <li><code class="inline">down</code></li>
+        // <li><code class="inline">select</code></li>
+        // <li><code class="inline">dismiss</code></li>
+        // </ul>
+        //   <p>Example:</p>
+        //   <pre><code class="language-toml">[picker.keys]<br>
+        //   # Format: command_name = "KeyCombination"
+        //   # Single key
+        //   up = "Up"
+        //   # Multiple keys
+        //   down = ["j", "Down"] # Added in 0.6.9
+        //   </code></pre>
+        //
+        // }
+        //
+        // @desc up
+        // @type str
+        //
+        // @endsection
+
         // @section Picker.Shadow
         // @section_desc Picker shadow struct
         // @section_type struct
@@ -1011,45 +1040,60 @@ struct Config
 
     // Just for documentation parsing, do not remove
 
+    // clang-format off
     // @section MouseBindings
     // @section_type struct
     // @section_added 0.6.6
     // @section_desc {
-    // Mouse binding options struct<br>
+    // Mouse binding options struct.
+    //
     // <p>Valid commands are:
+    //
     // <ul>
-    // <li><code class="inline">preview</code> - Shows a preview of the link
-    // location in a floating window</li>
-    // <li><code
-    // class="inline">synctex_jump</code> - Takes to the source code if opened
-    // in SyncTeX mode</li>
-    // <li><code class="inline">portal</code> - Opens a
-    // portal pointing to the clicked link</li>
+    // <li><code class="inline">preview</code> - Shows a preview of the link location in a floating window</li>
+    // <li><code class="inline">synctex_jump</code> - Takes to the source code if opened in SyncTeX mode</li>
+    // <li><code class="inline">portal</code> - Opens a portal pointing to the clicked link</li>
     // </ul>
-    // Example of how to define a mouse binding in the config file:</p>
-    // <pre><code class="language-toml">
-    // [mousebindings]&#10;
-    // # Format: mouse_command_name = "Modifier(s)+MouseButton"&#10;
+    //
+    // <p><b>Example</b>:</p>
+    // <pre><code class="language-toml">[mousebindings]
+    // # Format: mouse_command_name = "Modifier(s)+MouseButton"
     // synctex_jump = "Shift+LeftButton"
+    //
     // </code></pre>
     // }
     // @endsection
+    // clang-format on
 
-
+    // clang-format off
     // @section KeyBindings
     // @section_type struct
     // @section_added 0.3.0
     // @section_desc {
-    // Keyboard binding options struct<br>
-    // By default, LEKTRA loads the default keybindings, which can be disabled by setting <code class="inline">load_defaults</code> to <code class="inline">false</code> in the config file.
-    // <p>Example of how to define a key binding in the config file:</p>
-    // <pre><code class="language-toml">
-    // [keybindings]&#10;
-    // # Format: command_name = "KeyCombination"&#10;
-    // open_outline = "Ctrl+O"&#10;
-    // </code></pre>
-    // Commands can be seen using the `--list-commands` command line option, or in the <a href="https://dheerajshenoy.github.io/lektra/commands">Commands Reference Webpage</a>, or in the command palette inside LEKTRA.
+    //   <p>Keyboard binding options struct.</p>
+    //
+    //   <p>By default, Lektra loads the default keybindings. You can disable this
+    //   by setting <code class="inline">load_defaults</code> to
+    //   <code class="inline">false</code> in the config file.</p>
+    //
+    //   <p>Example:</p>
+    //   <pre><code class="language-toml">[keybindings]<br>
+    //   # Format: command_name = "KeyCombination"
+    //   # Single key
+    //   open_outline = "Ctrl+O"
+    //   # Multiple keys
+    //   scroll_down = ["j", "Down"] # Added in 0.6.9
+    //   </code></pre>
+    //
+    //   Commands can be viewed via:
+    //   <ul>
+    //     <li>The <code class="inline">--list-commands</code> command line option</li>
+    //     <li>The <a href="https://dheerajshenoy.github.io/lektra/commands">Commands Reference</a></li>
+    //     <li>The command palette inside Lektra</li>
+    //   </ul>
+    // }
     // @endsection
+    // clang-format on
 
     // @section Preview
     // @section_desc Preview options struct
@@ -1057,6 +1101,7 @@ struct Config
     // @section_added 0.6.6
     struct Preview
     {
+
         // Required for documentation parsing, do not remove
         using WindowRatio = std::array<float, 2>;
 
