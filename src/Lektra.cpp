@@ -5851,3 +5851,12 @@ Lektra::OpenConfigFile() noexcept
             tr("Config file not found at:\n%1").arg(m_config_file_path));
     }
 }
+
+void
+Lektra::ToggleThumbnailPanel() noexcept
+{
+    if (!m_doc)
+        return;
+
+    m_doc->ToggleThumbnailPanel();
+}
