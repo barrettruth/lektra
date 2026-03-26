@@ -58,7 +58,8 @@ class DocumentView : public QWidget
 public:
     using Id = uint32_t;
     DocumentView(const Config &config, const float dpr = 1.0f,
-                 QWidget *parent = nullptr) noexcept;
+                 QWidget *parent    = nullptr,
+                 bool thumbnailMode = false) noexcept;
 
     DocumentView(const DocumentView &)            = delete;
     DocumentView &operator=(const DocumentView &) = delete;
@@ -145,11 +146,7 @@ public:
         return m_model->m_filetype;
     }
 
-    inline void setDPR(float dpr) noexcept
-    {
-        m_model->setDPR(dpr);
-        renderPages();
-    }
+    void setDPR(float dpr) noexcept;
 
     inline QString fileName() const noexcept
     {
@@ -269,8 +266,15 @@ public:
         return m_visual_line_mode;
     }
 
-    void set_portal(DocumentView *portal) noexcept;
-    void clear_portal() noexcept;
+    inline bool isThumbnailView() const noexcept
+    {
+        return m_thumbnail_mode;
+    }
+
+    bool pageAtScenePos(QPointF scenePos, int &outPageIndex,
+                        GraphicsImageItem *&outPageItem) const noexcept;
+    void setPortal(DocumentView *portal) noexcept;
+    void clearPortal() noexcept;
     void set_visual_line_mode(bool state) noexcept;
     void FollowLink(const Model::LinkInfo &info) noexcept;
     void setInvertColor(bool invert) noexcept;
@@ -319,7 +323,8 @@ public:
     void SaveFile() noexcept;
     void SaveAsFile() noexcept;
     void CloseFile() noexcept;
-    void Toggle_comment_markers() noexcept;
+    void ToggleCommentMarkers() noexcept;
+    void ToggleThumbnailPanel() noexcept;
     void ToggleAutoResize() noexcept;
     void ToggleTextHighlight() noexcept;
     void ToggleRegionSelect() noexcept;
@@ -339,7 +344,6 @@ public:
     void Reshow_jump_marker() noexcept;
     void Copy_page_image() noexcept;
     void rotateHelper() noexcept;
-
 signals:
     void allRendersFinished();
     void linkPreviewRequested(DocumentView *view,
@@ -434,8 +438,6 @@ private:
 
     void initGui() noexcept;
     void setModified(bool state) noexcept;
-    bool pageAtScenePos(QPointF scenePos, int &outPageIndex,
-                        GraphicsImageItem *&outPageItem) const noexcept;
     void requestPageRender(int pageno, bool force = false) noexcept;
     void startNextRenderJob() noexcept;
     void clearLinksForPage(int pageno) noexcept;
@@ -484,6 +486,8 @@ private:
     void changeColorOfSelectedAnnotations(const QColor &color) noexcept;
     void stopPendingRenders() noexcept;
     int pageAtAxisCoord(double coord) const noexcept;
+    void updatePageLabels(int pageno, qreal xPos, qreal yPos, qreal pageW,
+                          qreal pageH) noexcept;
 
 #ifdef HAS_SYNCTEX
     void initSynctex() noexcept;
@@ -573,6 +577,6 @@ private:
     void visual_line_move(Direction direction) noexcept;
     void snapVisualLine(bool centerView = true) noexcept;
 
-    int m_generation = 0; // save generation count for pending render jobs to
-                          // detect stale jobs
+    int m_generation = 0;
+    bool m_thumbnail_mode{false};
 };
