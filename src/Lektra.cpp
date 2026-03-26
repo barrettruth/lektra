@@ -4995,51 +4995,38 @@ Lektra::TabsCloseOthers() noexcept
     }
 }
 
-DocumentContainer *
-Lektra::VSplit() noexcept
+void
+Lektra::splitHelper(Qt::Orientation orientation) noexcept
 {
     int currentTabIndex = m_tab_widget->currentIndex();
     if (!validTabIndex(currentTabIndex))
-        return nullptr;
+        return;
 
     // Get the container for this tab
     DocumentContainer *container = m_tab_widget->rootContainer(currentTabIndex);
     if (!container)
-        return nullptr;
+        return;
 
     DocumentView *currentView = container->view();
     if (!currentView)
         return nullptr;
 
     // Perform vertical split (top/bottom)
-    container->split(currentView, Qt::Vertical);
+    container->split(currentView, orientation);
     m_tab_widget->tabBar()->set_split_count(currentTabIndex,
                                             container->getViewCount());
-    return container;
 }
 
-DocumentContainer *
+void
+Lektra::VSplit() noexcept
+{
+    splitHelper(Qt::Vertical);
+}
+
+void
 Lektra::HSplit() noexcept
 {
-    int currentTabIndex = m_tab_widget->currentIndex();
-    if (!validTabIndex(currentTabIndex))
-        return nullptr;
-
-    // Get the container for this tab
-    DocumentContainer *container = m_tab_widget->rootContainer(currentTabIndex);
-    if (!container)
-        return nullptr;
-
-    DocumentView *currentView = container->view();
-    if (!currentView)
-        return nullptr;
-
-    // Perform horizontal split (left/right)
-    container->split(currentView, Qt::Horizontal);
-    m_tab_widget->tabBar()->set_split_count(currentTabIndex,
-                                            container->getViewCount());
-
-    return container;
+    splitHelper(Qt::Horizontal);
 }
 
 // Closes all splits except the current one in the current tab. If there is
