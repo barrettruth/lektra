@@ -417,11 +417,6 @@ DocumentView::initConnections() noexcept
     // if (!pageAtScenePos(scenePos, pageIndex, pageItem))
     //     return; // selection start outside visible pages?
 
-    // const QPointF pagePos = pageItem->mapFromScene(scenePos);
-    // m_hit_pixmap = m_model->hitTestImage(pageIndex, pagePos,
-    // m_current_zoom,
-    //                                      m_rotation);
-    // });
     connect(m_model, &Model::undoStackCleanChanged, this,
             [this](bool clean) { setModified(!clean); });
 
