@@ -11,6 +11,7 @@
   - `split_focus_right` => `Ctrl+W,l`
   - `split_focus_up` => `Ctrl+W,k`
   - `split_focus_down` => `Ctrl+W,j`
+  - `split_close` => `Ctrl+W,c`
 
 ### Config Options
 
