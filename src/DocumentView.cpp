@@ -61,9 +61,10 @@ g_newId() noexcept
     return nextId++;
 }
 
-DocumentView::DocumentView(const Config &config, float dpr,
-                           QWidget *parent) noexcept
-    : QWidget(parent), m_id(g_newId()), m_config(config)
+DocumentView::DocumentView(const Config &config, float dpr, QWidget *parent,
+                           bool thumbnailMode) noexcept
+    : QWidget(parent), m_id(g_newId()), m_config(config),
+      m_thumbnail_mode(thumbnailMode)
 {
 #ifndef NDEBUG
     qDebug() << "DocumentView::DocumentView(): Initializing DocumentView";
@@ -85,6 +86,7 @@ DocumentView::DocumentView(const Config &config, float dpr,
             &DocumentView::handle_wrong_password);
 
     initGui();
+
 #ifdef HAS_SYNCTEX
     initSynctex();
 #endif
@@ -107,10 +109,17 @@ DocumentView::~DocumentView() noexcept
 
     clearDocumentItems();
 
-    delete m_visual_line_item;
-    delete m_jump_marker;
-    delete m_selection_path_item;
-    delete m_current_search_hit_item;
+    if (m_visual_line_item)
+        delete m_visual_line_item;
+
+    if (m_jump_marker)
+        delete m_jump_marker;
+
+    if (m_selection_path_item)
+        delete m_selection_path_item;
+
+    if (m_current_search_hit_item)
+        delete m_current_search_hit_item;
 }
 
 void
@@ -120,23 +129,32 @@ DocumentView::initGui() noexcept
     m_gscene = new GraphicsScene(m_gview);
     m_gview->setScene(m_gscene);
 
+    if (!m_thumbnail_mode)
+    {
+        m_selection_path_item = m_gscene->addPath(QPainterPath());
+        m_selection_path_item->setBrush(
+            QBrush(rgbaToQColor(m_config.selection.color)));
+        m_selection_path_item->setPen(Qt::NoPen);
+        m_selection_path_item->setZValue(ZVALUE_TEXT_SELECTION);
+
+        m_current_search_hit_item = m_gscene->addPath(QPainterPath());
+        m_current_search_hit_item->setBrush(
+            rgbaToQColor(m_config.search.index_color));
+        m_current_search_hit_item->setPen(Qt::NoPen);
+        m_current_search_hit_item->setZValue(ZVALUE_SEARCH_HITS + 1);
+
+        m_jump_marker
+            = new JumpMarker(rgbaToQColor(m_config.jump_marker.color));
+        m_jump_marker->setFadeDuration(m_config.jump_marker.fade_duration);
+        m_jump_marker->setZValue(ZVALUE_JUMP_MARKER);
+        m_gscene->addItem(m_jump_marker);
+    }
+
     m_spinner = new WaitingSpinnerWidget(this);
     m_spinner->setInnerRadius(5.0);
     m_spinner->setColor(palette().color(QPalette::Text));
 
-    m_spacing             = m_config.layout.spacing;
-    m_selection_path_item = m_gscene->addPath(QPainterPath());
-
-    m_selection_path_item->setBrush(
-        QBrush(rgbaToQColor(m_config.selection.color)));
-    m_selection_path_item->setPen(Qt::NoPen);
-    m_selection_path_item->setZValue(ZVALUE_TEXT_SELECTION);
-
-    m_current_search_hit_item = m_gscene->addPath(QPainterPath());
-    m_current_search_hit_item->setBrush(
-        rgbaToQColor(m_config.search.index_color));
-    m_current_search_hit_item->setPen(Qt::NoPen);
-    m_current_search_hit_item->setZValue(ZVALUE_SEARCH_HITS + 1);
+    m_spacing = m_config.layout.spacing;
 
     m_hq_render_timer = new QTimer(this);
     m_hq_render_timer->setInterval(150);
@@ -152,11 +170,6 @@ DocumentView::initGui() noexcept
     connect(m_resize_timer, &QTimer::timeout, this,
             &DocumentView::handleDeferredResize);
 
-    m_jump_marker = new JumpMarker(rgbaToQColor(m_config.jump_marker.color));
-    m_jump_marker->setFadeDuration(m_config.jump_marker.fade_duration);
-    m_jump_marker->setZValue(ZVALUE_JUMP_MARKER);
-    m_gscene->addItem(m_jump_marker);
-
     m_gview->setAlignment(Qt::AlignCenter);
     m_gview->setDefaultMode(m_config.behavior.initial_mode);
     m_gview->setMode(m_config.behavior.initial_mode);
@@ -170,7 +183,6 @@ DocumentView::initGui() noexcept
     m_model->undoStack()->setUndoLimit(m_config.behavior.undo_limit);
 
     m_model->setInvertColor(m_config.behavior.invert_mode);
-    m_model->setLinkBoundary(m_config.links.boundary);
     m_model->setDetectUrlLinks(m_config.links.detect_urls);
     m_model->setUrlLinkRegex(m_config.links.url_regex);
     // if (m_config.rendering.icc_color_profile)
@@ -408,14 +420,18 @@ DocumentView::initConnections() noexcept
             &DocumentView::handleSynctexJumpRequested);
 #endif
 
-    // connect(m_gview, &GraphicsView::rightClickRequested, this,
-    //         [&](const QPointF &scenePos)
-    // {
-    // int pageIndex                = -1;
-    // GraphicsImageItem *pageItem = nullptr;
-
-    // if (!pageAtScenePos(scenePos, pageIndex, pageItem))
-    //     return; // selection start outside visible pages?
+    if (m_thumbnail_mode)
+    {
+        connect(m_model, &Model::openFileFinished, this,
+                &DocumentView::handleOpenFileFinished);
+        connect(m_vscroll, &QScrollBar::valueChanged, this,
+                &DocumentView::handleVScrollValueChanged);
+        connect(m_hq_render_timer, &QTimer::timeout, this,
+                &DocumentView::renderPages);
+        connect(m_scroll_page_update_timer, &QTimer::timeout, this,
+                &DocumentView::renderPages);
+        return;
+    }
 
     connect(m_model, &Model::undoStackCleanChanged, this,
             [this](bool clean) { setModified(!clean); });
@@ -1301,7 +1317,9 @@ DocumentView::GotoLocation(const PageLocation &targetLocation) noexcept
 
     m_gview->centerOn(scenePos);
 
-    m_jump_marker->showAt(scenePos.x(), scenePos.y());
+    if (m_jump_marker)
+        m_jump_marker->showAt(scenePos.x(), scenePos.y());
+
     m_old_jump_marker_pos = scenePos;
     m_pending_jump        = {-1, 0, 0};
 }
@@ -2026,6 +2044,21 @@ DocumentView::ToggleAutoResize() noexcept
     m_auto_resize = !m_auto_resize;
 }
 
+// Toggle thumbnail panel
+void
+DocumentView::ToggleThumbnailPanel() noexcept
+{
+    DocumentContainer *container = this->container();
+    assert(container && "DocumentView should have a valid container");
+
+    if (!container->thumbnailView())
+    {
+        container->createThumbnailView(this);
+    }
+
+    container->toggleThumbnailView();
+}
+
 // Toggle text highlight mode
 void
 DocumentView::ToggleTextHighlight() noexcept
@@ -2483,6 +2516,7 @@ DocumentView::renderPages() noexcept
     }
     m_gscene->blockSignals(false);
     m_gview->setUpdatesEnabled(true);
+
     updateCurrentHitHighlight();
 
     if (m_visual_line_mode)
@@ -2614,7 +2648,8 @@ DocumentView::startNextRenderJob() noexcept
                         }
                     }
                     setUpdatesEnabled(true);
-                    renderLinks(pageno, result.links);
+                    if (!m_thumbnail_mode)
+                        renderLinks(pageno, result.links);
                     m_gscene->blockSignals(false);
                     startNextRenderJob();
                     return;
@@ -2624,9 +2659,12 @@ DocumentView::startNextRenderJob() noexcept
                 setUpdatesEnabled(false);
                 {
                     renderPageFromImage(pageno, image);
-                    renderLinks(pageno, result.links);
-                    renderAnnotations(pageno, result.annotations);
-                    renderSearchHitsForPage(pageno);
+                    if (!m_thumbnail_mode)
+                    {
+                        renderLinks(pageno, result.links);
+                        renderAnnotations(pageno, result.annotations);
+                        renderSearchHitsForPage(pageno);
+                    }
                     updateCurrentHitHighlight();
                 }
                 setUpdatesEnabled(true);
@@ -2817,6 +2855,20 @@ DocumentView::cachePageStride() noexcept
     }
     else
     {
+        double labelHeight = 0.0;
+
+        if (m_thumbnail_mode)
+        {
+            // Use a consistent font (e.g., from config or a default size)
+            QFont font;
+            font.setPointSizeF(
+                10); // Adjust to your preferred thumbnail font size
+            QFontMetricsF metrics(font);
+
+            // height() + a small percentage for padding below the text
+            labelHeight = metrics.height() + (metrics.height() * 0.25) + 10.0f;
+        }
+
         const bool horizontal = (m_layout_mode == LayoutMode::HORIZONTAL);
         for (int i = 0; i < N; ++i)
         {
@@ -2824,6 +2876,10 @@ DocumentView::cachePageStride() noexcept
             double w, h;
             getExtents(i, w, h);
             cursor += (horizontal ? w : h) + spacingScene;
+
+            if (m_thumbnail_mode)
+                cursor += labelHeight; // Add buffer for thumbnail labels
+
             maxCross = std::max(maxCross, horizontal ? h : w); // <-- add this
         }
     }
@@ -2912,11 +2968,21 @@ DocumentView::updateSceneRect() noexcept
     else
     {
         // VERTICAL
-        const double totalHeight = totalPageExtent();
-        const double sceneW      = std::max(viewW, m_max_page_cross_extent);
+        double totalHeight  = totalPageExtent();
+        const double sceneW = std::max(viewW, m_max_page_cross_extent);
         const double yMargin
             = std::max(0.0, (viewH - pageSceneSize(m_pageno).height()) / 2.0);
-        m_gview->setSceneRect(0, -yMargin, sceneW, totalHeight + 2.0 * yMargin);
+
+        QRectF sceneRect(0, -yMargin, sceneW, totalHeight + 2.0 * yMargin);
+
+        if (m_thumbnail_mode)
+        {
+            // Unite the calculated rect with the actual bounding box of all
+            // items to ensure labels are included.
+            sceneRect = sceneRect.united(m_gscene->itemsBoundingRect());
+        }
+
+        m_gview->setSceneRect(sceneRect);
     }
 }
 
@@ -2988,8 +3054,6 @@ DocumentView::pageAtScenePos(QPointF scenePos, int &outPageIndex,
     if (N <= 0 || m_page_offsets.size() < static_cast<size_t>(N + 1))
         return false;
 
-    // ── SINGLE mode: only one page is ever in the scene
-    // ─────────────────────
     if (m_layout_mode == LayoutMode::SINGLE)
     {
         auto it = m_page_items_hash.find(m_pageno);
@@ -2997,13 +3061,13 @@ DocumentView::pageAtScenePos(QPointF scenePos, int &outPageIndex,
             && it.value()->sceneBoundingRect().contains(scenePos))
         {
             outPageIndex = m_pageno;
-            outPageItem  = it.value();
+            if (outPageItem)
+                outPageItem = it.value();
             return true;
         }
         return false;
     }
 
-    // ── Multi-page modes: binary search the prefix-sum array
     // pageOffset(i) is the main-axis start of page i.
     // upper_bound(coord) gives the first entry strictly greater than coord,
     // so the page that owns coord is one slot before that iterator.
@@ -3215,6 +3279,9 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
 void
 DocumentView::updateCurrentHitHighlight() noexcept
 {
+    if (m_thumbnail_mode)
+        return;
+
     if (m_search_index < 0
         || m_search_index >= (int)m_search_hit_flat_refs.size())
     {
@@ -3437,9 +3504,9 @@ DocumentView::createAndAddPlaceholderPageItem(int pageno) noexcept
     QImage img(1, 1, QImage::Format_RGB32);
     img.fill(m_model->invertColor() ? Qt::black : Qt::white);
 
-    auto *item = new GraphicsImageItem();
-    item->setImage(img);
-    item->setTransform(
+    auto *pageItem = new GraphicsImageItem();
+    pageItem->setImage(img);
+    pageItem->setTransform(
         QTransform::fromScale(logicalSize.width() / img.width(),
                               logicalSize.height() / img.height()));
 
@@ -3451,24 +3518,24 @@ DocumentView::createAndAddPlaceholderPageItem(int pageno) noexcept
     {
         const double yOffset = (m_max_page_cross_extent - pageH) / 2.0;
         const double xPos    = pageOffset(pageno);
-        item->setPos(xPos, yOffset);
+        pageItem->setPos(xPos, yOffset);
     }
     else if (m_layout_mode == LayoutMode::SINGLE)
     {
         const double xPos = sr.x() + (sr.width() - pageW) / 2.0;
         const double yPos = sr.y() + (sr.height() - pageH) / 2.0;
-        item->setPos(xPos, yPos);
+        pageItem->setPos(xPos, yPos);
     }
     else
     {
         // BOOK or TOP_TO_BOTTOM
-        item->setPos(pageXOffset(pageno, pageW, sr.width()),
-                     pageOffset(pageno));
+        pageItem->setPos(pageXOffset(pageno, pageW, sr.width()),
+                         pageOffset(pageno));
     }
 
-    m_gscene->addItem(item);
-    m_page_items_hash[pageno] = item;
-    item->setData(0, QStringLiteral("placeholder_page"));
+    m_gscene->addItem(pageItem);
+    m_page_items_hash[pageno] = pageItem;
+    pageItem->setData(0, QStringLiteral("placeholder_page"));
 }
 
 void
@@ -3478,8 +3545,8 @@ DocumentView::createAndAddPageItem(int pageno, const QImage &img) noexcept
     qDebug() << "DocumentView::createAndAddPageItem(): Adding page item for "
              << "pageno = " << pageno;
 #endif
-    auto *item = new GraphicsImageItem();
-    item->setImage(img);
+    auto *pageItem = new GraphicsImageItem();
+    pageItem->setImage(img);
 
     // Logical scene size of the rendered image.
     const QSizeF logicalSize = pageSceneSize(pageno);
@@ -3490,21 +3557,28 @@ DocumentView::createAndAddPageItem(int pageno, const QImage &img) noexcept
     if (m_layout_mode == LayoutMode::HORIZONTAL)
     {
         const double yPos = (m_max_page_cross_extent - pageH) / 2.0;
-        item->setPos(pageOffset(pageno), yPos);
+        pageItem->setPos(pageOffset(pageno), yPos);
     }
     else if (m_layout_mode == LayoutMode::SINGLE)
     {
-        item->setPos(sr.x() + (sr.width() - pageW) / 2.0,
-                     sr.y() + (sr.height() - pageH) / 2.0);
+        pageItem->setPos(sr.x() + (sr.width() - pageW) / 2.0,
+                         sr.y() + (sr.height() - pageH) / 2.0);
     }
     else // TOP_TO_BOTTOM & BOOK
     {
-        item->setPos(pageXOffset(pageno, pageW, sr.width()),
-                     pageOffset(pageno));
+        const qreal xPos = pageXOffset(pageno, pageW, sr.width());
+        const qreal yPos = pageOffset(pageno);
+        pageItem->setPos(xPos, yPos);
     }
 
-    m_gscene->addItem(item);
-    m_page_items_hash[pageno] = item;
+    if (m_thumbnail_mode)
+    {
+        if (m_config.thumbnail.show_page_numbers)
+            pageItem->setPageNumber(pageno);
+    }
+
+    m_gscene->addItem(pageItem);
+    m_page_items_hash[pageno] = pageItem;
 }
 
 void
@@ -4983,7 +5057,7 @@ DocumentView::handleReloadRequested(int pageno) noexcept
 }
 
 void
-DocumentView::Toggle_comment_markers() noexcept
+DocumentView::ToggleCommentMarkers() noexcept
 {
     if (!m_model->supports_annotations())
         return;
@@ -5025,7 +5099,7 @@ DocumentView::Toggle_comment_markers() noexcept
 }
 
 void
-DocumentView::set_portal(DocumentView *portal) noexcept
+DocumentView::setPortal(DocumentView *portal) noexcept
 {
     m_portal_view = portal;
     portal->set_source(this);
@@ -5033,7 +5107,7 @@ DocumentView::set_portal(DocumentView *portal) noexcept
 }
 
 void
-DocumentView::clear_portal() noexcept
+DocumentView::clearPortal() noexcept
 {
     if (m_portal_view)
     {
@@ -5043,4 +5117,11 @@ DocumentView::clear_portal() noexcept
     }
 
     // TODO: Maybe notify views that the portal was cleared
+}
+
+void
+DocumentView::setDPR(float dpr) noexcept
+{
+    m_model->setDPR(dpr);
+    renderPages();
 }
