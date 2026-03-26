@@ -112,7 +112,7 @@ class Parser:
                 code_part = line.split("{")[0].strip()
                 if code_part:
                     parts = code_part.split()
-                    current_tags["name"] = parts[-1]
+                    current_tags["name"] = parts[1]
                     if "type" not in current_tags:
                         current_tags["type"] = " ".join(parts[:-1])
                     current_section["fields"].append(current_tags)
