@@ -50,8 +50,8 @@ public:
     Lektra(const QString &sessionName,
            const QJsonArray &sessionArray) noexcept; // load from session
 
-    DocumentContainer *VSplit() noexcept;
-    DocumentContainer *HSplit() noexcept;
+    void VSplit() noexcept;
+    void HSplit() noexcept;
 
     void OpenConfigFile() noexcept;
     void Create_or_focus_portal() noexcept;
@@ -70,10 +70,11 @@ public:
     void Show_highlight_search() noexcept;
     void Show_annot_comment_search() noexcept;
     void Show_command_picker() noexcept;
-    void Toggle_comment_markers() noexcept;
-    void Toggle_none_mode() noexcept;
-    void Toggle_visual_line_mode() noexcept;
-    void Toggle_presentation_mode() noexcept;
+    void ToggleCommentMarkers() noexcept;
+    void ToggleNoneMode() noexcept;
+    void ToggleVisualLineMode() noexcept;
+    void TogglePresentationMode() noexcept;
+    void ToggleThumbnailPanel() noexcept;
     void ToggleAutoResize() noexcept;
     void ToggleFocusMode() noexcept;
     void ToggleMenubar() noexcept;
@@ -212,6 +213,7 @@ private:
                           DocumentView *targetView, const QJsonObject &node,
                           std::function<void()> onAllDone) noexcept;
     void focusSplitHelper(DocumentContainer::Direction direction) noexcept;
+    void splitHelper(Qt::Orientation orientation) noexcept;
 
     DocumentView *
     openFileSplitHelper(const QString &filename               = {},
