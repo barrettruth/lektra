@@ -20,11 +20,6 @@ DocumentContainer::DocumentContainer(DocumentView *initialView, QWidget *parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-DocumentContainer::~DocumentContainer()
-{
-    // Qt's parent-child relationship handles cleanup
-}
-
 DocumentView *
 DocumentContainer::split(DocumentView *view, Qt::Orientation orientation,
                          const QString &filePath) noexcept

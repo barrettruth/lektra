@@ -32,7 +32,6 @@ class DocumentContainer : public QWidget
 public:
     explicit DocumentContainer(DocumentView *initialView,
                                QWidget *parent = nullptr);
-    ~DocumentContainer();
     enum class Direction
     {
         Up = 0,
