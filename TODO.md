@@ -4,6 +4,9 @@
 
 ## HIGH PRIORITY
 
+- [ ] Show visually, and identifier for split files (if they remain as original file) next to their name. Maybe, a numbered gutter badge, small [1], [2] badge in the corner of each split — same number means same file. Simple and non-intrusive.
+- [ ] Do not show thumbnail panel in the total split count of tab
+- [ ] Statusbar don't show info for thumbnail panel
 - [ ] Mult-click drag select word, line, paragraph, etc. based on number of clicks before dragging
 - [ ] Scissor mode for cropping and copying specific regions of the PDF when zoomed in to a high level (high performance gain)
 - [ ] Text selection change pos on resize event
@@ -16,12 +19,12 @@
 
 ## MEDIUM PRIORITY
 
+- [ ] Password protected PDFs thumbnail view asking for password, do something about it.
 - [ ] Show text highlight brush cursor when highlighting text
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
 - [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
-- [ ] Command Line Arguments
 - [ ] lektra.readthedocs.io page
 
 ## LOW PRIORITY
@@ -49,3 +52,9 @@
 - [ ] Try to generate outline if not present somehow
 - [ ] Visual line mode, if starting fresh, enable at the viewport
 - [ ] Custom source DPI region copy to clipboard
+
+
+# DONE
+
+- [X] Thumbnail Panel
+- [X] Don't allow splitting thumbnail panel
