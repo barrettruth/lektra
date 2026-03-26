@@ -71,6 +71,8 @@ private:
     void splitInSplitter(QSplitter *splitter, DocumentView *view,
                          DocumentView *newView,
                          Qt::Orientation orientation) noexcept;
+
+    void equalizeAll(QWidget *widget) noexcept;
     bool containsView(QWidget *widget, DocumentView *view) const noexcept;
     void collectViews(QWidget *widget,
                       QList<DocumentView *> &views) const noexcept;

@@ -79,8 +79,7 @@ DocumentContainer::split(DocumentView *view, Qt::Orientation orientation,
 
         // Apply the captured geometry so equalizeStretch sees real dimensions
         splitter->setGeometry(viewGeom);
-
-        equalizeStretch(splitter);
+        equalizeAll(splitter);
     }
     else
     {
@@ -89,6 +88,7 @@ DocumentContainer::split(DocumentView *view, Qt::Orientation orientation,
         if (parentSplitter)
         {
             splitInSplitter(parentSplitter, view, newView, orientation);
+            equalizeAll(parentSplitter);
         }
     }
 
@@ -164,8 +164,6 @@ DocumentContainer::splitInSplitter(QSplitter *splitter, DocumentView *view,
         // Insert into parent BEFORE equalizing so the splitter inherits
         // real pixel dimensions from the already-laid-out parent
         splitter->insertWidget(viewIndex, newSplitter);
-
-        equalizeStretch(newSplitter);
     }
 
     // Ensure the new view is marked visible so it's included in size calcs
@@ -173,8 +171,6 @@ DocumentContainer::splitInSplitter(QSplitter *splitter, DocumentView *view,
 
     // Force the splitter to recalculate its child list before equalizing
     splitter->refresh();
-
-    equalizeStretch(splitter);
 }
 
 bool
@@ -394,6 +390,17 @@ DocumentContainer::focusView(DocumentView *view) noexcept
     }
 
     view->setActive(true);
+}
+
+void
+DocumentContainer::equalizeAll(QWidget *widget) noexcept
+{
+    QSplitter *splitter = qobject_cast<QSplitter *>(widget);
+    if (!splitter)
+        return;
+    for (int i = 0; i < splitter->count(); ++i)
+        equalizeAll(splitter->widget(i));
+    equalizeStretch(splitter); // post-order: children first
 }
 
 void
