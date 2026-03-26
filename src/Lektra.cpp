@@ -385,13 +385,13 @@ Lektra::initMenubar() noexcept
     // TODO: Store visual line mode state in config
     m_actionVisualLineMode = m_modeMenu->addAction(
         tr("Visual Line Mode\t%1").arg(m_config.keybinds["visual_line_mode"]),
-        this, &Lektra::Toggle_visual_line_mode);
+        this, &Lektra::ToggleVisualLineMode);
     m_actionVisualLineMode->setCheckable(true);
     modeActionGroup->addAction(m_actionVisualLineMode);
 
     m_actionNoneMode = m_modeMenu->addAction(
         tr("None\t%1").arg(m_config.keybinds["none_mode"]), this,
-        &Lektra::Toggle_none_mode);
+        &Lektra::ToggleNoneMode);
     m_actionNoneMode->setCheckable(true);
     modeActionGroup->addAction(m_actionNoneMode);
 
@@ -4039,7 +4039,7 @@ Lektra::initCommands() noexcept
     // Toggles
     m_command_manager->reg("presentation_mode", tr("Toggle presentation mode"),
                            [this](const QStringList &)
-    { Toggle_presentation_mode(); });
+    { TogglePresentationMode(); });
     m_command_manager->reg("fullscreen", tr("Toggle fullscreen"),
                            [this](const QStringList &) { ToggleFullscreen(); });
     m_command_manager->reg("command_palette", tr("Open command palette"),
@@ -4055,10 +4055,10 @@ Lektra::initCommands() noexcept
                            [this](const QStringList &) { ToggleFocusMode(); });
     m_command_manager->reg("visual_line_mode", tr("Toggle visual line mode"),
                            [this](const QStringList &)
-    { Toggle_visual_line_mode(); });
+    { ToggleVisualLineMode(); });
     m_command_manager->reg(
         "toggle_comment_markers", tr("Toggle comment markers"),
-        [this](const QStringList &) { Toggle_comment_markers(); });
+        [this](const QStringList &) { ToggleCommentMarkers(); });
 
 #ifdef ENABLE_LLM_SUPPORT
     m_command_manager->reg("llm_widget", tr("Toggle LLM assistant widget"),
@@ -4215,7 +4215,7 @@ Lektra::initCommands() noexcept
         "annot_highlight_mode", tr("Toggle text highlight mode"),
         [this](const QStringList &) { ToggleTextHighlight(); });
     m_command_manager->reg("none_mode", tr("Toggle none interaction mode"),
-                           [this](const QStringList &) { Toggle_none_mode(); });
+                           [this](const QStringList &) { ToggleNoneMode(); });
 
     // Selection modes
     m_command_manager->reg(
@@ -5566,7 +5566,7 @@ Lektra::Reshow_jump_marker() noexcept
 }
 
 void
-Lektra::Toggle_presentation_mode() noexcept
+Lektra::TogglePresentationMode() noexcept
 {
     if (!m_doc)
         return;
@@ -5771,7 +5771,7 @@ Lektra::GotoMark(const QStringList &args) noexcept
 }
 
 void
-Lektra::Toggle_visual_line_mode() noexcept
+Lektra::ToggleVisualLineMode() noexcept
 {
     if (!m_doc)
         return;
@@ -5786,7 +5786,7 @@ Lektra::Toggle_visual_line_mode() noexcept
 }
 
 void
-Lektra::Toggle_none_mode() noexcept
+Lektra::ToggleNoneMode() noexcept
 {
     if (!m_doc)
         return;
@@ -5801,7 +5801,7 @@ Lektra::Toggle_none_mode() noexcept
 }
 
 void
-Lektra::Toggle_comment_markers() noexcept
+Lektra::ToggleCommentMarkers() noexcept
 {
     if (!m_doc)
         return;
@@ -5812,7 +5812,7 @@ Lektra::Toggle_comment_markers() noexcept
     m_config.annotations.rect.comment_marker
         = !m_config.annotations.rect.comment_marker;
 
-    m_doc->Toggle_comment_markers();
+    m_doc->ToggleCommentMarkers();
 }
 
 void
