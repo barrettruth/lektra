@@ -5473,7 +5473,7 @@ Lektra::create_portal(DocumentView *sourceView,
     if (!newView)
         return nullptr;
 
-    sourceView->set_portal(newView);
+    sourceView->setPortal(newView);
     m_statusbar->setPortalMode(true);
 
     auto pair = std::make_shared<PortalPair>(sourceView, newView);
@@ -5502,7 +5502,7 @@ Lektra::create_portal(DocumentView *sourceView,
         pair->portal = nullptr;
         if (pair->source)
         {
-            pair->source->clear_portal();
+            pair->source->clearPortal();
             m_statusbar->setPortalMode(false);
         }
     }, Qt::SingleShotConnection);
