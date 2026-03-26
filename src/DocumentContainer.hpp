@@ -25,6 +25,7 @@
  * - Automatic cleanup of empty splitters when views are closed
  * - Maintains focus tracking across all views
  */
+
 class DocumentContainer : public QWidget
 {
     Q_OBJECT
