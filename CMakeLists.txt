@@ -137,7 +137,8 @@ add_executable(${PROJECT_NAME}
     src/RecentFilesPicker.cpp
     src/OutlinePicker.cpp
     src/CommentSearchPicker.cpp
-
+    src/ScrollBar.cpp
+    
     src/PageLocation.hpp
     src/Config.hpp
     src/MarkManager.hpp
