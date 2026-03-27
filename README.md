@@ -18,6 +18,8 @@
 <a href="https://codeberg.org/lektra/lektra/src/branch/main/LICENSE"><img alt="Static Badge" src="https://img.shields.io/badge/LICENSE-AGPL--3.0-darkgreen?style=for-the-badge"></a>
 </p>
 
+**NOTE: For the latest updates and breaking changes (if any), please check the [CHANGELOG.md](CHANGELOG.md), where the description of the latest changes in features, config, bug fixes etc. are updated frequently.**
+
 ## Screenshots
 
 <p align="center">
