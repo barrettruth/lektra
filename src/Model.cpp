@@ -1417,7 +1417,7 @@ Model::buildPageCache(int pageno) noexcept
         fz_drop_page(ctx, page);
         if (!success && dlist)
             fz_drop_display_list(ctx, dlist);
-        // fz_drop_context(ctx);
+        fz_drop_context(ctx);
     }
     fz_catch(ctx)
     {
