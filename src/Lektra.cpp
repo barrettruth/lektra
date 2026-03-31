@@ -549,6 +549,7 @@ Lektra::initConfig() noexcept
         set_color(portal["border_color"], m_config.portal.border_color);
         set(portal["enabled"], m_config.portal.enabled);
         set(portal["border_width"], m_config.portal.border_width);
+        set(portal["respect_parent"], m_config.portal.respect_parent);
         set(portal["dim_inactive"], m_config.portal.dim_inactive);
     }
 
@@ -574,6 +575,7 @@ Lektra::initConfig() noexcept
                 m_config.preview.size_ratio = {width, height};
             }
         }
+        set(preview["opacity"], m_config.preview.opacity);
     }
 
     if (auto thumbnail_panel = toml["thumbnail_panel"])
@@ -675,7 +677,7 @@ Lektra::initConfig() noexcept
             this->showFullScreen();
 
         // Only override title format if key exists
-        set_title_format_if_present(window["window_title"],
+        set_title_format_if_present(window["title_format"],
                                     m_config.window.title_format);
     }
 
@@ -833,11 +835,13 @@ Lektra::initConfig() noexcept
         // set(command_palette["show_grid"], m_config.command_palette.grid);
         // TODO: Implement grid in command palette
         set(command_palette["show_shortcuts"],
-            m_config.command_palette.shortcuts);
-
             m_config.command_palette.show_shortcuts);
+        set(command_palette["border"], m_config.command_palette.border);
+        set(command_palette["alternating_row_color"],
+            m_config.command_palette.alternating_row_color);
         set(command_palette["placeholder_text"],
             m_config.command_palette.placeholder_text);
+        // set(command_palette["shadow"], m_config.command_palette.shadow);
     }
 
     // Picker
