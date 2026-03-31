@@ -1676,7 +1676,7 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
 #ifdef HAS_SYNCTEX
     if (argparser.is_used("synctex-forward"))
     {
-        m_config.behavior.startpage_override = -1; // do not override the page
+        m_config.behavior._startpage_override = -1; // do not override the page
 
         // Format: --synctex-forward={pdf}#{src}:{line}:{column}
         // Example: --synctex-forward=test.pdf#main.tex:14
@@ -1761,7 +1761,7 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
     {
         auto files = argparser.get<std::vector<std::string>>("files");
         m_config.behavior.open_last_visited = false;
-        const int pageOverride = m_config.behavior.startpage_override;
+        const int pageOverride = m_config.behavior._startpage_override;
 
         if (!files.empty())
         {
@@ -1799,7 +1799,7 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
 
     if (m_tab_widget->count() == 0 && m_config.window.startup_tab)
         showStartupWidget();
-    m_config.behavior.startpage_override = -1;
+    m_config.behavior._startpage_override = -1;
 }
 
 void

@@ -1048,7 +1048,7 @@ struct Config
         int page_history_limit = 5;
 
         // Don't document this as it's for internal use
-        int startpage_override{-1};
+        int _startpage_override{-1};
 
         // @desc Initial interaction mode
         // @type str
