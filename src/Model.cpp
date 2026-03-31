@@ -1709,8 +1709,8 @@ Model::computeTextSelectionQuad(int pageno, QPointF devStart,
         page_to_dev = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(page_bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
@@ -1790,8 +1790,8 @@ Model::get_selected_text(int pageno, QPointF start, QPointF end,
         page_to_dev      = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 
@@ -2118,7 +2118,6 @@ Model::requestPageRender(
         ensurePageCached(job.pageno);
         if (m_render_cancelled.load(std::memory_order_acquire))
             return {};
-
         return renderPageWithExtrasAsync(job);
     });
 
@@ -2500,8 +2499,8 @@ Model::highlight_text_selection(int pageno, QPointF start, QPointF end) noexcept
         page_to_dev      = fz_pre_rotate(page_to_dev, m_rotation);
 
         const fz_rect dev_bounds = fz_transform_rect(bounds, page_to_dev);
-        page_to_dev              = fz_concat(page_to_dev,
-                                             fz_translate(-dev_bounds.x0, -dev_bounds.y0));
+        page_to_dev = fz_concat(page_to_dev,
+                                fz_translate(-dev_bounds.x0, -dev_bounds.y0));
 
         const fz_matrix dev_to_page = fz_invert_matrix(page_to_dev);
 

@@ -1646,7 +1646,7 @@ DocumentView::GotoHit(int index) noexcept
         const QRectF sr = m_gview->sceneRect();
         // Ensure the hit is calculated relative to the centered page
         // position
-        scenePos = QPointF(
+        scenePos        = QPointF(
             sr.left() + (sr.width() - pageSceneSize(ref.page).width()) / 2.0
                 + hitX,
             sr.top() + (sr.height() - pageSceneSize(ref.page).height()) / 2.0
