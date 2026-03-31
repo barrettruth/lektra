@@ -835,6 +835,7 @@ Lektra::initConfig() noexcept
         set(command_palette["show_shortcuts"],
             m_config.command_palette.shortcuts);
 
+            m_config.command_palette.show_shortcuts);
         set(command_palette["placeholder_text"],
             m_config.command_palette.placeholder_text);
     }

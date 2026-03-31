@@ -831,7 +831,7 @@ struct Config
         // @type bool
         // @default true
         // @added 0.5.4
-        bool shortcuts = true;
+        bool show_shortcuts = true;
 
         // @desc Show command description
         // @type bool
