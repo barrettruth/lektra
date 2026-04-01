@@ -18,7 +18,7 @@
 #include "TabWidget.hpp"
 #include "argparse.hpp"
 #ifdef ENABLE_LLM_SUPPORT
-#include "LLM/LLMWidget.hpp"
+    #include "LLM/LLMWidget.hpp"
 #endif
 #include "CommandManager.hpp"
 
