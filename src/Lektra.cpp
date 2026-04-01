@@ -986,6 +986,14 @@ Lektra::initConfig() noexcept
         set_color(search["index_color"], m_config.search.index_color);
     }
 
+#ifdef HAS_SYNCTEX
+    if (auto synctex = toml["synctex"])
+    {
+        set(synctex["enabled"], m_config.synctex.enabled);
+        set(synctex["editor_command"], m_config.synctex.editor_command);
+    }
+#endif
+
     // Colors
     if (auto colors = toml["colors"])
     {
@@ -1091,11 +1099,6 @@ Lektra::initConfig() noexcept
 
     if (auto behavior = toml["behavior"])
     {
-#ifdef HAS_SYNCTEX
-        set(behavior["synctex_editor_command"],
-            m_config.behavior.synctex_editor_command);
-#endif
-
         set(behavior["preload_pages"], m_config.behavior.preload_pages);
         set(behavior["confirm_on_quit"], m_config.behavior.confirm_on_quit);
         set(behavior["undo_limit"], m_config.behavior.undo_limit);

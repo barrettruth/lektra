@@ -20,6 +20,9 @@ Clicking on a thumbnail will navigate to that page in the main view.
 
 ### Config Options
 
+- Move synctex settings to their own section `[synctex]` for better organization and maintainability of the config file
+    - `enabled` (bool): Enable/Disable synctex support
+    - `editor_command` (string): Command to open the editor for synctex jump (e.g. `code --goto {file}:{line}:{column}`)
 - `[thumbnail_panel]` section for thumbnail panel related settings
     - `show_page_number` (bool): Whether to show page numbers on the thumbnails
     - `panel_width` (float): Width of the thumbnail panel as a ratio of the main window width (e.g. 0.2 for 20% of the main window width)
@@ -41,6 +44,7 @@ command_palette = [ ":", "Ctrl+P" ]
 
 ### Breaking Changes
 
+- Removed `synctex_editor_command` from `[behavior]` section and moved it to `[synctex]` section as `editor_command`
 - `dim_inactive` is now disabled by default (which was enabled previously out of the box)
 - `confirm_on_quit` is now false by default (I feel it was annoying).
 - Renamed config options:
