@@ -772,10 +772,10 @@ DocumentView::handleClickSelection(int clickType, QPointF scenePos) noexcept
 void
 DocumentView::handleSynctexJumpRequested(QPointF scenePos) noexcept
 {
-#ifndef NDEBUG
+    #ifndef NDEBUG
     qDebug() << "DocumentView::handleSynctexJumpRequested(): Handling "
              << "SyncTeX jump to scene position" << scenePos;
-#endif
+    #endif
 
     if (m_synctex_scanner)
     {
