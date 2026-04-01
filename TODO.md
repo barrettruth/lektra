@@ -4,7 +4,6 @@
 
 ## HIGH PRIORITY
 
-- [ ] Add --check-config option to check if the configuration file is valid without starting the application
 - [ ] Don't hide scrollbars when search hits have been drawn
 - [ ] Grow/Shrink scrollbar when hovering for easy clicking and dragging
 - [ ] Grow/Shrink splitter handle when hovering over it for easy dragging
