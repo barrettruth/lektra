@@ -14,9 +14,9 @@
 #ifdef HAS_SYNCTEX
 extern "C"
 {
-#include <synctex/synctex_parser.h>
-#include <synctex/synctex_parser_utils.h>
-#include <synctex/synctex_version.h>
+    #include <synctex/synctex_parser.h>
+    #include <synctex/synctex_parser_utils.h>
+    #include <synctex/synctex_version.h>
 }
 #endif
 

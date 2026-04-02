@@ -24,8 +24,8 @@ extern "C"
 #include <mupdf/pdf.h>
 
 #ifdef HAS_DJVU
-#    include <libdjvu/ddjvuapi.h>
-#    include <libdjvu/miniexp.h>
+    #include <libdjvu/ddjvuapi.h>
+    #include <libdjvu/miniexp.h>
 #endif
 }
 
@@ -370,17 +370,6 @@ public:
         m_page_lru_cache.setCapacity(n);
     }
 
-    void rotateClock() noexcept;
-    void rotateAnticlock() noexcept;
-    void setZoom(float zoom) noexcept;
-    void setUrlLinkRegex(const QString &pattern) noexcept;
-
-    // Clear page cache to free memory (e.g., when tab becomes inactive)
-    void clearPageCache() noexcept;
-
-    // Ensure a page is cached (lazy loading)
-    void ensurePageCached(int pageno) noexcept;
-
     inline void setBackgroundColor(const uint32_t bg) noexcept
     {
         m_bg_color = bg;
@@ -406,15 +395,6 @@ public:
         return m_dpi;
     }
 
-    // Clear cached fz_stext_page objects
-    // inline void clear_fz_stext_page_cache() noexcept
-    // {
-    // for (auto &pair : m_stext_page_cache)
-    //     fz_drop_stext_page(m_ctx, pair.second);
-    // m_stext_page_cache.clear();
-    //     m_stext_page_cache.clear();
-    // }
-
     [[nodiscard]] inline const float *annotRectColor() const noexcept
     {
         return m_annot_rect_color;
@@ -425,6 +405,13 @@ public:
         return m_filetype;
     }
 
+    void rotateClock() noexcept;
+    void rotateAnticlock() noexcept;
+    void setZoom(float zoom) noexcept;
+    void setUrlLinkRegex(const QString &pattern) noexcept;
+    void clearPending() noexcept;
+    void clearPageCache() noexcept;
+    void ensurePageCached(int pageno) noexcept;
     RenderJob createRenderJob(int pageno) const noexcept;
     void requestPageRender(
         const RenderJob &job,
@@ -489,7 +476,7 @@ public:
     void removeAnnotComment(const int pageno, const int objNum) noexcept;
     void addAnnotComment(const int pageno, const int objNum,
                          const QString &comment) noexcept;
-    const char *getAnnotComment(const int pageno, const int objNum) noexcept;
+    QString getAnnotComment(const int pageno, const int objNum) noexcept;
     QColor getAnnotColor(const int pageno, const int index) noexcept;
     int get_obj_num_at_rect(int pageno, fz_rect targetRect) noexcept;
 

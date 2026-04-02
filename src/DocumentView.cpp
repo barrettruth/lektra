@@ -774,10 +774,10 @@ DocumentView::handleClickSelection(int clickType, QPointF scenePos) noexcept
 void
 DocumentView::handleSynctexJumpRequested(QPointF scenePos) noexcept
 {
-#ifndef NDEBUG
+    #ifndef NDEBUG
     qDebug() << "DocumentView::handleSynctexJumpRequested(): Handling "
              << "SyncTeX jump to scene position" << scenePos;
-#endif
+    #endif
 
     if (m_synctex_scanner)
     {
@@ -2001,6 +2001,11 @@ DocumentView::SaveFile() noexcept
             renderPages();
         }
         m_model->undoStack()->setClean();
+#ifndef NDEBUG
+        qDebug() << "DocumentView::SaveFile(): Save successful, updated "
+                    "generation to"
+                 << m_generation;
+#endif
     }
     else
     {
