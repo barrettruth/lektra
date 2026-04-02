@@ -59,8 +59,8 @@ set_title_format_if_present(toml::node_view<toml::node> n,
     if (auto v = n.value<std::string>())
     {
         QString window_title = QString::fromStdString(*v);
-        window_title.replace("{}", "%1");
-        title_format = window_title;
+        window_title         = window_title.replace("{}", "%1");
+        title_format         = window_title;
     }
 }
 
