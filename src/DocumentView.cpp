@@ -2004,9 +2004,7 @@ DocumentView::SaveFile() noexcept
         m_model->undoStack()->setClean();
 
 #ifndef NDEBUG
-        qDebug() << "DocumentView::SaveFile(): Save successful, updated "
-                    "generation to"
-                 << m_generation;
+        qDebug() << "DocumentView::SaveFile(): Save successful";
 #endif
     }
     else
@@ -2579,8 +2577,8 @@ DocumentView::startNextRenderJob() noexcept
 {
 
 #ifndef NDEBUG
-    qDebug() << "DocumentView::startNextRenderJob(): Renders in flight:"
-             << m_renders_in_flight << " Queue size: " << m_render_queue.size();
+    qDebug() << "DocumentView::startNextRenderJob(): Queue size: "
+             << m_render_queue.size();
 #endif
 
     // Get current visible pages for prioritization
@@ -3869,6 +3867,11 @@ DocumentView::setModified(bool modified) noexcept
 
     emit statusbarNameChanged(fileName);
     this->setWindowTitle(title);
+
+#ifndef NDEBUG
+    qDebug() << "DocumentView::setModified(): Setting modified state to"
+             << modified;
+#endif
 }
 
 bool
