@@ -1031,6 +1031,22 @@ Model::openAsync_mupdf(const QString &canonPath) noexcept
     });
 }
 
+void
+Model::clearPending() noexcept
+{
+    if (m_pending.doc)
+    {
+        fz_drop_document(m_pending.ctx, m_pending.doc);
+    }
+
+    if (m_pending.ctx)
+    {
+        fz_drop_context(m_pending.ctx);
+    }
+
+    m_pending.clear();
+}
+
 QFuture<void>
 Model::submitPassword(const QString &password) noexcept
 {
@@ -1049,6 +1065,7 @@ Model::submitPassword(const QString &password) noexcept
             // Wrong password — put it back so the user can retry
             QMetaObject::invokeMethod(this, [this, ctx, doc]
             {
+                clearPending();
                 m_pending = {ctx, doc};
                 emit wrongPassword();
             }, Qt::QueuedConnection);
