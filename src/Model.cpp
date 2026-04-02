@@ -2643,7 +2643,7 @@ Model::addRectAnnotation(const int pageno, const fz_rect &rect,
 
     fz_try(m_ctx)
     {
-        // Load the specific page for this annotation
+        std::lock_guard<std::mutex> lock(m_doc_mutex);
         page = pdf_load_page(m_ctx, m_pdf_doc, pageno);
 
         if (!page)
@@ -2879,6 +2879,7 @@ Model::removeAnnotations(int pageno, const std::vector<int> &objNums) noexcept
 
     fz_try(m_ctx)
     {
+        std::lock_guard<std::mutex> lock(m_doc_mutex);
         page = pdf_load_page(m_ctx, m_pdf_doc, pageno);
         if (!page)
             fz_throw(m_ctx, FZ_ERROR_GENERIC, "Failed to load page");
