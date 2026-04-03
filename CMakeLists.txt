@@ -107,6 +107,22 @@ if (NOT SYNCTEX_FOUND)
     message(STATUS "SyncTeX not found, disabling SyncTeX support.")
 endif()
 
+
+file(GLOB LEKTRA_CORE_HEADERS
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+)
+
+file(GLOB LEKTRA_ANNOTATION_HEADERS
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Annotations/*.hpp
+)
+
+file(GLOB LEKTRA_COMMAND_HEADERS
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Commands/*.hpp
+)
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/Lektra.cpp
@@ -119,7 +135,7 @@ add_executable(${PROJECT_NAME}
     src/DocumentView.cpp
     src/StartupWidget.cpp
     src/MessageBar.cpp
-    src/Annotations/Annotation.cpp
+    src/Annotation.cpp
     src/EditLastPagesWidget.cpp
     src/RecentFilesStore.cpp
     src/RecentFilesModel.cpp
@@ -138,44 +154,18 @@ add_executable(${PROJECT_NAME}
     src/OutlinePicker.cpp
     src/CommentSearchPicker.cpp
     src/ScrollBar.cpp
-    
-    src/PageLocation.hpp
-    src/Config.hpp
-    src/MarkManager.hpp
-    src/AppPaths.hpp
-    src/GraphicsPixmapItem.hpp
-    src/BrowseLinkItem.hpp
-    # src/OutlineWidget.hpp
-    src/ElidableLabel.hpp
-    src/FloatingOverlayWidget.hpp
-    src/HighlightSearchPicker.hpp
-    src/EditLastPagesWidget.hpp
-    src/RecentFilesStore.hpp
-    src/RecentFilesModel.hpp
-    src/LinkHint.hpp
-    src/JumpMarker.hpp
-    src/CircleLabel.hpp
-    src/PlaceholderWidget.hpp
-    src/ScrollBar.hpp
-    src/CommandPicker.hpp
-    src/JumpMarker.hpp
-    src/OutlinePicker.hpp
-    src/InputDialog.hpp
 
-    # Annotations
-    src/Annotations/RectAnnotation.hpp
-    src/Annotations/PopupAnnotation.hpp
-    src/Annotations/HighlightAnnotation.hpp
-    src/Annotations/CommentPopupButton.hpp
-
-    # Commands
-    src/Commands/RectAnnotationCommand.hpp
-    src/Commands/TextAnnotationCommand.hpp
-    src/Commands/TextHighlightAnnotationCommand.hpp
-    src/Commands/DeleteAnnotationsCommand.hpp
-    src/Commands/AnnotCommentCommand.hpp
-    src/Commands/AnnotColorCommand.hpp
+    ${LEKTRA_CORE_HEADERS}
+    ${LEKTRA_ANNOTATION_HEADERS}
+    ${LEKTRA_COMMAND_HEADERS}
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    include # Include project headers
+    ${CMAKE_CURRENT_BINARY_DIR}/include # Include generated headers like TranslationsDir.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty # Include third-party headers (MuPDF)
+)
+
 
 if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -198,19 +188,22 @@ if (ENABLE_LLM_SUPPORT)
     message(STATUS "LLM support enabled.")
     target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_LLM_SUPPORT=1)
 
-    target_sources(${PROJECT_NAME} PRIVATE
-        src/LLM/http/HttpStreamClient.cpp
-        src/LLM/LLMWidget.cpp
-        src/LLM/providers/LLMProvider.cpp
-        src/LLM/providers/ollama/OllamaProvider.cpp
+
+    file(GLOB_RECURSE LEKTRA_LLM_HEADERS
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/LLM/*.hpp
+    )
+
+    file(GLOB_RECURSE LEKTRA_LLM_SOURCES
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/LLM/*.cpp
+    )
+    target_sources(${PROJECT_NAME} PRIVATE ${LEKTRA_LLM_SOURCES} ${LEKTRA_LLM_HEADERS}
     )
 
     find_package(CURL REQUIRED)
     target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl)
 
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/llm
-    )
 else()
     message(STATUS "LLM support disabled.")
 endif()
@@ -218,12 +211,6 @@ endif()
 
 qt_add_resources(RESOURCES resources.qrc)
 
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/include # Include generated headers like TranslationsDir.hpp
-    # Include thirdparty folder
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
-)
 
 target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 
@@ -259,13 +246,13 @@ endif()
 # ------------------------------
 # Translations
 # ------------------------------
-set(TRANSLATION_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Translations")
+set(TRANSLATION_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Translations")
 file(GLOB TRANSLATION_FILES "${TRANSLATION_SRC_DIR}/*.ts")
 
 # Configure translationsdir.hpp
 set(TRANSLATIONS_DIR "${CMAKE_INSTALL_FULL_DATADIR}/locale")
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/TranslationsDir.hpp.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TranslationsDir.hpp.in"
     "${CMAKE_CURRENT_BINARY_DIR}/include/TranslationsDir.hpp"
     @ONLY
 )
