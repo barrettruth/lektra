@@ -22,6 +22,24 @@ Clicking on a thumbnail will navigate to that page in the main view.
 
 ### Config Options
 
+- Ability to set `width` and `height` of pickers (outline, highlight search, recent files etc.)
+    - These take either absolute pixel values (integers > 1) or fractional values in the range (0.0, 1.0] to
+    size the picker relative to the window dimensions. These options apply globally to all picker
+    types (outline, highlight, search, etc.); each picker type can override them individually in its own configuration section.
+
+    For example:
+    ```toml
+    [picker]
+    width = 0.3 # 30% of the window width
+    height = 400 # 400 pixels height
+
+    [outline]
+    width = 0.25 # 25% of the window width for the outline picker
+    ```
+
+    Here, the default width for all pickers is set to 30% of the window width, but the outline picker specifically
+    overrides this to be 25% of the window width. The height for all pickers is set to 400 pixels.
+
 - Move synctex settings to their own section `[synctex]` for better organization and maintainability of the config file
     - `enabled` (bool): Enable/Disable synctex support
     - `editor_command` (string): Command to open the editor for synctex jump (e.g. `code --goto {file}:{line}:{column}`)

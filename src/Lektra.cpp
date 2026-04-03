@@ -90,6 +90,33 @@ set_color(toml::node_view<toml::node> n, uint32_t &dst)
     }
 }
 
+static inline void
+set_picker_shared(toml::node_view<toml::node> picker, Config::Picker &target)
+{
+    set(picker["width"], target.width);
+    set(picker["height"], target.height);
+    set(picker["border"], target.border);
+    set(picker["alternating_row_color"], target.alternating_row_color);
+
+    if (auto picker_shadow = picker["shadow"])
+    {
+        set(picker_shadow["enabled"], target.shadow.enabled);
+        set(picker_shadow["blur_radius"], target.shadow.blur_radius);
+        set(picker_shadow["offset_x"], target.shadow.offset_x);
+        set(picker_shadow["offset_y"], target.shadow.offset_y);
+        set(picker_shadow["opacity"], target.shadow.opacity);
+    }
+}
+
+template <typename T>
+static inline void
+inherit_picker_defaults(const Config::Picker &base, T &target)
+{
+    static_assert(std::is_base_of_v<Config::Picker, T>,
+                  "Target must derive from Config::Picker");
+    static_cast<Config::Picker &>(target) = base;
+}
+
 } // namespace
 
 // Constructs the `Lektra` class
@@ -830,42 +857,10 @@ Lektra::initConfig() noexcept
         set(scrollbars["hide_timeout"], m_config.scrollbars.hide_timeout);
     }
 
-    // Command Palette
-    if (auto command_palette = toml["command_palette"])
-    {
-        set(command_palette["description"],
-            m_config.command_palette.description);
-        set(command_palette["height"], m_config.command_palette.height);
-        set(command_palette["width"], m_config.command_palette.width);
-        set(command_palette["vscrollbar"], m_config.command_palette.vscrollbar);
-        // set(command_palette["show_grid"], m_config.command_palette.grid);
-        // TODO: Implement grid in command palette
-        set(command_palette["show_shortcuts"],
-            m_config.command_palette.show_shortcuts);
-        set(command_palette["border"], m_config.command_palette.border);
-        set(command_palette["alternating_row_color"],
-            m_config.command_palette.alternating_row_color);
-        set(command_palette["placeholder_text"],
-            m_config.command_palette.placeholder_text);
-        // set(command_palette["shadow"], m_config.command_palette.shadow);
-    }
-
     // Picker
     if (auto picker = toml["picker"])
     {
-        set(picker["border"], m_config.picker.border);
-        set(picker["alternating_row_color"],
-            m_config.picker.alternating_row_color);
-
-        if (auto picker_shadow = picker["shadow"])
-        {
-            set(picker_shadow["enabled"], m_config.picker.shadow.enabled);
-            set(picker_shadow["blur_radius"],
-                m_config.picker.shadow.blur_radius);
-            set(picker_shadow["offset_x"], m_config.picker.shadow.offset_x);
-            set(picker_shadow["offset_y"], m_config.picker.shadow.offset_y);
-            set(picker_shadow["opacity"], m_config.picker.shadow.opacity);
-        }
+        set_picker_shared(picker, m_config.picker);
 
         // Picker.Keys
         if (auto picker_keys = picker["keys"])
@@ -925,6 +920,29 @@ Lektra::initConfig() noexcept
         }
     }
 
+    // Apply picker defaults to all picker-like sections.
+    // Individual sections parsed below can still override these values.
+    inherit_picker_defaults(m_config.picker, m_config.outline);
+    inherit_picker_defaults(m_config.picker, m_config.highlight_search);
+    inherit_picker_defaults(m_config.picker, m_config.command_palette);
+
+    // Command Palette
+    if (auto command_palette = toml["command_palette"])
+    {
+        set_picker_shared(command_palette, static_cast<Config::Picker &>(
+                                               m_config.command_palette));
+
+        set(command_palette["description"],
+            m_config.command_palette.description);
+        set(command_palette["vscrollbar"], m_config.command_palette.vscrollbar);
+        // set(command_palette["show_grid"], m_config.command_palette.grid);
+        // TODO: Implement grid in command palette
+        set(command_palette["show_shortcuts"],
+            m_config.command_palette.show_shortcuts);
+        set(command_palette["placeholder_text"],
+            m_config.command_palette.placeholder_text);
+    }
+
     // Markers
     if (auto jump_marker = toml["jump_marker"])
     {
@@ -952,6 +970,9 @@ Lektra::initConfig() noexcept
     // Outline
     if (auto outline = toml["outline"])
     {
+        set_picker_shared(outline,
+                          static_cast<Config::Picker &>(m_config.outline));
+
         set(outline["indent_width"], m_config.outline.indent_width);
         set(outline["show_page_numbers"], m_config.outline.show_page_number);
     }
@@ -959,7 +980,8 @@ Lektra::initConfig() noexcept
     // Highlight Search
     if (auto highlight_search = toml["highlight_search"])
     {
-        // TODO
+        set_picker_shared(highlight_search, static_cast<Config::Picker &>(
+                                                m_config.highlight_search));
     }
 
 #ifdef ENABLE_LLM_SUPPORT
@@ -5967,9 +5989,11 @@ Lektra::checkConfigFile(const QString &path) const noexcept
 
         {"command_palette",
          {"description", "height", "width", "vscrollbar", "show_shortcuts",
-          "border", "alternating_row_color", "placeholder_text"}},
+          "border", "alternating_row_color", "placeholder_text", "shadow"}},
 
-        {"picker", {"border", "alternating_row_color", "shadow", "keys"}},
+        {"picker",
+         {"width", "height", "border", "alternating_row_color", "shadow",
+          "keys"}},
 
         {"jump_marker", {"enabled", "color", "fade_duration"}},
 
@@ -5977,7 +6001,12 @@ Lektra::checkConfigFile(const QString &path) const noexcept
 
         {"link_hints", {"size", "bg", "fg"}},
 
-        {"outline", {"indent_width", "show_page_numbers"}},
+        {"outline",
+         {"width", "height", "border", "alternating_row_color", "shadow",
+          "indent_width", "show_page_numbers"}},
+
+        {"highlight_search",
+         {"width", "height", "border", "alternating_row_color", "shadow"}},
 
         {"search",
          {"highlight_matches", "progressive", "match_color", "index_color",

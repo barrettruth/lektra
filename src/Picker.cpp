@@ -10,6 +10,14 @@
 Picker::Picker(const Config::Picker &config, QWidget *parent) noexcept
     : QWidget(parent), m_config(config)
 {
+    float w = m_config.width, h = m_config.height;
+
+    if (w > 0.0f && w <= 1.0f)
+        w *= parent->width();
+    if (h > 0.0f && h <= 1.0f)
+        h *= parent->height();
+
+    resize(static_cast<int>(w), static_cast<int>(h));
     setWindowFlags(Qt::Widget);
     setAttribute(Qt::WA_StyledBackground, true);
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
@@ -84,11 +92,17 @@ Picker::launch() noexcept
 void
 Picker::reposition()
 {
-    // Fixed size, centered in parent
-    const QSize s(600, 400);
-    resize(s);
-    move((parentWidget()->width() - s.width()) / 2,
-         (parentWidget()->height() - s.height()) / 2);
+    QWidget *p = parentWidget();
+
+    float w = m_config.width, h = m_config.height;
+
+    if (w > 0.0f && w <= 1.0f)
+        w *= p->width();
+    if (h > 0.0f && h <= 1.0f)
+        h *= p->height();
+
+    resize(static_cast<int>(w), static_cast<int>(h));
+    move((p->width() - width()) / 2, (p->height() - height()) / 2);
 }
 
 bool

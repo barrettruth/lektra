@@ -706,6 +706,24 @@ struct Config
     // @section_added 0.6.0
     struct Picker
     {
+        // @desc {
+        // Width of picker in pixels (if greater than 1) or relative
+        // to the window width (0.0 - 1.0, if float)
+        // }
+        // @type int
+        // @default 600
+        // @added 0.6.9
+        float width = 600;
+
+        // @desc {
+        // Height of picker in pixels (if greater than 1) or relative
+        // to the window height (0.0 - 1.0, if float)
+        // }
+        // @type int
+        // @default 400
+        // @added 0.6.9
+        float height = 400;
+
         // @desc Show stylish border around picker
         // @type bool
         // @default true
@@ -822,18 +840,6 @@ struct Config
     // @section_added 0.5.4
     struct CommandPalette : public Picker
     {
-        // @desc Width of the command palette picker
-        // @type int
-        // @default 500
-        // @added 0.5.4
-        int width = 500;
-
-        // @desc Height of the command palette picker
-        // @type int
-        // @default 300
-        // @added 0.5.4
-        int height = 300;
-
         // @desc Placeholder text for the input field
         // @type str
         // @default "Type a command..."
