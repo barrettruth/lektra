@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include <fcntl.h>
 #include <print>
+#include <qcoreapplication.h>
 #include <signal.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -194,18 +195,31 @@ main(int argc, char *argv[])
 
     QLocale locale = QLocale::system();
 
-    bool loaded = translator->load(QString("lektra_%1").arg(locale.name()));
+    const QStringList searchPaths
+        = {QCoreApplication::applicationDirPath() + "/translations",
+           QString("%1/share/lektra/translations").arg(APP_INSTALL_PREFIX)};
+
+    const QString fileName = QString("lektra.%1").arg(locale.name());
+
+    bool loaded = false;
+    for (const QString &path : searchPaths)
+    {
+        if (translator->load(fileName, path))
+        {
+            loaded = true;
+            break;
+        }
+    }
 
     if (loaded)
     {
         app.installTranslator(translator);
+        qDebug() << "Loaded language: " << translator->language();
     }
     else
     {
         delete translator;
     }
-
-    qDebug() << "Loaded language: " << translator->language();
 
     Lektra d;
     d.Read_args_parser(program);

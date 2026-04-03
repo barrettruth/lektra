@@ -290,7 +290,9 @@ macro(get_qm_lang qm_file out_lang)
     endif()
 endmacro()
 
+# Apple Stuff
 if(APPLE)
+
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources"
@@ -299,6 +301,7 @@ if(APPLE)
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/tutorial.pdf"
         VERBATIM
     )
+
     foreach(qm_file ${QM_FILES})
         get_qm_lang("${qm_file}" lang)
         if(lang STREQUAL "")
@@ -306,13 +309,14 @@ if(APPLE)
         endif()
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/locale/${lang}/LC_MESSAGES"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${qm_file}"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/locale/${lang}/LC_MESSAGES/lektra.qm"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations/"
             VERBATIM
         )
     endforeach()
+
     if(ENABLE_LLM_SUPPORT)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -321,9 +325,10 @@ if(APPLE)
             VERBATIM
         )
     endif()
+
 endif()
 
-# Install each .qm into locale/<lang>/LC_MESSAGES/
+# Install each .qm into translations/
 foreach(qm_file ${QM_FILES})
     get_qm_lang("${qm_file}" lang)
     if(lang STREQUAL "")
@@ -331,8 +336,7 @@ foreach(qm_file ${QM_FILES})
     endif()
     install(
         FILES "${qm_file}"
-        DESTINATION "${TRANSLATIONS_DIR}/${lang}/LC_MESSAGES"
-        RENAME "lektra.qm"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/lektra/translations"
     )
 endforeach()
 
