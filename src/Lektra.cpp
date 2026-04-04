@@ -15,6 +15,7 @@
 #include "utils.hpp"
 
 #include <QColorDialog>
+#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
@@ -569,7 +570,7 @@ Lektra::initConfig() noexcept
     catch (std::exception &e)
     {
         QMessageBox::critical(
-            this, "Error in configuration file",
+            this, tr("Error in configuration file"),
             tr("There are one or more error(s) in your config "
                "file:\n%1\n\nLoading default config.")
                 .arg(e.what()));
@@ -1557,14 +1558,15 @@ Lektra::setupMousebinding(const QString &action_str,
     Config::MouseBinding binding = get_mouse_bind_key(trigger);
     if (!binding.isValid())
     {
-        qWarning() << "Invalid mouse binding for action" << action_str << ":"
-                   << trigger;
+        qWarning() << tr("Invalid mouse binding for action") << action_str
+                   << ":" << trigger;
         return;
     }
 
     if (action_str.isEmpty())
     {
-        qWarning() << "Empty action for mouse binding with trigger:" << trigger;
+        qWarning() << tr("Empty action for mouse binding with trigger:")
+                   << trigger;
         return;
     }
 
@@ -1581,7 +1583,7 @@ Lektra::setupMousebinding(const QString &action_str,
         action = GraphicsView::MouseAction::Preview;
     else
     {
-        qWarning() << "Unknown action for mouse binding:" << action_str;
+        qWarning() << tr("Unknown action for mouse binding:") << action_str;
         return;
     }
 
@@ -1660,7 +1662,8 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
         }
         catch (const std::exception &e)
         {
-            qWarning() << "No config file path provided, using default path:"
+            qWarning() << tr(
+                "No config file path provided, using default path:")
                        << m_config_file_path;
             config_file_path = m_config_file_path;
         }
@@ -1756,8 +1759,8 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
         }
         else
         {
-            qWarning() << "Invalid --synctex-forward format. Expected "
-                          "file.pdf#file.tex:line:column";
+            qWarning() << tr("Invalid --synctex-forward format. Expected "
+                             "file.pdf#file.tex:line:column");
         }
     }
 #endif
@@ -1798,11 +1801,10 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
 
             const QString cmd_name = parts[0];
             const QStringList args = parts.mid(1);
-            PPRINT("Executing command from command line:", cmd_name, args);
             if (auto *c = m_command_manager->find(cmd_name))
                 c->action(args);
             else
-                err << "Unknown command from command line:" << cmd_name
+                err << tr("Unknown command from command line:") << cmd_name
                     << Qt::endl;
         }
     };
@@ -1915,10 +1917,10 @@ Lektra::editLastPages() noexcept
     if (!m_config.behavior.remember_last_visited)
     {
         QMessageBox::information(
-            this, "Edit Last Pages",
-            "Couldn't find the recent files data. Maybe "
-            "`remember_last_visited` option is turned off in the config "
-            "file");
+            this, tr("Edit Last Pages"),
+            tr("Couldn't find the recent files data. Maybe "
+               "`remember_last_visited` option is turned off in the config "
+               "file"));
         return;
     }
 
@@ -1971,9 +1973,9 @@ Lektra::Zoom_set(const QStringList &args) noexcept
     bool ok;
 
     if (args.isEmpty())
-        zoom = QInputDialog::getDouble(this, "Set Zoom",
-                                       "Enter zoom level (e.g. 1.5 for 150%):",
-                                       m_doc->zoom(), 0.1, 10.0, 2, &ok);
+        zoom = QInputDialog::getDouble(
+            this, tr("Set Zoom"), tr("Enter zoom level (e.g. 1.5 for 150%):"),
+            m_doc->zoom(), 0.1, 10.0, 2, &ok);
     else
         zoom = args.at(0).toDouble(&ok);
     if (!ok)
@@ -2004,13 +2006,13 @@ Lektra::Goto_page(const QStringList &args) noexcept
     {
         if (total == 0)
         {
-            QMessageBox::information(this, "Goto Page",
-                                     "This document has no pages");
+            QMessageBox::information(this, tr("Goto Page"),
+                                     tr("This document has no pages"));
             return;
         }
 
         pageno = QInputDialog::getInt(
-            this, "Goto Page", tr("Enter page number (1 to %1)").arg(total),
+            this, tr("Goto Page"), tr("Enter page number (1 to %1)").arg(total),
             m_doc->pageNo() + 1, 0, m_doc->numPages(), 1, &ok);
         if (!ok)
             return;
@@ -2024,7 +2026,7 @@ Lektra::Goto_page(const QStringList &args) noexcept
 
     if (pageno <= 0 || pageno > total)
     {
-        QMessageBox::critical(this, "Goto Page",
+        QMessageBox::critical(this, tr("Goto Page"),
                               tr("Page %1 is out of range").arg(pageno));
         return;
     }
@@ -2649,7 +2651,7 @@ Lektra::OpenFileInNewWindow(const QString &filePath,
 
     if (!QFile::exists(fp))
     {
-        QMessageBox::warning(this, "Open File",
+        QMessageBox::warning(this, tr("Open File"),
                              tr("Unable to find %1").arg(fp));
         return false;
     }
@@ -2659,7 +2661,7 @@ Lektra::OpenFileInNewWindow(const QString &filePath,
     bool started = QProcess::startDetached(
         QCoreApplication::applicationFilePath(), args);
     if (!started)
-        m_message_bar->showMessage("Failed to open file in new window");
+        m_message_bar->showMessage(tr("Failed to open file in new window"));
     return started;
 }
 
@@ -2738,8 +2740,8 @@ Lektra::ShowOutline() noexcept
 
     if (!m_doc->model()->getOutline())
     {
-        QMessageBox::information(this, "Outline",
-                                 "This document has no outline");
+        QMessageBox::information(this, tr("Outline"),
+                                 tr("This document has no outline"));
         return;
     }
 
@@ -2830,8 +2832,8 @@ Lektra::ToggleTextHighlight() noexcept
         if (m_doc->fileType() == Model::FileType::PDF)
             m_doc->ToggleTextHighlight();
         else
-            QMessageBox::information(this, "Toggle Text Highlight",
-                                     "Not a PDF file to annotate");
+            QMessageBox::information(this, tr("Toggle Text Highlight"),
+                                     tr("Not a PDF file to annotate"));
     }
 }
 
@@ -2852,8 +2854,8 @@ Lektra::ToggleAnnotRect() noexcept
         if (m_doc->fileType() == Model::FileType::PDF)
             m_doc->ToggleAnnotRect();
         else
-            QMessageBox::information(this, "Toggle Annot Rect",
-                                     "Not a PDF file to annotate");
+            QMessageBox::information(this, tr("Toggle Annot Rect"),
+                                     tr("Not a PDF file to annotate"));
     }
 }
 
@@ -2866,8 +2868,8 @@ Lektra::ToggleAnnotSelect() noexcept
         if (m_doc->fileType() == Model::FileType::PDF)
             m_doc->ToggleAnnotSelect();
         else
-            QMessageBox::information(this, "Toggle Annot Select",
-                                     "Not a PDF file to annotate");
+            QMessageBox::information(this, tr("Toggle Annot Select"),
+                                     tr("Not a PDF file to annotate"));
     }
 }
 
@@ -2881,8 +2883,8 @@ Lektra::ToggleAnnotPopup() noexcept
     if (m_doc->fileType() == Model::FileType::PDF)
         m_doc->ToggleAnnotPopup();
     else
-        QMessageBox::information(this, "Toggle Annot Popup",
-                                 "Not a PDF file to annotate");
+        QMessageBox::information(this, tr("Toggle Annot Popup"),
+                                 tr("Not a PDF file to annotate"));
 }
 
 // Toggle region select mode
@@ -3233,7 +3235,7 @@ Lektra::handleTabDetachedToNewWindow(int index,
     }
     else
     {
-        m_message_bar->showMessage("Failed to open tab in new window");
+        m_message_bar->showMessage(tr("Failed to open tab in new window"));
     }
 }
 
@@ -3267,7 +3269,7 @@ Lektra::closeEvent(QCloseEvent *e)
             if (doc->isModified())
             {
                 int ret = QMessageBox::warning(
-                    this, "Unsaved Changes",
+                    this, tr("Unsaved Changes"),
                     tr("File %1 has unsaved changes. Do you want to save "
                        "them?")
                         .arg(m_tab_widget->tabText(i)),
@@ -3823,7 +3825,7 @@ Lektra::LoadSession(QString sessionName) noexcept
             QMessageBox::critical(this, tr("Session File Parse Error"),
                                   err.errorString());
 #ifndef NDEBUG
-            qDebug() << tr("JSON parse error:") << err.errorString();
+            qDebug() << "JSON parse error:" << err.errorString();
 #endif
             return;
         }
@@ -3833,7 +3835,7 @@ Lektra::LoadSession(QString sessionName) noexcept
             QMessageBox::critical(this, tr("Session File Parse Error"),
                                   tr("Session file root is not an array"));
 #ifndef NDEBUG
-            qDebug() << tr("Session file root is not an array");
+            qDebug() << "Session file root is not an array";
 #endif
             return;
         }
@@ -4481,7 +4483,7 @@ Lektra::SetDPR() noexcept
         if (ok)
             m_doc->setDPR(dpr);
         else
-            QMessageBox::critical(this, tr("Set DPR"), ("Invalid DPR value"));
+            QMessageBox::critical(this, tr("Set DPR"), tr("Invalid DPR value"));
     }
 }
 
@@ -4949,7 +4951,7 @@ void
 Lektra::handleEscapeKeyPressed() noexcept
 {
 #ifndef NDEBUG
-    qDebug() << tr("Escape key pressed handled");
+    qDebug() << "Escape key pressed handled";
 #endif
 
     m_lockedInputBuffer.clear();
@@ -5930,7 +5932,7 @@ Lektra::checkConfigFile(const QString &path) const noexcept
 
     if (!QFile::exists(path))
     {
-        warn(QString("Config file not found at: %1").arg(path));
+        warn(QString(tr("Config file not found at: %1")).arg(path));
         return ok;
     }
 
@@ -5941,7 +5943,7 @@ Lektra::checkConfigFile(const QString &path) const noexcept
     }
     catch (const std::exception &e)
     {
-        warn(QString("TOML parse error: %1").arg(e.what()));
+        warn(QString(tr("TOML parse error: %1")).arg(e.what()));
         return false;
     }
     std::cout << "[lektra --check-config] TOML syntax OK\n";
@@ -6041,7 +6043,7 @@ Lektra::checkConfigFile(const QString &path) const noexcept
 
         if (!knownKeys.contains(section))
         {
-            warn(QString("Unknown section: [%1]").arg(section));
+            warn(QString(tr("Unknown section: [%1]")).arg(section));
             continue;
         }
 
@@ -6053,13 +6055,14 @@ Lektra::checkConfigFile(const QString &path) const noexcept
         {
             const QString field = QString::fromStdString(std::string(k.str()));
             if (!knownKeys[section].contains(field))
-                warn(QString("Unknown key '%1' in [%2]").arg(field, section));
+                warn(QString(tr("Unknown key '%1' in [%2]"))
+                         .arg(field, section));
         }
     }
 
     if (ok)
-        std::cout << "[lektra --check-config] All keys valid. Config looks "
-                     "good!\n";
+        qInfo() << tr("[lektra --check-config] All keys valid. Config looks "
+                      "good!\n");
 
     return ok;
 }
