@@ -82,12 +82,11 @@ AboutDialog::AboutDialog(QWidget *parent)
 QWidget *
 AboutDialog::softwaresUsedSection() noexcept
 {
-    QWidget *widget     = new QWidget();
-    QFormLayout *layout = new QFormLayout();
+    QWidget *widget          = new QWidget();
+    QVBoxLayout *outerLayout = new QVBoxLayout(widget);
+    QFormLayout *layout      = new QFormLayout();
 
-    QVBoxLayout *outerLayout = new QVBoxLayout();
     layout->setAlignment(Qt::AlignCenter);
-
     layout->addRow("Qt", new QLabel(QT_VERSION_STR));
     layout->addRow("MuPDF", new QLabel(QString(FZ_VERSION)));
 #ifdef HAS_SYNCTEX
@@ -108,15 +107,19 @@ QWidget *
 AboutDialog::authorsSection() noexcept
 
 {
-    QWidget *widget = new QWidget(this);
-
+    QWidget *widget     = new QWidget();
     QFormLayout *layout = new QFormLayout(widget);
+
     layout->addRow(tr("Version"), new QLabel(APP_VERSION));
     layout->addRow(tr("Created by"), new QLabel("Dheeraj Vittal Shenoy"));
     layout->addRow(
-        "GitHub", new QLabel("<a "
-                             "href='https://codeberg.org/lektra/lektra'>https:/"
-                             "/codeberg.org/lektra/lektra</a>"));
+        "Source",
+        new QLabel("<a "
+                   "href='https://codeberg.org/lektra/lektra'>https:/"
+                   "/codeberg.org/lektra/lektra</a><br>"
+                   "<a "
+                   "href='https://github.com/dheerajshenoy/lektra'>https://"
+                   "github.com/dheerajshenoy/lektra</a>"));
     widget->setLayout(layout);
 
     return widget;
