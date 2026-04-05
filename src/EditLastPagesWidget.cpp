@@ -64,8 +64,9 @@ EditLastPagesWidget::initConnections() noexcept
 
     connect(m_apply_btn, &QPushButton::clicked, this, [&]()
     {
-        auto confirm = QMessageBox::question(
-            this, tr("Apply Changes"), tr("Do you want to apply the changes ?"));
+        auto confirm
+            = QMessageBox::question(this, tr("Apply Changes"),
+                                    tr("Do you want to apply the changes ?"));
         if (confirm == QMessageBox::Yes)
         {
             if (m_store)
@@ -123,7 +124,8 @@ EditLastPagesWidget::revertChanges() noexcept
         return;
     }
     auto confirm = QMessageBox::question(
-        this, tr("Revert Changes"), tr("Do you really want to revert the changes ?"));
+        this, tr("Revert Changes"),
+        tr("Do you really want to revert the changes ?"));
     if (confirm == QMessageBox::Yes)
         m_model->revertAll();
 }
