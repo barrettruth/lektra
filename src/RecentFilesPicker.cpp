@@ -8,6 +8,8 @@ RecentFilesPicker::RecentFilesPicker(const Config::Picker &config,
 {
     setColumns(
         {{.header = "Name", .stretch = 2}, {.header = "Path", .stretch = 0}});
+
+    setStructureMode(StructureMode::Flat);
 }
 
 QList<Picker::Item>

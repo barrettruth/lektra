@@ -1,5 +1,11 @@
 # LEKTRA CHANGELOG
 
+## 0.7.0
+
+### Bug Fixes
+
+- Make `RecentFilesPicker` be flat structured by default instead of hierarchical (it makes more sense to have flat structure)
+
 ## 0.6.9
 
 ### Features
@@ -63,7 +69,7 @@ down = [ "Ctrl+j", "Down" ]
 command_palette = [ ":", "Ctrl+P" ]
 ```
 
-> ![NOTE]
+> [!NOTE]
 > Notice that multiple keybindings use `[]` square brackets and not `{}` curly braces,
 > which have a different meaning in [TOML](https://toml.io/en/v1.0.0#inline-table)
 
