@@ -85,6 +85,7 @@ command_palette = [ ":", "Ctrl+P" ]
 
 ### Core Changes
 
+- Replaced Qt's `QColorDialog` with a custom color picker dialog for annotation color selection.
 - Moved `Translations` directory to the root of the project (preivously it was in `src` directory).
 - Moved `.hpp` header files into `include` directory (previously they were in `src` directory) for better organization
   of the codebase and to follow common C++ project structure conventions.
