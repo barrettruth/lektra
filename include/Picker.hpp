@@ -8,6 +8,8 @@
 #include <QTreeView>
 #include <QWidget>
 
+class QGraphicsDropShadowEffect;
+
 class PickerFilterProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -80,10 +82,24 @@ protected:
         if (m_raw.isEmpty())
             return true;
 
-        const QModelIndex idx
-            = sourceModel()->index(sourceRow, 0, sourceParent);
-        const QString haystack = idx.data(filterRole()).toString();
+        QModelIndex idx  = sourceModel()->index(sourceRow, 0, sourceParent);
+        QString haystack = idx.data(filterRole()).toString();
 
+        if (matches(haystack))
+            return true;
+
+        int childCount = sourceModel()->rowCount(idx);
+
+        for (int i = 0; i < childCount; ++i)
+            if (filterAcceptsRow(i, idx))
+                return true;
+
+        return false;
+    }
+
+private:
+    bool matches(const QString &haystack) const
+    {
         if (m_modes & Regex)
             return m_regex.match(haystack).hasMatch();
 
@@ -99,11 +115,11 @@ protected:
     }
 
 private:
-    SearchModes m_modes = SearchMode::Orderless;
-    QString m_raw;
+    SearchModes m_modes      = SearchMode::Orderless;
     Qt::CaseSensitivity m_cs = Qt::CaseInsensitive;
     QRegularExpression m_regex;
     QStringList m_tokens;
+    QString m_raw;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(PickerFilterProxy::SearchModes)
@@ -138,7 +154,19 @@ public:
     {
         QList<QString> columns;
         QVariant data;
+        QList<Item> children;
     };
+
+    enum class StructureMode
+    {
+        Flat = 0,
+        Hierarchical,
+    };
+
+    inline StructureMode structureMode() const noexcept
+    {
+        return m_structureMode;
+    }
 
     inline void setSearchModes(PickerFilterProxy::SearchModes modes) noexcept
     {
@@ -187,7 +215,9 @@ public:
     virtual QList<Item> collectItems()            = 0;
     virtual void onItemAccepted(const Item &item) = 0;
     virtual void launch() noexcept;
+
     void repopulate() noexcept;
+    void setStructureMode(StructureMode mode) noexcept;
 
 signals:
     void itemSelected(const Item &item);
@@ -195,15 +225,18 @@ signals:
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    PickerFilterProxy *m_proxy = nullptr;
-    QTreeView *m_listView      = nullptr;
-    QLineEdit *m_searchBox;
     void populate(const QList<Item> &items);
     void reposition();
+
+protected:
+    PickerFilterProxy *m_proxy = nullptr;
+    QTreeView *m_listView      = nullptr;
+    QLineEdit *m_searchBox     = nullptr;
     const Config::Picker &m_config;
 
 private slots:
     void onSearchChanged(const QString &text);
+    void onItemClicked(const QModelIndex &index);
     void onItemActivated(const QModelIndex &index);
     virtual void onFilterChanged(int visibleCount)
     {
@@ -215,10 +248,10 @@ private:
     Item itemAtProxyIndex(const QModelIndex &index) const;
 
 private:
-    QFrame *m_frame{nullptr};
-    QStandardItemModel *m_model = nullptr;
+    QFrame *m_frame                            = nullptr;
+    QStandardItemModel *m_model                = nullptr;
+    StructureMode m_structureMode              = StructureMode::Hierarchical;
+    QGraphicsDropShadowEffect *m_shadow_effect = nullptr;
     Keybindings m_keys;
     QVector<Column> m_columns;
-
-    class QGraphicsDropShadowEffect *m_shadow_effect = nullptr;
 };

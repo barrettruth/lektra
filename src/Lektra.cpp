@@ -976,6 +976,7 @@ Lektra::initConfig() noexcept
 
         set(outline["indent_width"], m_config.outline.indent_width);
         set(outline["show_page_numbers"], m_config.outline.show_page_number);
+        set(outline["flat_menu"], m_config.outline.flat_menu);
     }
 
     // Highlight Search
@@ -983,6 +984,7 @@ Lektra::initConfig() noexcept
     {
         set_picker_shared(highlight_search, static_cast<Config::Picker &>(
                                                 m_config.highlight_search));
+        set(highlight_search["flat_menu"], m_config.highlight_search.flat_menu);
     }
 
 #ifdef ENABLE_LLM_SUPPORT

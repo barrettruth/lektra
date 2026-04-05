@@ -822,6 +822,16 @@ struct Config
         // @default true
         // @added 0.6.5
         bool show_page_number = true;
+
+        // @desc {
+        // if true, show the outline in a flat menu instead of a hierarchical
+        // one
+        // }
+        // @type bool
+        // @default true
+        // @added 0.6.9
+        bool flat_menu = true;
+
     } outline{};
     // @endsection
 
@@ -831,6 +841,14 @@ struct Config
     // @section_added 0.5.3
     struct HighlightSearch : public Picker
     {
+        // @desc {
+        // if true, show the outline in a flat menu instead of a hierarchical
+        // one
+        // }
+        // @type bool
+        // @default true
+        // @added 0.6.9
+        bool flat_menu = true;
     } highlight_search{};
     // @endsection
 

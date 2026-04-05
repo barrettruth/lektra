@@ -21,6 +21,8 @@ CommandPicker::CommandPicker(const Config::CommandPalette &config,
                      .alignment = Qt::AlignRight | Qt::AlignVCenter});
     setScrollbarEnabled(m_config.vscrollbar);
     setColumns(cols);
+
+    setStructureMode(StructureMode::Flat);
 }
 
 QList<Picker::Item>

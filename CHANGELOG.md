@@ -23,6 +23,10 @@ Clicking on a thumbnail will navigate to that page in the main view.
 
 ### Config Options
 
+- `flat_menu` option for `[outline]`, `[highlight_search]` picker. If `true`, the picker will
+show all entries in a flat list without indentation, otherwise it will show entries in a
+clickable node structure
+
 - Ability to set `width` and `height` of pickers (outline, highlight search, recent files etc.)
     - These take either absolute pixel values (integers > 1) or fractional values in the range (0.0, 1.0] to
     size the picker relative to the window dimensions. These options apply globally to all picker

@@ -50,13 +50,13 @@ Picker::Picker(const Config::Picker &config, QWidget *parent) noexcept
     m_searchBox->installEventFilter(this);
 
     m_listView = new QTreeView(m_frame);
-    m_listView->setRootIsDecorated(false);
-    m_listView->setItemsExpandable(false);
-    m_listView->setUniformRowHeights(true);
     m_listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_listView->setFrameShape(QFrame::NoFrame);
     m_listView->header()->setStretchLastSection(true);
     m_listView->setAlternatingRowColors(m_config.alternating_row_color);
+    m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     innerLayout->addWidget(m_listView);
 
     // Models parented to this — they outlive any layout changes
@@ -69,6 +69,7 @@ Picker::Picker(const Config::Picker &config, QWidget *parent) noexcept
 
     connect(m_searchBox, &QLineEdit::textChanged, this,
             &Picker::onSearchChanged);
+    connect(m_listView, &QTreeView::clicked, this, &Picker::onItemClicked);
     connect(m_listView, &QTreeView::activated, this, &Picker::onItemActivated);
 
     applyFrameStyle();
@@ -203,9 +204,28 @@ Picker::onSearchChanged(const QString &text)
 }
 
 void
+Picker::onItemClicked(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    if (m_structureMode == StructureMode::Hierarchical
+        && m_proxy->rowCount(index) > 0)
+        m_listView->setExpanded(index, !m_listView->isExpanded(index));
+}
+
+void
 Picker::onItemActivated(const QModelIndex &index)
 {
     auto item = itemAtProxyIndex(index);
+
+    if (m_structureMode == StructureMode::Hierarchical
+        && m_proxy->rowCount(index) > 0)
+    {
+        m_listView->setExpanded(index, !m_listView->isExpanded(index));
+        return;
+    }
+
     emit itemSelected(item);
     onItemAccepted(item);
     hide();
@@ -221,33 +241,45 @@ Picker::populate(const QList<Picker::Item> &items)
         m_model->setHorizontalHeaderItem(
             col, new QStandardItem(m_columns[col].header));
 
-    for (const auto &item : items)
+    std::function<void(const QList<Item> &, QStandardItem *)> addItems
+        = [&](const QList<Item> &items, QStandardItem *parent)
     {
-        QList<QStandardItem *> row;
-        row.reserve(m_columns.size());
-
-        for (int col = 0; col < m_columns.size(); ++col)
+        for (const auto &it : items)
         {
-            const QString text
-                = (col < item.columns.size()) ? item.columns[col] : QString{};
-            auto *item = new QStandardItem(text);
-            item->setTextAlignment(m_columns[col].alignment);
-            row.append(item);
+            QList<QStandardItem *> row;
+            row.reserve(m_columns.size());
+
+            for (int col = 0; col < m_columns.size(); ++col)
+            {
+                const QString text
+                    = (col < it.columns.size()) ? it.columns[col] : QString{};
+                auto *cell = new QStandardItem(text);
+                cell->setTextAlignment(m_columns[col].alignment);
+                row.append(cell);
+            }
+
+            QString searchText;
+            for (const auto &c : it.columns)
+                if (!c.isEmpty())
+                    searchText += c + ' ';
+
+            row[0]->setData(searchText.trimmed(), Qt::UserRole + 1);
+            row[0]->setData(QVariant::fromValue(it), Qt::UserRole + 2);
+
+            if (parent)
+                parent->appendRow(row);
+            else
+                m_model->appendRow(row);
+
+            if (!it.children.isEmpty())
+                addItems(it.children, row[0]);
         }
+    };
 
-        // All columns contribute to search
-        QString searchText;
-        for (const auto &c : item.columns)
-            if (!c.isEmpty())
-                searchText += c + ' ';
+    addItems(items, nullptr);
 
-        row[0]->setData(searchText.trimmed(), Qt::UserRole + 1);
-        row[0]->setData(QVariant::fromValue(item), Qt::UserRole + 2);
-        m_model->appendRow(row);
-    }
-
-    auto *header = m_listView->header();
-    if (header)
+    // header setup (unchanged)
+    if (auto *header = m_listView->header())
     {
         header->setStretchLastSection(false);
         for (int i = 0; i < m_columns.size(); ++i)
@@ -310,4 +342,13 @@ Picker::applyFrameStyle() noexcept
                                    m_config.shadow.offset_y);
         m_shadow_effect->setColor(QColor(0, 0, 0, alpha));
     }
+}
+
+void
+Picker::setStructureMode(StructureMode mode) noexcept
+{
+    m_structureMode = mode;
+
+    m_listView->setRootIsDecorated(mode == StructureMode::Hierarchical);
+    m_listView->setItemsExpandable(mode == StructureMode::Hierarchical);
 }

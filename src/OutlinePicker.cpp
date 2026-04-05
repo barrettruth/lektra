@@ -4,8 +4,10 @@ OutlinePicker::OutlinePicker(const Config::Outline &config,
                              QWidget *parent) noexcept
     : Picker(config, parent), m_config(config)
 {
-    m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    setStructureMode(config.flat_menu ? StructureMode::Flat
+                                      : StructureMode::Hierarchical);
+    // setStructureMode(StructureMode::Hierarchical);
 
     // Configure the columns for the new populate() logic
     if (config.show_page_number)
@@ -64,37 +66,70 @@ OutlinePicker::collectItems()
     QList<Item> items;
     items.reserve(static_cast<int>(m_entries.size()));
 
-    if (m_config.show_page_number)
+    if (structureMode() == StructureMode::Flat)
     {
-        for (size_t i = 0; i < m_entries.size(); ++i)
+        if (m_config.show_page_number)
         {
-            const auto &e = m_entries[i];
-
-            // The new populate() logic expects:
-            // Column 0: item.title
-            // Column 1: item.subtitle
-            items.push_back(
-                {.columns
-                 = {QString(e.depth * m_config.indent_width, ' ') + e.title,
-                    QString::number(e.page + 1)},
-                 .data = static_cast<qulonglong>(i)});
+            for (size_t i = 0; i < m_entries.size(); ++i)
+            {
+                const auto &e = m_entries[i];
+                items.push_back({
+                    .columns
+                    = {QString(e.depth * m_config.indent_width, ' ') + e.title,
+                       QString::number(e.page + 1)},
+                    .data     = static_cast<qulonglong>(i),
+                    .children = {},
+                });
+            }
         }
+        else
+        {
+            for (size_t i = 0; i < m_entries.size(); ++i)
+            {
+                const auto &e = m_entries[i];
+                items.push_back(
+                    {.columns  = {QString(e.depth * m_config.indent_width, ' ')
+                                  + e.title},
+                     .data     = static_cast<qulonglong>(i),
+                     .children = {}});
+            }
+        }
+
+        return items;
     }
-    else
+
+    QVector<int> path;
+
+    auto listForDepth = [&items, &path](int depth) -> QList<Item> *
     {
-        for (size_t i = 0; i < m_entries.size(); ++i)
-        {
-            const auto &e = m_entries[i];
+        QList<Item> *list = &items;
+        for (int d = 0; d < depth; ++d)
+            list = &((*list)[path[d]].children);
+        return list;
+    };
 
-            // The new populate() logic expects:
-            // Column 0: item.title
-            // Column 1: item.subtitle
-            items.push_back(
-                {.columns
-                 = {QString(e.depth * m_config.indent_width, ' ') + e.title},
-                 .data = static_cast<qulonglong>(i)});
-        }
+    for (size_t i = 0; i < m_entries.size(); ++i)
+    {
+        const auto &e = m_entries[i];
+        int depth     = qMax(0, e.depth);
+
+        if (depth > path.size())
+            depth = path.size();
+        while (path.size() > depth)
+            path.removeLast();
+
+        Item node;
+        if (m_config.show_page_number)
+            node.columns = {e.title, QString::number(e.page + 1)};
+        else
+            node.columns = {e.title};
+        node.data = static_cast<qulonglong>(i);
+
+        QList<Item> *target = listForDepth(depth);
+        target->append(node);
+        path.append(target->size() - 1);
     }
+
     return items;
 }
 

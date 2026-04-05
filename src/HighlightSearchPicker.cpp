@@ -5,16 +5,17 @@
 #include <QHBoxLayout>
 #include <QShortcut>
 #include <QVBoxLayout>
-#include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent>
 
 HighlightSearchPicker::HighlightSearchPicker(
     const Config::HighlightSearch &config, QWidget *parent) noexcept
     : Picker(config, parent), m_config(config)
 {
-    setColumns({{.header = "Highlight", .stretch = 1}}); // ← add this first
+    setStructureMode(m_config.flat_menu ? StructureMode::Flat
+                                        : StructureMode::Hierarchical);
 
-    // --- Extra controls ---
+    setColumns({{.header = "Highlight", .stretch = 1}});
+
     m_spinner = new WaitingSpinnerWidget(this, false, false);
     m_spinner->setInnerRadius(5);
     m_spinner->setColor(palette().color(QPalette::Text));
@@ -23,17 +24,14 @@ HighlightSearchPicker::HighlightSearchPicker(
     m_refreshButton = new QPushButton("Refresh", this);
     m_countLabel    = new QLabel("0 results", this);
 
-    // Inject a footer row into Picker's layout
     auto *footer = new QHBoxLayout();
     footer->addWidget(m_countLabel);
     footer->addStretch();
     footer->addWidget(m_spinner);
     footer->addWidget(m_refreshButton);
 
-    // Picker exposes its outer layout for extension
     layout()->addItem(footer);
 
-    // --- Connections ---
     connect(m_refreshButton, &QPushButton::clicked, this,
             &HighlightSearchPicker::refresh);
 
@@ -43,12 +41,10 @@ HighlightSearchPicker::HighlightSearchPicker(
     {
         m_entries = m_watcher.result();
         setLoading(false);
-        // Re-run collectItems with current search term
         repopulate();
     });
 }
 
-// highlightsearchpicker.cpp
 void
 HighlightSearchPicker::launch() noexcept
 {
@@ -57,11 +53,10 @@ HighlightSearchPicker::launch() noexcept
         refresh();
 }
 
-// Called by Picker::launch() — return all items, filtering happens in proxy
 QList<Picker::Item>
 HighlightSearchPicker::collectItems()
 {
-    return buildItems({}); // proxy handles filtering
+    return buildItems({});
 }
 
 QList<Picker::Item>
@@ -72,7 +67,31 @@ HighlightSearchPicker::buildItems(const QString & /*term*/) const noexcept
     if (m_entries.empty())
         return items;
 
-    items.reserve(static_cast<int>(m_entries.size()));
+    if (structureMode() == StructureMode::Flat)
+    {
+        items.reserve(static_cast<int>(m_entries.size()));
+
+        for (size_t i = 0; i < m_entries.size(); ++i)
+        {
+            const auto &e = m_entries[i];
+            const double cx
+                = (e.quad.ul.x + e.quad.ur.x + e.quad.ll.x + e.quad.lr.x)
+                  * 0.25;
+            const double cy
+                = (e.quad.ul.y + e.quad.ur.y + e.quad.ll.y + e.quad.lr.y)
+                  * 0.25;
+
+            items.push_back(
+                {.columns  = {QString("p%1: %2").arg(e.page + 1).arg(e.text)},
+                 .data     = QVariantList{e.page, QPointF(cx, cy)},
+                 .children = {}});
+        }
+
+        return items;
+    }
+
+    int currentPage = -1;
+    Item *pageItem  = nullptr;
 
     for (size_t i = 0; i < m_entries.size(); ++i)
     {
@@ -82,10 +101,24 @@ HighlightSearchPicker::buildItems(const QString & /*term*/) const noexcept
         const double cy
             = (e.quad.ul.y + e.quad.ur.y + e.quad.ll.y + e.quad.lr.y) * 0.25;
 
-        items.push_back(
-            {.columns = {QString("p%1: %2").arg(e.page + 1).arg(e.text)},
-             .data    = QVariantList{e.page, QPointF(cx, cy)}});
+        if (e.page != currentPage)
+        {
+            currentPage = e.page;
+            items.push_back({.columns  = {QString("Page %1").arg(e.page + 1)},
+                             .data     = QVariant{},
+                             .children = {}});
+            pageItem = &items.back();
+        }
+
+        if (!pageItem)
+            continue;
+
+        pageItem->children.push_back(
+            {.columns  = {e.text},
+             .data     = QVariantList{e.page, QPointF(cx, cy)},
+             .children = {}});
     }
+
     return items;
 }
 
