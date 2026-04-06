@@ -1,5 +1,12 @@
 #!/bin/sh
 
+rm -rf build/
+rm -rf pkg/
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -G Ninja
+ninja
+cd ..
 VERSION=$(grep -m1 'project(' CMakeLists.txt | grep -oP 'VERSION \K[0-9]+\.[0-9]+\.[0-9]+')
 echo "Building GZ file for Lektra version: $VERSION"
 DESTDIR="$PWD/pkg" cmake --install build
