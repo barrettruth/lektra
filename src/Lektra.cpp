@@ -3327,53 +3327,114 @@ Lektra::eventFilter(QObject *object, QEvent *event)
 {
     const QEvent::Type type = event->type();
 
+    if (m_link_hint_mode)
+    {
+        return handleLinkHintEvent(event);
+    }
+
+    // TODO: Do this cleanly, looks like spaghetti code.
     // Close preview window on Escape
-    if (type == QEvent::KeyRelease && m_preview_view)
+    if (type == QEvent::KeyRelease)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Escape)
         {
-            // if (QWidget *overlay = m_preview_view->parentWidget())
-            //     overlay->deleteLater();
-            // m_preview_view = nullptr;
-            // TODO: maybe add config option ?
-            m_preview_overlay->hide();
+            if (m_preview_view && m_preview_view->isVisible())
+            {
+                // if (QWidget *overlay = m_preview_view->parentWidget())
+                //     overlay->deleteLater();
+                // m_preview_view = nullptr;
+                // TODO: maybe add config option ?
+                m_preview_overlay->hide();
+                return true;
+            }
+
+            if (m_command_picker)
+            {
+                if (m_command_picker->isVisible())
+                {
+                    m_command_picker->hide();
+                    return true;
+                }
+            }
+
+            if (m_outline_picker)
+            {
+                if (m_outline_picker->isVisible())
+                {
+                    m_outline_picker->hide();
+                    return true;
+                }
+            }
+
+            if (m_highlight_search_picker)
+            {
+                if (m_highlight_search_picker->isVisible())
+                {
+                    m_highlight_search_picker->hide();
+                    return true;
+                }
+            }
+
+            if (m_comment_search_picker)
+            {
+                if (m_comment_search_picker->isVisible())
+                {
+                    m_comment_search_picker->hide();
+                    return true;
+                }
+            }
+
+            if (m_recent_file_picker)
+            {
+                if (m_recent_file_picker->isVisible())
+                {
+                    m_recent_file_picker->hide();
+
+                    return true;
+                }
+            }
+
             return true;
         }
     }
 
     // Close preview when clicking outside the inner container
-    if (type == QEvent::MouseButtonPress && m_preview_overlay
-        && m_preview_overlay->isVisible()
+    if (m_preview_overlay && m_preview_overlay->isVisible()
         && m_config.preview.close_on_click_outside)
     {
-        // Check if click is on the overlay background (not the inner container)
-        if (object == m_preview_overlay)
+        if (type == QEvent::MouseButtonPress)
         {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            QWidget *innerContainer
-                = m_preview_overlay->findChild<QWidget *>("linkPreviewInner");
-            if (innerContainer)
             {
-                QPoint posInOverlay = mouseEvent->pos();
-                QRect innerRect     = innerContainer->geometry();
-                if (!innerRect.contains(posInOverlay))
+                // Check if click is on the overlay background (not the inner
+                // container)
+                if (object == m_preview_overlay)
                 {
-                    m_preview_overlay->hide();
-                    return true;
+                    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+                    QWidget *innerContainer
+                        = m_preview_overlay->findChild<QWidget *>(
+                            "linkPreviewInner");
+                    if (innerContainer)
+                    {
+                        QPoint posInOverlay = mouseEvent->pos();
+                        QRect innerRect     = innerContainer->geometry();
+                        if (!innerRect.contains(posInOverlay))
+                        {
+                            m_preview_overlay->hide();
+                            return true;
+                        }
+                    }
                 }
             }
         }
     }
 
-    // Link Hint Handle Key Press
-    if (m_link_hint_mode)
-        return handleLinkHintEvent(event);
-
     // Context menu for the tab widgets
-    if ((object == m_tab_widget->tabBar() || object == m_tab_widget)
-        && type == QEvent::ContextMenu)
-        return handleTabContextMenu(object, event);
+    if (object == m_tab_widget || object == m_tab_widget->tabBar())
+    {
+        if (type == QEvent::ContextMenu)
+            return handleTabContextMenu(object, event);
+    }
 
     // Let other events pass through
     return QObject::eventFilter(object, event);
@@ -4963,7 +5024,6 @@ Lektra::handleEscapeKeyPressed() noexcept
         m_doc->ClearKBHintsOverlay();
         m_link_hint_map.clear();
         m_link_hint_mode = false;
-        return;
     }
 }
 
