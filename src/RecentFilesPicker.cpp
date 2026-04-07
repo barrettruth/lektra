@@ -21,8 +21,9 @@ RecentFilesPicker::collectItems()
     {
         QFileInfo fi(path);
         items.push_back({
-            .columns = {fi.fileName(), fi.absolutePath()},
-            .data    = path,
+            .columns  = {fi.fileName(), fi.absolutePath()},
+            .data     = path,
+            .children = {},
         });
     }
     return items;

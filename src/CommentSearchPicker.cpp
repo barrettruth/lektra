@@ -79,8 +79,9 @@ CommentSearchPicker::buildItems(const QString & /*term*/) const noexcept
         const double cy = (e.rect.y0 + e.rect.y1) * 0.5;
 
         items.push_back({
-            .columns = {QString("p%1: %2").arg(e.page + 1).arg(e.comment)},
-            .data    = QVariantList{e.page, QPointF(cx, cy)},
+            .columns  = {QString("p%1: %2").arg(e.page + 1).arg(e.comment)},
+            .data     = QVariantList{e.page, QPointF(cx, cy)},
+            .children = {},
         });
     }
     return items;
