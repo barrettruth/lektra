@@ -6,6 +6,7 @@
 
 - Fix `ColorDialog` not showing up the colored buttons.
 - Make `RecentFilesPicker` be flat structured by default instead of hierarchical (it makes more sense to have flat structure)
+- Handle `Esc` key to quit open pickers.
 
 ## 0.6.9
 
