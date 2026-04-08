@@ -18,6 +18,20 @@ color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of color
 - Make `RecentFilesPicker` be flat structured by default instead of hierarchical (it makes more sense to have flat structure)
 - Handle `Esc` key to quit open pickers.
 
+### Breaking Changes
+
+- Removed shell scripts support as it was never implemented and there are no current plans to implement it.
+
+#### Config changes:
+ 
+- Organised `[statusbar]` components into it's own sections.
+    - `[statusbar.component]` for the actual components to show in the statusbar and their order
+        - `[statusbar.component.mode]` for the interaction mode component settings
+        - `[statusbar.component.filename]` for the file name component settings
+        - `[statusbar.component.zoom]` for the zoom indicator component settings
+        - `[statusbar.component.pagenumber]` for the split indicator component settings
+        - `[statusbar.component.progress]` for the link hint indicator component settings
+
 ## 0.6.9
 
 ### Features
