@@ -11,7 +11,8 @@ class ColorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ColorDialog(QWidget *parent = nullptr);
+    explicit ColorDialog(const std::vector<QColor> colors,
+                         QWidget *parent = nullptr);
 
     inline QColor selectedColor() const
     {
@@ -29,4 +30,6 @@ private:
     QPushButton *m_okButton     = nullptr;
     QPushButton *m_cancelButton = nullptr;
     QColor m_selected_color;
+
+    const std::vector<QColor> m_colors;
 };

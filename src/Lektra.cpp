@@ -577,6 +577,25 @@ Lektra::initConfig() noexcept
         return;
     }
 
+    // Misc
+    if (auto misc = toml["misc"])
+    {
+        if (auto color_dialog_colors = misc["color_dialog_colors"].as_array())
+        {
+            m_config.misc.color_dialog_colors.clear();
+            for (const auto &color_node : *color_dialog_colors)
+            {
+                if (auto color_str = color_node.value<std::string>())
+                {
+                    uint32_t color;
+                    if (parseHexColor(*color_str, color))
+                        m_config.misc.color_dialog_colors.push_back(
+                            rgbaToQColor(color));
+                }
+            }
+        }
+    }
+
     // Portals
     if (auto portal = toml["portal"])
     {
@@ -4975,9 +4994,7 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
 void
 Lektra::modeColorChangeRequested(const GraphicsView::Mode mode) noexcept
 {
-    // FIXME: Make this a function
-    QColorDialog colorDialog(this);
-    colorDialog.setOption(QColorDialog::ShowAlphaChannel, true);
+    ColorDialog colorDialog(m_config.misc.color_dialog_colors, this);
     colorDialog.setWindowTitle(tr("Select Color"));
     if (colorDialog.exec() == QDialog::Accepted)
     {

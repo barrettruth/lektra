@@ -2,6 +2,15 @@
 
 ## 0.7.0
 
+### Features
+
+- Ability to have configurable colors in the Color Dialog
+
+```toml
+[misc]
+color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of colors
+```
+
 ### Bug Fixes
 
 - Don't null out the statusbar item spacings which caused the statusbar items to have 0 padding and look weird.

@@ -3,7 +3,8 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-ColorDialog::ColorDialog(QWidget *parent) : QDialog(parent)
+ColorDialog::ColorDialog(const std::vector<QColor> colors, QWidget *parent)
+    : m_colors(colors), QDialog(parent)
 {
     initUI();
 }
@@ -15,27 +16,22 @@ ColorDialog::initUI()
     setFixedSize(200, 150);
     setModal(true);
 
-    m_layout                 = new QVBoxLayout(this);
-    QGridLayout *colorLayout = new QGridLayout(this);
+    m_layout                 = new QVBoxLayout();
+    QGridLayout *colorLayout = new QGridLayout();
 
-    static const QList<QColor> highlightColors = {
-        {255, 255, 0, 128},   // Yellow
-        {255, 165, 0, 128},   // Orange
-        {255, 0, 0, 128},     // Red
-        {0, 255, 0, 128},     // Green
-        {0, 200, 255, 128},   // Cyan
-        {128, 0, 255, 128},   // Purple
-        {255, 105, 180, 128}, // Pink
-        {0, 0, 255, 128},     // Blue
-        {255, 255, 255, 128}, // White
-    };
+    int idx            = 0;
+    size_t color_count = m_colors.size();
+    int nrows
+        = std::min(3, static_cast<int>((color_count + 2)
+                                       / 3)); // Calculate number of rows needed
+    int ncols = std::min(
+        3, static_cast<int>(color_count)); // Calculate number of columns needed
 
-    int idx = 0;
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < nrows; ++i)
     {
-        for (int j = 0; j < 3; ++j)
+        for (int j = 0; j < ncols; ++j)
         {
-            const QColor &c          = highlightColors[idx++];
+            const QColor &c          = m_colors[idx++];
             QPushButton *colorButton = new QPushButton(this);
             colorButton->setStyleSheet(QString(R"(
             QPushButton { background: rgb(%1, %2, %3); }

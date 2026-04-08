@@ -3256,7 +3256,7 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
         // TODO: Put this under a undo command
         addAction(tr("Change Color"), [this, selectedAnnots]()
         {
-            ColorDialog cp(this);
+            ColorDialog cp(m_config.misc.color_dialog_colors, this);
             cp.setWindowTitle(tr("Select Annotation Color"));
 
             if (cp.exec() == QDialog::Accepted)
@@ -3823,7 +3823,7 @@ DocumentView::renderAnnotations(
         connect(annot_item, &Annotation::annotColorChangeRequested, this,
                 [this, annot_item, pageno]()
         {
-            ColorDialog colorDialog(this);
+            ColorDialog colorDialog(m_config.misc.color_dialog_colors, this);
             QColor oldColor = annot_item->color();
             colorDialog.setWindowTitle(tr("Select Annotation Color"));
 
