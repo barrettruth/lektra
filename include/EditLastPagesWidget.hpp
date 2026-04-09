@@ -14,6 +14,7 @@
 
 class EditLastPagesWidget : public QDialog
 {
+    Q_OBJECT
 public:
     EditLastPagesWidget(RecentFilesStore *store, QWidget *parent = nullptr);
 

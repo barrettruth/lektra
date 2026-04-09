@@ -8,6 +8,7 @@
 
 class InputDialog : public QDialog
 {
+    Q_OBJECT
 public:
     InputDialog(QWidget *parent = nullptr) : QDialog(parent)
     {
