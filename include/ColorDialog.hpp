@@ -1,20 +1,18 @@
 #pragma once
 
+#include <QButtonGroup>
 #include <QColor>
 #include <QDialog>
 #include <QSpinBox>
 #include <QVBoxLayout>
-#include <qboxlayout.h>
 
 class ColorDialog : public QDialog
 {
     Q_OBJECT
-
 public:
-    explicit ColorDialog(const std::vector<QColor> colors,
+    explicit ColorDialog(const std::vector<QColor> &colors,
                          QWidget *parent = nullptr);
-
-    inline QColor selectedColor() const
+    QColor selectedColor() const
     {
         return m_selected_color;
     }
@@ -24,12 +22,7 @@ signals:
 
 private:
     void initUI();
-
-private:
-    QVBoxLayout *m_layout       = nullptr;
-    QPushButton *m_okButton     = nullptr;
-    QPushButton *m_cancelButton = nullptr;
+    std::vector<QColor> m_colors;
     QColor m_selected_color;
-
-    const std::vector<QColor> m_colors;
+    QButtonGroup *m_color_button_group;
 };
