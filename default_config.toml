@@ -298,4 +298,5 @@ files_recent = "Ctrl+Shift+O"
 # LeftButton, RightButton, MiddleButton
 portal = "Ctrl+LeftButton"
 synctex_jump = "Shift+LeftButton"
-preview = "Alt+LeftButton"
+pan = "Alt+LeftButton"
+preview = "Alt+Shift+LeftButton"

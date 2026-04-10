@@ -1610,6 +1610,10 @@ Lektra::setupMousebinding(const QString &action_str,
 
     else if (action_str == "preview")
         action = GraphicsView::MouseAction::Preview;
+
+    else if (action_str == "pan")
+        action = GraphicsView::MouseAction::Pan;
+
     else
     {
         qWarning() << tr("Unknown action for mouse binding:") << action_str;

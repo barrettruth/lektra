@@ -193,6 +193,17 @@ GraphicsView::mousePressEvent(QMouseEvent *event)
     const MouseAction action
         = resolveMouseAction(event->button(), event->modifiers());
 
+    if (action == MouseAction::Pan)
+    {
+        m_panning    = true;
+        m_lastPanPos = event->pos();
+        // Press
+        viewport()->setCursor(Qt::ClosedHandCursor);
+
+        event->accept();
+        return;
+    }
+
     // Unbound button — let the base class handle it (e.g. right-click context
     // menu).
     if (action == MouseAction::None && event->button() != Qt::LeftButton)
@@ -309,6 +320,17 @@ void
 GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     // Forward to active scrollbar if dragging
+    if (m_panning)
+    {
+        const QPoint delta = event->pos() - m_lastPanPos;
+        m_lastPanPos       = event->pos();
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()
+                                        - delta.x());
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
+        event->accept();
+        return;
+    }
+
     if (m_activeScrollbar)
     {
         forwardMouseEvent(m_activeScrollbar, event);
@@ -371,6 +393,16 @@ GraphicsView::mouseMoveEvent(QMouseEvent *event)
 void
 GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (m_panning
+        && resolveMouseAction(event->button(), event->modifiers())
+               == MouseAction::Pan)
+    {
+        m_panning = false;
+        viewport()->unsetCursor();
+        event->accept();
+        return;
+    }
+
     if (m_activeScrollbar)
     {
         forwardMouseEvent(m_activeScrollbar, event);

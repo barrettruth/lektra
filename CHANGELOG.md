@@ -4,6 +4,16 @@
 
 ### Features
 
+- Add "pan" mouse action in `[mousebindings]` section.
+    Used for panning around the page my clicking and dragging the mouse
+
+    Example:
+
+    ```toml
+    [mousebindings]
+    pan = "Alt+LeftButton"
+    ```
+
 - Ability to have configurable colors in the Color Dialog
 
 ```toml

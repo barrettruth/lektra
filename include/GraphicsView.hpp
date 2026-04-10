@@ -31,10 +31,11 @@ public:
 
     enum class MouseAction
     {
-        None,
-        SynctexJump, // e.g. Shift+click in TextSelection mode
-        Portal,      // e.g. Ctrl+click on a link item
-        Preview,     // e.g. Alt+click on a link item
+        None = 0,
+        SynctexJump,
+        Portal,
+        Preview,
+        Pan,
     };
 
     explicit GraphicsView(const Config &config, QWidget *parent = nullptr);
@@ -96,16 +97,16 @@ public:
         return m_default_mode;
     }
 
-    void setMode(Mode mode) noexcept;
-    void setAutoHideScrollbars(bool enabled);
     inline void setScrollbarIdleTimeout(int ms)
     {
         m_scrollbar_hide_timer.setInterval(ms);
     }
+
     inline void setScrollbarSize(int size) noexcept
     {
         m_scrollbarSize = size;
     }
+
     inline void flashScrollbars()
     {
         showScrollbars();
@@ -119,6 +120,7 @@ public:
             restartHideTimer();
         });
     }
+
     inline void setVerticalScrollbarEnabled(bool enabled) noexcept
     {
         if (m_vbarEnabled != enabled)
@@ -127,6 +129,7 @@ public:
             updateScrollbars();
         }
     }
+
     inline void setHorizontalScrollbarEnabled(bool enabled) noexcept
     {
         if (m_hbarEnabled != enabled)
@@ -135,6 +138,9 @@ public:
             updateScrollbars();
         }
     }
+
+    void setMode(Mode mode) noexcept;
+    void setAutoHideScrollbars(bool enabled);
 
     void bindScrollbarActivity(QScrollBar *vertical,
                                QScrollBar *horizontal) noexcept;
@@ -215,6 +221,12 @@ private:
             m_scrollbar_hide_timer.start();
     }
 
+    // Utility
+    inline QPointF scenePosFromEvent(QMouseEvent *event) const
+    {
+        return mapToScene(event->pos());
+    }
+
     void updateCursorForMode() noexcept;
     void onScrollbarActivity() noexcept;
     void applyBackend() noexcept;
@@ -230,57 +242,49 @@ private:
     QPointF m_mousePressPos;
     QPointF m_selection_start;
 
-    bool m_selecting{false};
-    bool m_dragging{false};
-    bool m_ignore_next_release{false};
-    Mode m_mode{Mode::TextSelection};
-    Mode m_default_mode{Mode::None};
-
-    QRubberBand *m_rubberBand{nullptr};
-    int m_drag_threshold{50};
-
     // Multi-click tracking
-    int m_clickCount{0};
     QElapsedTimer m_clickTimer;
     QPointF m_lastClickPos;
+    QPoint m_lastMovePos;
+
+    QPoint m_lastPanPos;
+
+    bool m_panning                                   = false;
+    bool m_selecting                                 = false;
+    bool m_dragging                                  = false;
+    bool m_ignore_next_release                       = false;
+    Mode m_mode                                      = Mode::TextSelection;
+    Mode m_default_mode                              = Mode::None;
+    QRubberBand *m_rubberBand                        = nullptr;
+    int m_drag_threshold                             = 50;
+    int m_clickCount                                 = 0;
+    static constexpr int SCROLLBAR_MARGIN            = 2;
     static constexpr int MULTI_CLICK_INTERVAL        = 400;
     static constexpr double CLICK_DISTANCE_THRESHOLD = 5.0;
-    QPoint m_lastMovePos;
-    static constexpr int MOVE_EMIT_THRESHOLD_PX = 2;
-
+    static constexpr int MOVE_EMIT_THRESHOLD_PX      = 2;
+    // ~12% “gesture energy” per step (tweak)
+    static constexpr qreal ZOOM_STEP_TRIGGER         = 0.12;
+    // pixels of trackpad scroll per page (tweak)
+    static constexpr qreal PAGE_SCROLL_TRIGGER       = 900.0;
     // Gesture state
-    qreal m_lastPinchScale = 1.0;
-    qreal m_zoomAccum
-        = 0.0; // accumulate pinch/native zoom deltas to trigger steps
-    qreal m_scrollAccumY
-        = 0.0; // accumulate trackpad scroll to trigger page flips
-    bool m_inNativeGesture{
-        false}; // tracks if we're in a native gesture sequence
-
-    static constexpr qreal ZOOM_STEP_TRIGGER
-        = 0.12; // ~12% “gesture energy” per step (tweak)
-    static constexpr qreal PAGE_SCROLL_TRIGGER
-        = 900.0; // pixels of trackpad scroll per page (tweak)
-
-    // Utility
-    QPointF scenePosFromEvent(QMouseEvent *event) const
-    {
-        return mapToScene(event->pos());
-    }
-
-    // Overlay scrollbar state (packed for cache efficiency)
-    QTimer m_scrollbar_hide_timer;
-    QScrollBar *m_activeScrollbar{nullptr};
-    int m_scrollbarSize{12};
-    bool m_autoHide{false};
-    bool m_scrollbarsVisible{false};
-    bool m_vbarEnabled{true};
-    bool m_hbarEnabled{true};
-    bool m_is_active{false};
-    bool m_is_portal{false};
-    static constexpr int SCROLLBAR_MARGIN = 2;
+    qreal m_lastPinchScale                           = 1.0;
+    // accumulate pinch/native zoom deltas to trigger steps
+    qreal m_zoomAccum                                = 0.0;
+    // accumulate trackpad scroll to trigger page flips
+    qreal m_scrollAccumY                             = 0.0;
+    // tracks if we're in a native gesture sequence
+    bool m_inNativeGesture                           = false;
+    QScrollBar *m_activeScrollbar                    = nullptr;
+    int m_scrollbarSize                              = 12;
+    bool m_autoHide                                  = false;
+    bool m_scrollbarsVisible                         = false;
+    bool m_vbarEnabled                               = true;
+    bool m_hbarEnabled                               = true;
+    bool m_is_active                                 = false;
+    bool m_is_portal                                 = false;
     const Config &m_config;
     QRectF m_visual_line_rect;
+    QTimer m_scrollbar_hide_timer;
 
     friend class DocumentView;
 };
