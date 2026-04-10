@@ -1628,8 +1628,9 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
     if (argparser.is_used("version"))
     {
         QTextStream out(stdout);
-        out << "Lektra version: " << APP_VERSION;
-        exit(0);
+        out << "Lektra version: " << APP_VERSION << Qt::endl;
+        QCoreApplication::exit(0);
+        return;
     }
 
     if (argparser.is_used("check-config"))
@@ -1643,14 +1644,14 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
         }
         catch (const std::exception &e)
         {
-            qWarning() << tr(
-                "No config file path provided, using default path:")
-                       << m_config_file_path;
+            qDebug() << tr("No config file path provided, using default path:")
+                     << m_config_file_path;
             config_file_path = m_config_file_path;
         }
 
         checkConfigFile(config_file_path);
-        exit(0);
+        QCoreApplication::exit(0);
+        return;
     }
 
     if (argparser.is_used("list-commands"))
@@ -1678,7 +1679,8 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
             out << line << Qt::endl;
         }
 
-        exit(0);
+        QCoreApplication::exit(0);
+        return;
     }
 
     if (argparser.is_used("config"))
@@ -5943,13 +5945,15 @@ Lektra::ToggleThumbnailPanel() noexcept
 // known keys. Print warnings for any issues found. Return true if no issues
 // found, false otherwise.
 bool
-Lektra::checkConfigFile(const QString &path) const noexcept
+Lektra::checkConfigFile(const QString &path) noexcept
 {
+    QTextStream out(stdout), err(stderr);
+    initCommands();
 
     bool ok         = true;
     const auto warn = [&](const QString &msg)
     {
-        std::cerr << "[lektra --check-config] " << msg.toStdString() << "\n";
+        err << "[lektra --check-config] " << msg << "\n";
         ok = false;
     };
 
@@ -5969,7 +5973,8 @@ Lektra::checkConfigFile(const QString &path) const noexcept
         warn(QString(tr("TOML parse error: %1")).arg(e.what()));
         return false;
     }
-    std::cout << "[lektra --check-config] TOML syntax OK\n";
+
+    out << "[lektra --check-config] TOML syntax OK" << Qt::endl;
 
     static const QHash<QString, QSet<QString>> knownKeys = {
         {"page", {"bg", "fg"}},
@@ -6000,7 +6005,7 @@ Lektra::checkConfigFile(const QString &path) const noexcept
         {"statusbar",
          {"visible", "padding", "show_progress", "file_name_only",
           "show_file_info", "show_page_number", "show_mode",
-          "show_session_name"}},
+          "show_session_name", "components"}},
 
         {"layout", {"mode", "initial_fit", "auto_resize", "spacing"}},
 
@@ -6028,10 +6033,11 @@ Lektra::checkConfigFile(const QString &path) const noexcept
 
         {"outline",
          {"width", "height", "border", "alternating_row_color", "shadow",
-          "indent_width", "show_page_numbers"}},
+          "indent_width", "show_page_numbers", "flat_menu"}},
 
         {"highlight_search",
-         {"width", "height", "border", "alternating_row_color", "shadow"}},
+         {"width", "height", "border", "alternating_row_color", "shadow",
+          "flat_menu"}},
 
         {"search",
          {"highlight_matches", "progressive", "match_color", "index_color",
@@ -6053,6 +6059,9 @@ Lektra::checkConfigFile(const QString &path) const noexcept
           "auto_reload", "recent_files", "num_recent_files", "initial_mode",
           "open_last_visited", "file_name_only", "cache_pages"}},
 
+        {"keybindings", {}},
+        {"mousebindings", {"pan", "portal", "synctex_jump", "preview"}},
+
     };
 
     for (auto &[key, _] : toml)
@@ -6072,15 +6081,23 @@ Lektra::checkConfigFile(const QString &path) const noexcept
         for (auto &[k, _] : *table->as_table())
         {
             const QString field = QString::fromStdString(std::string(k.str()));
-            if (!knownKeys[section].contains(field))
+            if (section == "keybindings")
+            {
+                if (!m_command_manager->hasCommand(field))
+                    warn(QString(tr("Unknown command '%1' in [keybindings]"))
+                             .arg(field));
+            }
+            else if (!knownKeys[section].contains(field))
+            {
                 warn(QString(tr("Unknown key '%1' in [%2]"))
                          .arg(field, section));
+            }
         }
     }
 
     if (ok)
-        qInfo() << tr("[lektra --check-config] All keys valid. Config looks "
-                      "good!\n");
+        out << tr("[lektra --check-config] All keys valid. Config looks good!")
+            << Qt::endl;
 
     return ok;
 }

@@ -46,6 +46,18 @@ public:
         return names;
     }
 
+    const bool hasCommand(const QString &name) const noexcept
+    {
+        for (const auto &cmd : m_commands)
+        {
+            if (cmd.name == name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     const Command *find(const QString &name) const noexcept
     {
         for (const auto &cmd : m_commands)

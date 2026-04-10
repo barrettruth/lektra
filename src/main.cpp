@@ -3,8 +3,6 @@
 #include "argparse.hpp"
 
 #include <QApplication>
-#include <QLocalServer>
-#include <QLocalSocket>
 #include <QLocale>
 #include <QTranslator>
 #include <fcntl.h>
@@ -182,8 +180,9 @@ main(int argc, char *argv[])
     bool foreground   = program.is_used("--foreground");
     bool listCommands = program.is_used("--list-commands");
     bool check_config = program.is_used("--check-config");
+    bool showVersion  = program.is_used("version");
 
-    if (!(foreground || listCommands || check_config))
+    if (!(foreground || listCommands || check_config || showVersion))
         return spawn_detached_child(argc, argv);
 
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
@@ -225,5 +224,9 @@ main(int argc, char *argv[])
 
     Lektra d;
     d.Read_args_parser(program);
-    app.exec();
+
+    if (listCommands || check_config || showVersion)
+        return 0;
+
+    return app.exec();
 }

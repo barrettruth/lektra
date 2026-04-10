@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+- Fix `--check-config` not working with `[keybindings]`, `[mousebindings]` sections. ([@lineick](https://github.com/lineick))
 - Don't null out the statusbar item spacings which caused the statusbar items to have 0 padding and look weird.
 - Fix `ColorDialog` not showing up the colored buttons.
 - Make `RecentFilesPicker` be flat structured by default instead of hierarchical (it makes more sense to have flat structure)
