@@ -39,6 +39,9 @@ static inline QString
 supportedFormats()
 {
     return "PDF (*.pdf);;"
+#ifdef HAS_DJVU
+           "DjVu (*.djvu *.djv);;"
+#endif
            "XPS (*.oxps *.xps);;"
            "CBZ (*.cbz *.cbt);;"
            "FB2 (*.fbz);;"
@@ -47,9 +50,8 @@ supportedFormats()
            "Mobi (*.mobi);;"
            "Images (*.jpg *.jpeg *.png *.tiff *.tif);;"
            "SVG (*.svg);;"
-#ifdef HAS_DJVU
-           "DjVu (*.djvu *.djv);;"
-#endif
+           "PNG (*.png);;"
+           "JPG (*.jpg *.jpeg);;"
            "All Files (*.*)";
 }
 
@@ -330,15 +332,6 @@ Lektra::initMenubar() noexcept
 
     m_viewMenu->addSeparator();
     m_toggleMenu = m_viewMenu->addMenu(tr("Show/Hide"));
-
-#ifdef ENABLE_LLM_SUPPORT
-    m_actionToggleLLMWidget = m_toggleMenu->addAction(
-        tr("LLM Widget\t%1").arg(m_config.keybinds["llm_widget"]), this,
-        &Lektra::ToggleLLMWidget);
-    m_actionToggleLLMWidget->setCheckable(true);
-
-    m_actionToggleLLMWidget->setChecked(m_config.llm_widget.visible);
-#endif
 
     m_actionCommandPicker = m_toggleMenu->addAction(
         tr("Command Picker\t%1").arg(m_config.keybinds["command_picker"]), this,
@@ -1013,24 +1006,6 @@ Lektra::initConfig() noexcept
         set(highlight_search["flat_menu"], m_config.highlight_search.flat_menu);
     }
 
-#ifdef ENABLE_LLM_SUPPORT
-    // LLM Widget
-    if (auto llm_widget = toml["llm_widget"])
-    {
-        set(llm_widget["panel_position"], m_config.llm_widget.panel_position);
-        set(llm_widget["panel_width"], m_config.llm_widget.panel_width);
-        set(llm_widget["visible"], m_config.llm_widget.visible);
-    }
-
-    // LLM
-    if (auto llm = toml["llm"])
-    {
-        set(llm["provider"], m_config.llm.provider);
-        set(llm["model"], m_config.llm.model);
-        set(llm["max_tokens"], m_config.llm.max_tokens);
-    }
-#endif
-
     // Search
     if (auto search = toml["search"])
     {
@@ -1376,34 +1351,7 @@ Lektra::initGui() noexcept
     m_message_bar = new MessageBar(this);
     m_tab_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-#ifdef ENABLE_LLM_SUPPORT
-    m_llm_widget = new LLMWidget(m_config, this);
-    m_llm_widget->setVisible(m_config.llm_widget.visible);
-    connect(m_llm_widget, &LLMWidget::actionRequested, this,
-            [this](const QString &action, const QStringList &args)
-    {
-        if (action.isEmpty() || action == QStringLiteral("noop"))
-            return;
-        auto *it = m_command_manager->find(action);
-        it->action(args);
-    });
-
-    QSplitter *llm_splitter = new QSplitter(Qt::Horizontal, this);
-    llm_splitter->addWidget(m_tab_widget);
-    llm_splitter->addWidget(m_llm_widget);
-    llm_splitter->setStretchFactor(0, 1);
-    llm_splitter->setStretchFactor(1, 0);
-    const int llmWidth = m_config.llm_widget.panel_width;
-    llm_splitter->setSizes({this->width() - llmWidth, llmWidth});
-    llm_splitter->setFrameShape(QFrame::NoFrame);
-    llm_splitter->setFrameShadow(QFrame::Plain);
-    llm_splitter->setHandleWidth(1);
-    llm_splitter->setContentsMargins(0, 0, 0, 0);
-    llm_splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    m_layout->addWidget(llm_splitter, 1);
-#else
     m_layout->addWidget(m_tab_widget, 1);
-#endif
 
     m_tab_widget->setTabsClosable(m_config.tabs.closable);
     m_tab_widget->setMovable(m_config.tabs.movable);
@@ -4218,11 +4166,6 @@ Lektra::initCommands() noexcept
         "toggle_comment_markers", tr("Toggle comment markers"),
         [this](const QStringList &) { ToggleCommentMarkers(); });
 
-#ifdef ENABLE_LLM_SUPPORT
-    m_command_manager->reg("llm_widget", tr("Toggle LLM assistant widget"),
-                           [this](const QStringList &) { ToggleLLMWidget(); });
-#endif
-
     // Link hints
     m_command_manager->reg("link_hint_visit",
                            tr("Open link using keyboard hint"),
@@ -5066,14 +5009,6 @@ Lektra::Show_command_picker() noexcept
 
     m_command_picker->launch();
 }
-
-#ifdef ENABLE_LLM_SUPPORT
-void
-Lektra::ToggleLLMWidget() noexcept
-{
-    m_llm_widget->setVisible(!m_llm_widget->isVisible());
-}
-#endif
 
 void
 Lektra::showTutorialFile() noexcept
@@ -6118,11 +6053,6 @@ Lektra::checkConfigFile(const QString &path) const noexcept
           "auto_reload", "recent_files", "num_recent_files", "initial_mode",
           "open_last_visited", "file_name_only", "cache_pages"}},
 
-#ifdef ENABLE_LLM_SUPPORT
-        {"llm_widget", {"visible", "panel_position", "panel_width"}},
-
-        {"llm", {"provider", "model", "max_tokens"}},
-#endif
     };
 
     for (auto &[key, _] : toml)

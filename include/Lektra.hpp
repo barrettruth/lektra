@@ -9,6 +9,7 @@
 #include "MessageBar.hpp"
 #include "TabBar.hpp"
 // #include "OutlineWidget.hpp"
+#include "CommandManager.hpp"
 #include "OutlinePicker.hpp"
 #include "RecentFilesPicker.hpp"
 #include "RecentFilesStore.hpp"
@@ -17,10 +18,6 @@
 #include "Statusbar.hpp"
 #include "TabWidget.hpp"
 #include "argparse.hpp"
-#ifdef ENABLE_LLM_SUPPORT
-    #include "LLM/LLMWidget.hpp"
-#endif
-#include "CommandManager.hpp"
 
 #include <QActionGroup>
 #include <QApplication>
@@ -177,10 +174,6 @@ public:
     void Show_recent_files_picker() noexcept;
     void Copy_page_image() noexcept;
     void Reopen_last_closed_file() noexcept;
-
-#ifdef ENABLE_LLM_SUPPORT
-    void ToggleLLMWidget() noexcept;
-#endif
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -361,9 +354,6 @@ private:
     QAction *m_actionSetMark{nullptr};
     QAction *m_actionGotoMark{nullptr};
     QAction *m_actionDeleteMark{nullptr};
-#ifdef ENABLE_LLM_SUPPORT
-    QAction *m_actionToggleLLMWidget{nullptr};
-#endif
     Config m_config;
     float m_dpr{1.0f};
     QMap<QString, float> m_screen_dpr_map; // DPR per screen
@@ -404,9 +394,4 @@ private:
 
     std::unique_ptr<MarkManager> m_marks_manager;
     std::unique_ptr<CommandManager> m_command_manager;
-
-#ifdef ENABLE_LLM_SUPPORT
-    // LLM Support
-    LLMWidget *m_llm_widget{nullptr};
-#endif
 };

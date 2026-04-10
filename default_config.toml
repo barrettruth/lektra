@@ -207,15 +207,6 @@ page_history_limit = 100
 # [misc]
 # color_dialog_colors = [ "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF" ]
 
-# Works only if compiled with LLM support
-# [llm]
-# provider = "ollama"
-# model = "llama3.2:3b"
-# max_tokens = 512
-
-# [scripts] (Work in progress, not implemented yet)
-# name_of_script = "path_to_shell_script"
-
 [keybindings]
 load_defaults = true
 command_palette = [ ":", "Ctrl+P" ]

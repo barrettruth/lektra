@@ -14,12 +14,6 @@
     pan = "Alt+LeftButton"
     ```
 
-- Ability to have configurable colors in the Color Dialog
-
-```toml
-[misc]
-color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of colors
-```
 
 ### Bug Fixes
 
@@ -30,6 +24,7 @@ color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of color
 
 ### Breaking Changes
 
+- Remove LLM support (current implementation was not good), but it will be added back in the future with a better implementation.
 - Removed shell scripts support as it was never implemented and there are no current plans to implement it.
 
 #### Config changes:
@@ -41,6 +36,13 @@ color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of color
         - `[statusbar.component.zoom]` for the zoom indicator component settings
         - `[statusbar.component.pagenumber]` for the split indicator component settings
         - `[statusbar.component.progress]` for the link hint indicator component settings
+
+- Ability to have configurable colors in the Color Dialog
+
+```toml
+[misc]
+color_dialog_colors = [ "#FF500055", "#FF000055"] # Can have any number of colors
+```
 
 ## 0.6.9
 

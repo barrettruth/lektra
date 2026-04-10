@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(lektra VERSION 0.7.0 LANGUAGES CXX)
 
-option(ENABLE_LLM_SUPPORT "Enable LLM support for advanced features" OFF)
-
 include(GNUInstallDirs)
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -92,7 +90,7 @@ set_target_properties(mupdf_lib PROPERTIES
 )
 add_dependencies(mupdf_lib mupdf_external)
 
-find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent LinguistTools OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Core Concurrent LinguistTools OpenGLWidgets Network)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(DJVULIBRE ddjvuapi)
@@ -183,30 +181,6 @@ endif()
 if (DJVULIBRE_FOUND)
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_DJVU=1)
 endif()
-
-if (ENABLE_LLM_SUPPORT)
-    message(STATUS "LLM support enabled.")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_LLM_SUPPORT=1)
-
-    file(GLOB_RECURSE LEKTRA_LLM_HEADERS
-        CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/LLM/*.hpp
-    )
-
-    file(GLOB_RECURSE LEKTRA_LLM_SOURCES
-        CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/LLM/*.cpp
-    )
-    target_sources(${PROJECT_NAME} PRIVATE ${LEKTRA_LLM_SOURCES} ${LEKTRA_LLM_HEADERS}
-    )
-
-    find_package(CURL REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl)
-
-else()
-    message(STATUS "LLM support disabled.")
-endif()
-
 
 qt_add_resources(RESOURCES resources.qrc)
 
@@ -317,15 +291,6 @@ if(APPLE)
         )
     endforeach()
 
-    if(ENABLE_LLM_SUPPORT)
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/llm/role.txt"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/role.txt"
-            VERBATIM
-        )
-    endif()
-
 endif()
 
 # Install each .qm into translations/
@@ -342,7 +307,7 @@ endforeach()
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent Qt6::OpenGLWidgets
+    Qt6::Gui Qt6::Widgets Qt6::Core Qt6::Concurrent Qt6::OpenGLWidgets Qt6::Network
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
@@ -390,7 +355,3 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.pdf
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra.1 DESTINATION share/man/man1)
 # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-config.5 DESTINATION share/man/man5)
 # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-commands.7 DESTINATION share/man/man7)
-
-if(ENABLE_LLM_SUPPORT)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/llm/role.txt DESTINATION share/${PROJECT_NAME}/)
-endif()

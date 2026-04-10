@@ -1,14 +1,7 @@
 #!/bin/sh
-# Lektra configuration script
-# This script is used to configure Lektra for the current system.
-# I need flags that specify turning on or off features, which are flags that are passed to cmake
-# --build-type, --with-llm, --without-llm
-# This script should be run from the root of the Lektra repository.
-
 set -e
 
 BUILD_TYPE="Release"
-LLM="OFF"
 PREFIX="/usr"
 
 print_help() {
@@ -19,13 +12,11 @@ Options:
     --prefix PATH           Set the installation prefix [default: /usr]
     --build-type TYPE       Set the CMake build type [default: Release]
                             Valid values: Debug, Release, RelWithDebInfo
-    --with-llm              Enable LLM support
-    --without-llm           Disable LLM support [default]
     -h, --help              Show this help message and exit
 
 Examples:
     ./configure
-    ./configure --prefix /usr/local --build-type Release --with-llm
+    ./configure --prefix /usr/local --build-type Release
 EOF
 }
 
@@ -35,14 +26,6 @@ while [ "$#" -gt 0 ]; do
         --build-type)
             BUILD_TYPE="$2"
             shift 2
-            ;;
-        --with-llm)
-            LLM="ON"
-            shift 1
-            ;;
-        --without-llm)
-            LLM="OFF"
-            shift 1
             ;;
         --prefix)
             PREFIX="$2"
@@ -77,7 +60,6 @@ fi
 # Run cmake with the specified options
 cmake -S . -B build \
   -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
-  -DENABLE_LLM_SUPPORT="$LLM" \
   -DCMAKE_INSTALL_PREFIX="$PREFIX"
 
 cmake --build build

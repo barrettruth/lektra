@@ -369,363 +369,358 @@
 <context>
     <name>Lektra</name>
     <message>
-        <location filename="../src/Lektra.cpp" line="179"/>
+        <location filename="../src/Lektra.cpp" line="181"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="182"/>
+        <location filename="../src/Lektra.cpp" line="184"/>
         <source>Open File	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="185"/>
+        <location filename="../src/Lektra.cpp" line="187"/>
         <source>Open File In VSplit	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="189"/>
+        <location filename="../src/Lektra.cpp" line="191"/>
         <source>Open File In HSplit	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="193"/>
-        <location filename="../src/Lektra.cpp" line="5726"/>
+        <location filename="../src/Lektra.cpp" line="195"/>
+        <location filename="../src/Lektra.cpp" line="5665"/>
         <source>Recent Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="196"/>
+        <location filename="../src/Lektra.cpp" line="198"/>
         <source>File Properties	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="200"/>
+        <location filename="../src/Lektra.cpp" line="202"/>
         <source>Open Containing Folder	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="206"/>
+        <location filename="../src/Lektra.cpp" line="208"/>
         <source>Save File	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="210"/>
+        <location filename="../src/Lektra.cpp" line="212"/>
         <source>Save As File	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="213"/>
+        <location filename="../src/Lektra.cpp" line="215"/>
         <source>Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="216"/>
+        <location filename="../src/Lektra.cpp" line="218"/>
         <source>Save	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="219"/>
+        <location filename="../src/Lektra.cpp" line="221"/>
         <source>Save As	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="222"/>
+        <location filename="../src/Lektra.cpp" line="224"/>
         <source>Load	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="228"/>
+        <location filename="../src/Lektra.cpp" line="230"/>
         <source>Close File	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="232"/>
+        <location filename="../src/Lektra.cpp" line="234"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="234"/>
+        <location filename="../src/Lektra.cpp" line="236"/>
         <source>&amp;Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="236"/>
+        <location filename="../src/Lektra.cpp" line="238"/>
         <source>Undo	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="238"/>
+        <location filename="../src/Lektra.cpp" line="240"/>
         <source>Redo	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="242"/>
+        <location filename="../src/Lektra.cpp" line="244"/>
         <source>Last Pages	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="246"/>
+        <location filename="../src/Lektra.cpp" line="248"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="248"/>
+        <location filename="../src/Lektra.cpp" line="250"/>
         <source>Fullscreen	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="254"/>
+        <location filename="../src/Lektra.cpp" line="256"/>
         <source>Zoom In	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="257"/>
+        <location filename="../src/Lektra.cpp" line="259"/>
         <source>Zoom Out	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="262"/>
+        <location filename="../src/Lektra.cpp" line="264"/>
         <source>Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="265"/>
+        <location filename="../src/Lektra.cpp" line="267"/>
         <source>Width	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="269"/>
+        <location filename="../src/Lektra.cpp" line="271"/>
         <source>Height	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="273"/>
+        <location filename="../src/Lektra.cpp" line="275"/>
         <source>Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="280"/>
+        <location filename="../src/Lektra.cpp" line="282"/>
         <source>Auto Fit	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="289"/>
+        <location filename="../src/Lektra.cpp" line="291"/>
         <source>Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="294"/>
+        <location filename="../src/Lektra.cpp" line="296"/>
         <source>Single Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="298"/>
+        <location filename="../src/Lektra.cpp" line="300"/>
         <source>Left to Right Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="303"/>
+        <location filename="../src/Lektra.cpp" line="305"/>
         <source>Top to Bottom Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="307"/>
+        <location filename="../src/Lektra.cpp" line="309"/>
         <source>Book	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="332"/>
+        <location filename="../src/Lektra.cpp" line="334"/>
         <source>Show/Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="336"/>
-        <source>LLM Widget	%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Lektra.cpp" line="344"/>
+        <location filename="../src/Lektra.cpp" line="337"/>
         <source>Command Picker	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="348"/>
+        <location filename="../src/Lektra.cpp" line="341"/>
         <source>Outline	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="352"/>
+        <location filename="../src/Lektra.cpp" line="345"/>
         <source>Highlight Annotation Search	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="357"/>
+        <location filename="../src/Lektra.cpp" line="350"/>
         <source>Menubar	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="363"/>
+        <location filename="../src/Lektra.cpp" line="356"/>
         <source>Tabs	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="369"/>
+        <location filename="../src/Lektra.cpp" line="362"/>
         <source>Statusbar	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="375"/>
+        <location filename="../src/Lektra.cpp" line="368"/>
         <source>Invert Color	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="382"/>
+        <location filename="../src/Lektra.cpp" line="375"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="384"/>
+        <location filename="../src/Lektra.cpp" line="377"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="390"/>
+        <location filename="../src/Lektra.cpp" line="383"/>
         <source>Region Selection	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="397"/>
+        <location filename="../src/Lektra.cpp" line="390"/>
         <source>Text Selection	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="403"/>
+        <location filename="../src/Lektra.cpp" line="396"/>
         <source>Text Highlight	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="409"/>
+        <location filename="../src/Lektra.cpp" line="402"/>
         <source>Annotate Rectangle	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="415"/>
+        <location filename="../src/Lektra.cpp" line="408"/>
         <source>Edit Annotations	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="421"/>
+        <location filename="../src/Lektra.cpp" line="414"/>
         <source>Annotate Popup	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="428"/>
+        <location filename="../src/Lektra.cpp" line="421"/>
         <source>Visual Line Mode	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="434"/>
+        <location filename="../src/Lektra.cpp" line="427"/>
         <source>None	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="473"/>
+        <location filename="../src/Lektra.cpp" line="466"/>
         <source>Encrypt Document	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="478"/>
+        <location filename="../src/Lektra.cpp" line="471"/>
         <source>Decrypt Document	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="483"/>
+        <location filename="../src/Lektra.cpp" line="476"/>
         <source>&amp;Navigation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="486"/>
+        <location filename="../src/Lektra.cpp" line="479"/>
         <source>StartPage	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="490"/>
+        <location filename="../src/Lektra.cpp" line="483"/>
         <source>Goto Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="494"/>
+        <location filename="../src/Lektra.cpp" line="487"/>
         <source>First Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="498"/>
+        <location filename="../src/Lektra.cpp" line="491"/>
         <source>Previous Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="502"/>
+        <location filename="../src/Lektra.cpp" line="495"/>
         <source>Next Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="505"/>
+        <location filename="../src/Lektra.cpp" line="498"/>
         <source>Last Page	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="509"/>
+        <location filename="../src/Lektra.cpp" line="502"/>
         <source>Previous Location	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="512"/>
+        <location filename="../src/Lektra.cpp" line="505"/>
         <source>Next Location	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="515"/>
+        <location filename="../src/Lektra.cpp" line="508"/>
         <source>Marks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="518"/>
+        <location filename="../src/Lektra.cpp" line="511"/>
         <source>Set Mark	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="522"/>
+        <location filename="../src/Lektra.cpp" line="515"/>
         <source>Goto Mark	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="526"/>
+        <location filename="../src/Lektra.cpp" line="519"/>
         <source>Delete Mark	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="530"/>
+        <location filename="../src/Lektra.cpp" line="523"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="532"/>
+        <location filename="../src/Lektra.cpp" line="525"/>
         <source>About	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="536"/>
+        <location filename="../src/Lektra.cpp" line="529"/>
         <source>Open Tutorial File	%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="573"/>
+        <location filename="../src/Lektra.cpp" line="566"/>
         <source>Error in configuration file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="574"/>
+        <location filename="../src/Lektra.cpp" line="567"/>
         <source>There are one or more error(s) in your config file:
 %1
 
@@ -733,1079 +728,1074 @@ Loading default config.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1331"/>
+        <location filename="../src/Lektra.cpp" line="1306"/>
         <source>%1 -&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1341"/>
+        <location filename="../src/Lektra.cpp" line="1316"/>
         <source>Shortcut conflict(s): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1345"/>
+        <location filename="../src/Lektra.cpp" line="1320"/>
         <source>Shortcut conflict(s): %1; and %2 more</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1590"/>
+        <location filename="../src/Lektra.cpp" line="1538"/>
         <source>Invalid mouse binding for action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1597"/>
+        <location filename="../src/Lektra.cpp" line="1545"/>
         <source>Empty action for mouse binding with trigger:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1615"/>
+        <location filename="../src/Lektra.cpp" line="1567"/>
         <source>Unknown action for mouse binding:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1694"/>
+        <location filename="../src/Lektra.cpp" line="1646"/>
         <source>No config file path provided, using default path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1791"/>
+        <location filename="../src/Lektra.cpp" line="1743"/>
         <source>Invalid --synctex-forward format. Expected file.pdf#file.tex:line:column</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1836"/>
+        <location filename="../src/Lektra.cpp" line="1788"/>
         <source>Unknown command from command line:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1949"/>
+        <location filename="../src/Lektra.cpp" line="1901"/>
         <source>Edit Last Pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="1950"/>
+        <location filename="../src/Lektra.cpp" line="1902"/>
         <source>Couldn&apos;t find the recent files data. Maybe `remember_last_visited` option is turned off in the config file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2006"/>
+        <location filename="../src/Lektra.cpp" line="1958"/>
         <source>Set Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2006"/>
+        <location filename="../src/Lektra.cpp" line="1958"/>
         <source>Enter zoom level (e.g. 1.5 for 150%):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2038"/>
-        <location filename="../src/Lektra.cpp" line="2044"/>
-        <location filename="../src/Lektra.cpp" line="2058"/>
+        <location filename="../src/Lektra.cpp" line="1990"/>
+        <location filename="../src/Lektra.cpp" line="1996"/>
+        <location filename="../src/Lektra.cpp" line="2010"/>
         <source>Goto Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2039"/>
+        <location filename="../src/Lektra.cpp" line="1991"/>
         <source>This document has no pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2044"/>
+        <location filename="../src/Lektra.cpp" line="1996"/>
         <source>Enter page number (1 to %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2059"/>
+        <location filename="../src/Lektra.cpp" line="2011"/>
         <source>Page %1 is out of range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2645"/>
+        <location filename="../src/Lektra.cpp" line="2597"/>
         <source>PDF Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2646"/>
-        <location filename="../src/Lektra.cpp" line="4083"/>
+        <location filename="../src/Lektra.cpp" line="2598"/>
+        <location filename="../src/Lektra.cpp" line="4035"/>
         <source>All Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2278"/>
-        <location filename="../src/Lektra.cpp" line="2434"/>
-        <location filename="../src/Lektra.cpp" line="5370"/>
-        <location filename="../src/Lektra.cpp" line="5989"/>
+        <location filename="../src/Lektra.cpp" line="2230"/>
+        <location filename="../src/Lektra.cpp" line="2386"/>
+        <location filename="../src/Lektra.cpp" line="5309"/>
+        <location filename="../src/Lektra.cpp" line="5928"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2279"/>
-        <location filename="../src/Lektra.cpp" line="2435"/>
-        <location filename="../src/Lektra.cpp" line="5371"/>
+        <location filename="../src/Lektra.cpp" line="2231"/>
+        <location filename="../src/Lektra.cpp" line="2387"/>
+        <location filename="../src/Lektra.cpp" line="5310"/>
         <source>The specified file does not exist:
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2644"/>
-        <location filename="../src/Lektra.cpp" line="2683"/>
+        <location filename="../src/Lektra.cpp" line="2596"/>
+        <location filename="../src/Lektra.cpp" line="2635"/>
         <source>Open File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2684"/>
+        <location filename="../src/Lektra.cpp" line="2636"/>
         <source>Unable to find %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2693"/>
+        <location filename="../src/Lektra.cpp" line="2645"/>
         <source>Failed to open file in new window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2772"/>
+        <location filename="../src/Lektra.cpp" line="2724"/>
         <source>Outline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2773"/>
+        <location filename="../src/Lektra.cpp" line="2725"/>
         <source>This document has no outline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2864"/>
+        <location filename="../src/Lektra.cpp" line="2816"/>
         <source>Toggle Text Highlight</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2865"/>
-        <location filename="../src/Lektra.cpp" line="2887"/>
-        <location filename="../src/Lektra.cpp" line="2901"/>
-        <location filename="../src/Lektra.cpp" line="2916"/>
+        <location filename="../src/Lektra.cpp" line="2817"/>
+        <location filename="../src/Lektra.cpp" line="2839"/>
+        <location filename="../src/Lektra.cpp" line="2853"/>
+        <location filename="../src/Lektra.cpp" line="2868"/>
         <source>Not a PDF file to annotate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2886"/>
+        <location filename="../src/Lektra.cpp" line="2838"/>
         <source>Toggle Annot Rect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2900"/>
+        <location filename="../src/Lektra.cpp" line="2852"/>
         <source>Toggle Annot Select</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="2915"/>
+        <location filename="../src/Lektra.cpp" line="2867"/>
         <source>Toggle Annot Popup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3267"/>
+        <location filename="../src/Lektra.cpp" line="3219"/>
         <source>Failed to open tab in new window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3301"/>
+        <location filename="../src/Lektra.cpp" line="3253"/>
         <source>Unsaved Changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3302"/>
+        <location filename="../src/Lektra.cpp" line="3254"/>
         <source>File %1 has unsaved changes. Do you want to save them?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3325"/>
+        <location filename="../src/Lektra.cpp" line="3277"/>
         <source>Confirm Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3326"/>
+        <location filename="../src/Lektra.cpp" line="3278"/>
         <source>Are you sure you want to quit Lektra?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3551"/>
+        <location filename="../src/Lektra.cpp" line="3503"/>
         <source>Open Location</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3553"/>
+        <location filename="../src/Lektra.cpp" line="3505"/>
         <source>File Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3556"/>
+        <location filename="../src/Lektra.cpp" line="3508"/>
         <source>Move Tab to New Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3563"/>
+        <location filename="../src/Lektra.cpp" line="3515"/>
         <source>Close Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3888"/>
-        <location filename="../src/Lektra.cpp" line="3897"/>
+        <location filename="../src/Lektra.cpp" line="3840"/>
+        <location filename="../src/Lektra.cpp" line="3849"/>
         <source>Load Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3889"/>
+        <location filename="../src/Lektra.cpp" line="3841"/>
         <source>No sessions found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3898"/>
+        <location filename="../src/Lektra.cpp" line="3850"/>
         <source>Session to load (existing sessions are listed): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3911"/>
-        <location filename="../src/Lektra.cpp" line="3921"/>
+        <location filename="../src/Lektra.cpp" line="3863"/>
+        <location filename="../src/Lektra.cpp" line="3873"/>
         <source>Session File Parse Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3922"/>
+        <location filename="../src/Lektra.cpp" line="3874"/>
         <source>Session file root is not an array</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3946"/>
+        <location filename="../src/Lektra.cpp" line="3898"/>
         <source>Open Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3947"/>
+        <location filename="../src/Lektra.cpp" line="3899"/>
         <source>Could not open session: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3961"/>
+        <location filename="../src/Lektra.cpp" line="3913"/>
         <source>Session Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3962"/>
+        <location filename="../src/Lektra.cpp" line="3914"/>
         <source>Unable to create sessions directory due to an unknown error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3981"/>
-        <location filename="../src/Lektra.cpp" line="3999"/>
-        <location filename="../src/Lektra.cpp" line="4058"/>
+        <location filename="../src/Lektra.cpp" line="3933"/>
+        <location filename="../src/Lektra.cpp" line="3951"/>
+        <location filename="../src/Lektra.cpp" line="4010"/>
         <source>Save Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="3982"/>
+        <location filename="../src/Lektra.cpp" line="3934"/>
         <source>No files in session to save the session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4000"/>
+        <location filename="../src/Lektra.cpp" line="3952"/>
         <source>Session name cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4010"/>
-        <location filename="../src/Lektra.cpp" line="4092"/>
+        <location filename="../src/Lektra.cpp" line="3962"/>
+        <location filename="../src/Lektra.cpp" line="4044"/>
         <source>Overwrite Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4011"/>
-        <location filename="../src/Lektra.cpp" line="4093"/>
+        <location filename="../src/Lektra.cpp" line="3963"/>
+        <location filename="../src/Lektra.cpp" line="4045"/>
         <source>Session named &quot;%1&quot; already exists. Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4059"/>
+        <location filename="../src/Lektra.cpp" line="4011"/>
         <source>Could not save session: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4074"/>
-        <location filename="../src/Lektra.cpp" line="4082"/>
-        <location filename="../src/Lektra.cpp" line="4107"/>
+        <location filename="../src/Lektra.cpp" line="4026"/>
+        <location filename="../src/Lektra.cpp" line="4034"/>
+        <location filename="../src/Lektra.cpp" line="4059"/>
         <source>Save As Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4075"/>
+        <location filename="../src/Lektra.cpp" line="4027"/>
         <source>Cannot save session as you are not currently in a session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4083"/>
+        <location filename="../src/Lektra.cpp" line="4035"/>
         <source>Lektra session files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4108"/>
+        <location filename="../src/Lektra.cpp" line="4060"/>
         <source>Failed to save session.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4135"/>
+        <location filename="../src/Lektra.cpp" line="4087"/>
         <source>Startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4137"/>
-        <location filename="../src/Lektra.cpp" line="4146"/>
+        <location filename="../src/Lektra.cpp" line="4089"/>
+        <location filename="../src/Lektra.cpp" line="4098"/>
         <source>Start Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4180"/>
+        <location filename="../src/Lektra.cpp" line="4132"/>
         <source>Copy current selection to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4183"/>
+        <location filename="../src/Lektra.cpp" line="4135"/>
         <source>Cancel and clear current selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4186"/>
+        <location filename="../src/Lektra.cpp" line="4138"/>
         <source>Reselect the last text selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4190"/>
+        <location filename="../src/Lektra.cpp" line="4142"/>
         <source>Toggle thumbnail panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4194"/>
+        <location filename="../src/Lektra.cpp" line="4146"/>
         <source>Toggle presentation mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4197"/>
+        <location filename="../src/Lektra.cpp" line="4149"/>
         <source>Toggle fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4199"/>
+        <location filename="../src/Lektra.cpp" line="4151"/>
         <source>Open command palette</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4202"/>
+        <location filename="../src/Lektra.cpp" line="4154"/>
         <source>Toggle tab bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4204"/>
+        <location filename="../src/Lektra.cpp" line="4156"/>
         <source>Toggle menu bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4206"/>
+        <location filename="../src/Lektra.cpp" line="4158"/>
         <source>Toggle status bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4208"/>
+        <location filename="../src/Lektra.cpp" line="4160"/>
         <source>Toggle focus mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4210"/>
+        <location filename="../src/Lektra.cpp" line="4162"/>
         <source>Toggle visual line mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4214"/>
+        <location filename="../src/Lektra.cpp" line="4166"/>
         <source>Toggle comment markers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4218"/>
-        <source>Toggle LLM assistant widget</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Lektra.cpp" line="4224"/>
+        <location filename="../src/Lektra.cpp" line="4171"/>
         <source>Open link using keyboard hint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4227"/>
+        <location filename="../src/Lektra.cpp" line="4174"/>
         <source>Copy link URL using keyboard hint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4231"/>
+        <location filename="../src/Lektra.cpp" line="4178"/>
         <source>Go to first page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4233"/>
+        <location filename="../src/Lektra.cpp" line="4180"/>
         <source>Go to last page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4235"/>
+        <location filename="../src/Lektra.cpp" line="4182"/>
         <source>Go to next page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4237"/>
+        <location filename="../src/Lektra.cpp" line="4184"/>
         <source>Go to previous page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4239"/>
+        <location filename="../src/Lektra.cpp" line="4186"/>
         <source>Jump to a specific page number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4245"/>
+        <location filename="../src/Lektra.cpp" line="4192"/>
         <source>Set a named mark at current position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4247"/>
+        <location filename="../src/Lektra.cpp" line="4194"/>
         <source>Delete a named mark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4250"/>
+        <location filename="../src/Lektra.cpp" line="4197"/>
         <source>Jump to a named mark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4254"/>
-        <location filename="../src/Lektra.cpp" line="4262"/>
+        <location filename="../src/Lektra.cpp" line="4201"/>
+        <location filename="../src/Lektra.cpp" line="4209"/>
         <source>Scroll down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4256"/>
-        <location filename="../src/Lektra.cpp" line="4265"/>
+        <location filename="../src/Lektra.cpp" line="4203"/>
+        <location filename="../src/Lektra.cpp" line="4212"/>
         <source>Scroll up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4258"/>
+        <location filename="../src/Lektra.cpp" line="4205"/>
         <source>Scroll left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4260"/>
+        <location filename="../src/Lektra.cpp" line="4207"/>
         <source>Scroll right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4270"/>
+        <location filename="../src/Lektra.cpp" line="4217"/>
         <source>Rotate page clockwise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4273"/>
+        <location filename="../src/Lektra.cpp" line="4220"/>
         <source>Rotate page counter-clockwise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4277"/>
+        <location filename="../src/Lektra.cpp" line="4224"/>
         <source>Go back in location history</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4280"/>
+        <location filename="../src/Lektra.cpp" line="4227"/>
         <source>Go forward in location history</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4284"/>
+        <location filename="../src/Lektra.cpp" line="4231"/>
         <source>Zoom in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4286"/>
+        <location filename="../src/Lektra.cpp" line="4233"/>
         <source>Zoom out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4288"/>
+        <location filename="../src/Lektra.cpp" line="4235"/>
         <source>Reset zoom to default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4290"/>
+        <location filename="../src/Lektra.cpp" line="4237"/>
         <source>Set zoom to a specific level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4294"/>
+        <location filename="../src/Lektra.cpp" line="4241"/>
         <source>Split view horizontally</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4296"/>
+        <location filename="../src/Lektra.cpp" line="4243"/>
         <source>Split view vertically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4298"/>
+        <location filename="../src/Lektra.cpp" line="4245"/>
         <source>Close current split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4300"/>
+        <location filename="../src/Lektra.cpp" line="4247"/>
         <source>Focus split to the right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4303"/>
+        <location filename="../src/Lektra.cpp" line="4250"/>
         <source>Focus split to the left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4305"/>
+        <location filename="../src/Lektra.cpp" line="4252"/>
         <source>Focus split above</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4307"/>
+        <location filename="../src/Lektra.cpp" line="4254"/>
         <source>Focus split below</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4310"/>
+        <location filename="../src/Lektra.cpp" line="4257"/>
         <source>Close all splits except current</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4314"/>
+        <location filename="../src/Lektra.cpp" line="4261"/>
         <source>Create or focus portal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4319"/>
+        <location filename="../src/Lektra.cpp" line="4266"/>
         <source>Open file in new tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4328"/>
+        <location filename="../src/Lektra.cpp" line="4275"/>
         <source>Open file in vertical split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4332"/>
+        <location filename="../src/Lektra.cpp" line="4279"/>
         <source>Open file in horizontal split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4335"/>
+        <location filename="../src/Lektra.cpp" line="4282"/>
         <source>Open file (do what I mean)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4338"/>
+        <location filename="../src/Lektra.cpp" line="4285"/>
         <source>Close current file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4341"/>
+        <location filename="../src/Lektra.cpp" line="4288"/>
         <source>Save current file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4344"/>
+        <location filename="../src/Lektra.cpp" line="4291"/>
         <source>Save current file as a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4346"/>
+        <location filename="../src/Lektra.cpp" line="4293"/>
         <source>Encrypt current document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4348"/>
+        <location filename="../src/Lektra.cpp" line="4295"/>
         <source>Decrypt current document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4350"/>
+        <location filename="../src/Lektra.cpp" line="4297"/>
         <source>Reload current file from disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4352"/>
+        <location filename="../src/Lektra.cpp" line="4299"/>
         <source>Show file properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4354"/>
+        <location filename="../src/Lektra.cpp" line="4301"/>
         <source>Show recently opened files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4360"/>
+        <location filename="../src/Lektra.cpp" line="4307"/>
         <source>Toggle annotation select mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4363"/>
+        <location filename="../src/Lektra.cpp" line="4310"/>
         <source>Toggle annotation popup mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4366"/>
+        <location filename="../src/Lektra.cpp" line="4313"/>
         <source>Toggle rectangle annotation mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4369"/>
+        <location filename="../src/Lektra.cpp" line="4316"/>
         <source>Toggle text highlight mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4371"/>
+        <location filename="../src/Lektra.cpp" line="4318"/>
         <source>Toggle none interaction mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4376"/>
+        <location filename="../src/Lektra.cpp" line="4323"/>
         <source>Switch to text selection mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4379"/>
+        <location filename="../src/Lektra.cpp" line="4326"/>
         <source>Switch to region selection mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4383"/>
+        <location filename="../src/Lektra.cpp" line="4330"/>
         <source>Fit page to window width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4385"/>
+        <location filename="../src/Lektra.cpp" line="4332"/>
         <source>Fit page to window height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4387"/>
+        <location filename="../src/Lektra.cpp" line="4334"/>
         <source>Fit entire page in window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4389"/>
+        <location filename="../src/Lektra.cpp" line="4336"/>
         <source>Toggle automatic resize to fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4393"/>
+        <location filename="../src/Lektra.cpp" line="4340"/>
         <source>Save current session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4396"/>
+        <location filename="../src/Lektra.cpp" line="4343"/>
         <source>Save current session under a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4398"/>
+        <location filename="../src/Lektra.cpp" line="4345"/>
         <source>Load a saved session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4402"/>
+        <location filename="../src/Lektra.cpp" line="4349"/>
         <source>Close all tabs to the left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4405"/>
+        <location filename="../src/Lektra.cpp" line="4352"/>
         <source>Close all tabs to the right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4408"/>
+        <location filename="../src/Lektra.cpp" line="4355"/>
         <source>Close all tabs except current</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4410"/>
+        <location filename="../src/Lektra.cpp" line="4357"/>
         <source>Move current tab right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4412"/>
+        <location filename="../src/Lektra.cpp" line="4359"/>
         <source>Move current tab left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4414"/>
+        <location filename="../src/Lektra.cpp" line="4361"/>
         <source>Switch to first tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4416"/>
+        <location filename="../src/Lektra.cpp" line="4363"/>
         <source>Switch to last tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4418"/>
+        <location filename="../src/Lektra.cpp" line="4365"/>
         <source>Switch to next tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4420"/>
+        <location filename="../src/Lektra.cpp" line="4367"/>
         <source>Switch to previous tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4422"/>
+        <location filename="../src/Lektra.cpp" line="4369"/>
         <source>Close current tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4424"/>
+        <location filename="../src/Lektra.cpp" line="4371"/>
         <source>Go to tab by number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4426"/>
+        <location filename="../src/Lektra.cpp" line="4373"/>
         <source>Switch to tab 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4428"/>
+        <location filename="../src/Lektra.cpp" line="4375"/>
         <source>Switch to tab 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4430"/>
+        <location filename="../src/Lektra.cpp" line="4377"/>
         <source>Switch to tab 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4432"/>
+        <location filename="../src/Lektra.cpp" line="4379"/>
         <source>Switch to tab 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4434"/>
+        <location filename="../src/Lektra.cpp" line="4381"/>
         <source>Switch to tab 5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4436"/>
+        <location filename="../src/Lektra.cpp" line="4383"/>
         <source>Switch to tab 6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4438"/>
+        <location filename="../src/Lektra.cpp" line="4385"/>
         <source>Switch to tab 7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4440"/>
+        <location filename="../src/Lektra.cpp" line="4387"/>
         <source>Switch to tab 8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4442"/>
+        <location filename="../src/Lektra.cpp" line="4389"/>
         <source>Switch to tab 9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4446"/>
+        <location filename="../src/Lektra.cpp" line="4393"/>
         <source>Open document outline picker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4449"/>
+        <location filename="../src/Lektra.cpp" line="4396"/>
         <source>Search within highlights</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4453"/>
+        <location filename="../src/Lektra.cpp" line="4400"/>
         <source>Search annotation comments</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4457"/>
+        <location filename="../src/Lektra.cpp" line="4404"/>
         <source>Search document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4459"/>
+        <location filename="../src/Lektra.cpp" line="4406"/>
         <source>Search document using regex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4463"/>
+        <location filename="../src/Lektra.cpp" line="4410"/>
         <source>Search from current position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4465"/>
+        <location filename="../src/Lektra.cpp" line="4412"/>
         <source>Jump to next search result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4467"/>
+        <location filename="../src/Lektra.cpp" line="4414"/>
         <source>Jump to previous search result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4470"/>
+        <location filename="../src/Lektra.cpp" line="4417"/>
         <source>Search with inline query argument</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4473"/>
+        <location filename="../src/Lektra.cpp" line="4420"/>
         <source>Cancel current search and clear highlights</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4477"/>
+        <location filename="../src/Lektra.cpp" line="4424"/>
         <source>Single page layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4481"/>
+        <location filename="../src/Lektra.cpp" line="4428"/>
         <source>Horizontal (left to right) layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4485"/>
+        <location filename="../src/Lektra.cpp" line="4432"/>
         <source>Vertical (top to bottom) layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4488"/>
+        <location filename="../src/Lektra.cpp" line="4435"/>
         <source>Book (two page spread) layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4493"/>
+        <location filename="../src/Lektra.cpp" line="4440"/>
         <source>Show the preview window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4502"/>
+        <location filename="../src/Lektra.cpp" line="4449"/>
         <source>Open configuration file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4505"/>
+        <location filename="../src/Lektra.cpp" line="4452"/>
         <source>Set device pixel ratio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4508"/>
+        <location filename="../src/Lektra.cpp" line="4455"/>
         <source>Open folder containing current file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4510"/>
+        <location filename="../src/Lektra.cpp" line="4457"/>
         <source>Undo last action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4512"/>
+        <location filename="../src/Lektra.cpp" line="4459"/>
         <source>Redo last undone action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4515"/>
+        <location filename="../src/Lektra.cpp" line="4462"/>
         <source>Highlight current text selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4518"/>
+        <location filename="../src/Lektra.cpp" line="4465"/>
         <source>Toggle inverted colour rendering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4521"/>
+        <location filename="../src/Lektra.cpp" line="4468"/>
         <source>Re-show the last jump marker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4524"/>
+        <location filename="../src/Lektra.cpp" line="4471"/>
         <source>Reopen last closed file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4526"/>
+        <location filename="../src/Lektra.cpp" line="4473"/>
         <source>Copy current page as image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4529"/>
+        <location filename="../src/Lektra.cpp" line="4476"/>
         <source>Run debug command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4534"/>
+        <location filename="../src/Lektra.cpp" line="4481"/>
         <source>Show startup screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4537"/>
+        <location filename="../src/Lektra.cpp" line="4484"/>
         <source>Open tutorial document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4539"/>
+        <location filename="../src/Lektra.cpp" line="4486"/>
         <source>Show about dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4554"/>
+        <location filename="../src/Lektra.cpp" line="4501"/>
         <source>Failed to trim recent files store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4566"/>
-        <location filename="../src/Lektra.cpp" line="4572"/>
+        <location filename="../src/Lektra.cpp" line="4513"/>
+        <location filename="../src/Lektra.cpp" line="4519"/>
         <source>Set DPR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4567"/>
+        <location filename="../src/Lektra.cpp" line="4514"/>
         <source>Enter the Device Pixel Ratio (DPR) value: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4572"/>
+        <location filename="../src/Lektra.cpp" line="4519"/>
         <source>Invalid DPR value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4636"/>
+        <location filename="../src/Lektra.cpp" line="4583"/>
         <source>Go to Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4637"/>
+        <location filename="../src/Lektra.cpp" line="4584"/>
         <source>Enter tab number: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4644"/>
+        <location filename="../src/Lektra.cpp" line="4591"/>
         <source>Invalid Tab Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4867"/>
+        <location filename="../src/Lektra.cpp" line="4814"/>
         <source>Search Not Supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="4868"/>
+        <location filename="../src/Lektra.cpp" line="4815"/>
         <source>The current document does not support text search.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5001"/>
+        <location filename="../src/Lektra.cpp" line="4948"/>
         <source>Select Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="6019"/>
+        <location filename="../src/Lektra.cpp" line="5958"/>
         <source>Config file not found at: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="6030"/>
+        <location filename="../src/Lektra.cpp" line="5969"/>
         <source>TOML parse error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="6130"/>
+        <location filename="../src/Lektra.cpp" line="6064"/>
         <source>Unknown section: [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="6142"/>
+        <location filename="../src/Lektra.cpp" line="6076"/>
         <source>Unknown key &apos;%1&apos; in [%2]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="6148"/>
+        <location filename="../src/Lektra.cpp" line="6082"/>
         <source>[lektra --check-config] All keys valid. Config looks good!
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5085"/>
+        <location filename="../src/Lektra.cpp" line="5024"/>
         <source>Show Tutorial File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5086"/>
+        <location filename="../src/Lektra.cpp" line="5025"/>
         <source>Tutorial file could not be found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5990"/>
+        <location filename="../src/Lektra.cpp" line="5929"/>
         <source>Config file not found at:
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5089"/>
+        <location filename="../src/Lektra.cpp" line="5028"/>
         <source>Not yet implemented for Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5727"/>
+        <location filename="../src/Lektra.cpp" line="5666"/>
         <source>No recent files found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5787"/>
+        <location filename="../src/Lektra.cpp" line="5726"/>
         <source>Reopen_last_file: file no longer exists:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5810"/>
-        <location filename="../src/Lektra.cpp" line="5815"/>
+        <location filename="../src/Lektra.cpp" line="5749"/>
+        <location filename="../src/Lektra.cpp" line="5754"/>
         <source>Set Mark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5811"/>
+        <location filename="../src/Lektra.cpp" line="5750"/>
         <source>Enter mark key (a-z for local, A-Z for global):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5816"/>
-        <location filename="../src/Lektra.cpp" line="5849"/>
-        <location filename="../src/Lektra.cpp" line="5881"/>
+        <location filename="../src/Lektra.cpp" line="5755"/>
+        <location filename="../src/Lektra.cpp" line="5788"/>
+        <location filename="../src/Lektra.cpp" line="5820"/>
         <source>Mark key cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5843"/>
-        <location filename="../src/Lektra.cpp" line="5848"/>
+        <location filename="../src/Lektra.cpp" line="5782"/>
+        <location filename="../src/Lektra.cpp" line="5787"/>
         <source>Delete Mark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5844"/>
+        <location filename="../src/Lektra.cpp" line="5783"/>
         <source>Mark to delete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5875"/>
-        <location filename="../src/Lektra.cpp" line="5880"/>
+        <location filename="../src/Lektra.cpp" line="5814"/>
+        <location filename="../src/Lektra.cpp" line="5819"/>
         <source>Goto Mark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Lektra.cpp" line="5875"/>
+        <location filename="../src/Lektra.cpp" line="5814"/>
         <source>Mark to go to:</source>
         <translation type="unfinished"></translation>
     </message>

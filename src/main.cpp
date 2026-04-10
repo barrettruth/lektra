@@ -3,6 +3,8 @@
 #include "argparse.hpp"
 
 #include <QApplication>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QLocale>
 #include <QTranslator>
 #include <fcntl.h>
