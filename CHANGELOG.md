@@ -4,7 +4,7 @@
 
 ### Features
 
-- Add `--new-window` command line argument to open files in a new window instead of a new tab in the existing window. 
+<!-- - Add `--new-window` command line argument to open files in a new window instead of a new tab in the existing window.  -->
 - Add "pan" mouse action in `[mousebindings]` section.
     Used for panning around the page my clicking and dragging the mouse
 
