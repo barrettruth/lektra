@@ -27,6 +27,8 @@
 
 ### Breaking Changes
 
+- Move `sessions` and `last_pages.json` file to `QStandardPaths::AppDataLocation` for better compliance with platform standards for application data storage
+  (previously stored in the `QStandardPaths::AppConfigLocation`, which is meant for configuration files).
 - Remove LLM support (current implementation was not good), but it will be added back in the future with a better implementation.
 - Removed shell scripts support as it was never implemented and there are no current plans to implement it.
 

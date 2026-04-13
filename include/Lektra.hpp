@@ -294,7 +294,7 @@ private:
         const argparse::ArgumentParser &argparser) noexcept;
     DocumentView *create_portal(DocumentView *sourceView,
                                 const QString &filePath) noexcept;
-    QDir m_config_dir, m_session_dir;
+    QDir m_config_dir, m_session_dir, m_app_data_dir;
     Statusbar *m_statusbar                      = nullptr;
     QMenuBar *m_menuBar                         = nullptr;
     QMenu *m_fitMenu                            = nullptr;

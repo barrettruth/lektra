@@ -535,8 +535,8 @@ Lektra::initMenubar() noexcept
 void
 Lektra::initDB() noexcept
 {
-    m_recent_files_path = m_config_dir.filePath("last_pages.json");
-    m_recent_files_store.setFilePath(m_recent_files_path);
+    QString recentf = m_app_data_dir.filePath("last_pages.json");
+    m_recent_files_store.setFilePath(recentf);
     if (!m_recent_files_store.load())
         qWarning() << "Failed to load recent files store";
 }
@@ -549,7 +549,28 @@ Lektra::initConfig() noexcept
     auto primaryScreen                      = QGuiApplication::primaryScreen();
     m_screen_dpr_map[primaryScreen->name()] = primaryScreen->devicePixelRatio();
 
-    m_session_dir = QDir(m_config_dir.filePath("sessions"));
+    m_app_data_dir = QDir(
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+
+    if (!m_app_data_dir.exists())
+    {
+        if (!m_app_data_dir.mkpath(".")) // Create the AppDataLocation directory
+                                         // if it doesn't exist
+        {
+            qWarning() << "Failed to create data directory: "
+                       << m_app_data_dir.absolutePath();
+        }
+    }
+
+    m_session_dir = m_app_data_dir.filePath("sessions");
+
+    if (!m_session_dir.exists())
+    {
+        if (!m_session_dir.mkpath("."))
+        {
+            qWarning() << "Failed to create sessions directory";
+        }
+    }
 
     if (!QFile::exists(m_config_file_path))
         return;
