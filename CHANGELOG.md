@@ -15,9 +15,16 @@
     pan = "Alt+LeftButton"
     ```
 
+- New actions in `[picker.keys]` section:
+    - `expand`: if on a heirarchy node, expand it (in `flat_mode = false`) (default: `Tab`)
+    - `collapse`: if on a heirarchy node, collapse it (in `flat_mode = false`) (default: `Tab`)
+    - `section_prev`: move to the previous section (e.g. previous chapter in the outline picker) (default: `Ctrl+Shift+k`)
+    - `section_next`: move to the next section (e.g. next chapter in the outline picker) (default: `Ctrl+Shift+j`)
 
 ### Bug Fixes
 
+- Picker `next`, `prev` navigation now goes through all the items instead of just the top level items when in `flat_mode = false` (hierarchical mode),
+  which makes navigation in the picker more intuitive and consistent regardless of the mode.
 - Picker not navigable when search bar is opened. (Issue reported by: [@linewaytin](https://codeberg.org/linwaytin))
 - Fix `--check-config` not working with `[keybindings]`, `[mousebindings]` sections. (Issue reported by: [@lineick](https://github.com/lineick))
 - Don't null out the statusbar item spacings which caused the statusbar items to have 0 padding and look weird.

@@ -132,14 +132,22 @@ public:
 
     struct Keybindings
     {
-        QList<QKeyCombination> moveDown
-            = {Qt::Key_Down, Qt::ControlModifier | Qt::Key_J};
-        QList<QKeyCombination> pageDown = {Qt::Key_PageDown};
         QList<QKeyCombination> moveUp
             = {Qt::Key_Up, Qt::ControlModifier | Qt::Key_K};
-        QList<QKeyCombination> pageUp  = {Qt::Key_PageUp};
-        QList<QKeyCombination> accept  = {Qt::Key_Return};
-        QList<QKeyCombination> dismiss = {Qt::Key_Escape};
+        QList<QKeyCombination> moveDown
+            = {Qt::Key_Down, Qt::ControlModifier | Qt::Key_J};
+        QList<QKeyCombination> pageUp   = {Qt::Key_PageUp};
+        QList<QKeyCombination> pageDown = {Qt::Key_PageDown};
+        QList<QKeyCombination> sectionPrev{
+            Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Up,
+            Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_K};
+        QList<QKeyCombination> sectionNext{
+            Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Down,
+            Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_J};
+        QList<QKeyCombination> accept   = {Qt::Key_Return};
+        QList<QKeyCombination> expand   = {Qt::Key_Tab};
+        QList<QKeyCombination> collapse = {Qt::Key_Tab};
+        QList<QKeyCombination> dismiss  = {Qt::Key_Escape};
     };
 
     struct Column

@@ -135,7 +135,10 @@ Picker::eventFilter(QObject *watched, QEvent *event)
             const auto key = keyEvent->keyCombination();
             if (m_keys.moveDown.contains(key) || m_keys.moveUp.contains(key)
                 || m_keys.pageDown.contains(key) || m_keys.pageUp.contains(key)
-                || m_keys.accept.contains(key))
+                || m_keys.sectionNext.contains(key)
+                || m_keys.sectionPrev.contains(key)
+                || m_keys.accept.contains(key) || m_keys.expand.contains(key)
+                || m_keys.collapse.contains(key))
             {
                 keyPressEvent(keyEvent);
                 return true;
@@ -150,43 +153,101 @@ void
 Picker::keyPressEvent(QKeyEvent *event)
 {
     const QKeyCombination key = event->keyCombination();
-    const int row             = m_listView->currentIndex().row();
+    const QModelIndex current = m_listView->currentIndex();
+
+    if (!current.isValid())
+    {
+        QWidget::keyPressEvent(event);
+        return;
+    }
 
     if (m_keys.moveDown.contains(key))
     {
-        m_listView->setCurrentIndex(
-            m_proxy->index(qMin(row + 1, m_proxy->rowCount() - 1), 0));
+        QModelIndex next = m_listView->indexBelow(current);
+        if (next.isValid())
+            m_listView->setCurrentIndex(next);
         event->accept();
     }
     else if (m_keys.pageDown.contains(key))
     {
-        m_listView->setCurrentIndex(
-            m_proxy->index(qMin(row
-                                    + m_listView->viewport()->height()
-                                          / m_listView->sizeHintForRow(0),
-                                m_proxy->rowCount() - 1),
-                           0));
+        QModelIndex idx = current;
+        const int steps = qMax(1, m_listView->viewport()->height()
+                                      / qMax(1, m_listView->sizeHintForRow(0)));
+        for (int i = 0; i < steps; ++i)
+        {
+            QModelIndex next = m_listView->indexBelow(idx);
+            if (!next.isValid())
+                break;
+            idx = next;
+        }
+        if (idx.isValid())
+            m_listView->setCurrentIndex(idx);
         event->accept();
     }
     else if (m_keys.moveUp.contains(key))
     {
-        m_listView->setCurrentIndex(m_proxy->index(qMax(row - 1, 0), 0));
+        QModelIndex prev = m_listView->indexAbove(current);
+        if (prev.isValid())
+            m_listView->setCurrentIndex(prev);
         event->accept();
     }
     else if (m_keys.pageUp.contains(key))
     {
-        m_listView->setCurrentIndex(
-            m_proxy->index(qMax(row
-                                    - m_listView->viewport()->height()
-                                          / m_listView->sizeHintForRow(0),
-                                0),
-                           0));
+        QModelIndex idx = current;
+        const int steps = qMax(1, m_listView->viewport()->height()
+                                      / qMax(1, m_listView->sizeHintForRow(0)));
+        for (int i = 0; i < steps; ++i)
+        {
+            QModelIndex prev = m_listView->indexAbove(idx);
+            if (!prev.isValid())
+                break;
+            idx = prev;
+        }
+        if (idx.isValid())
+            m_listView->setCurrentIndex(idx);
+        event->accept();
+    }
+    else if (m_keys.sectionNext.contains(key))
+    {
+        QModelIndex idx = m_listView->indexBelow(current);
+        while (idx.isValid() && m_proxy->rowCount(idx) <= 0)
+            idx = m_listView->indexBelow(idx);
+        if (idx.isValid())
+            m_listView->setCurrentIndex(idx);
+        event->accept();
+    }
+    else if (m_keys.sectionPrev.contains(key))
+    {
+        QModelIndex idx = m_listView->indexAbove(current);
+        while (idx.isValid() && m_proxy->rowCount(idx) <= 0)
+            idx = m_listView->indexAbove(idx);
+        if (idx.isValid())
+            m_listView->setCurrentIndex(idx);
         event->accept();
     }
     else if (m_keys.accept.contains(key))
     {
         if (m_listView->currentIndex().isValid())
             onItemActivated(m_listView->currentIndex());
+        event->accept();
+    }
+    else if (m_keys.expand.contains(key) || m_keys.collapse.contains(key))
+    {
+        const QModelIndex index = m_listView->currentIndex();
+        if (!index.isValid() || m_structureMode != StructureMode::Hierarchical
+            || m_proxy->rowCount(index) <= 0)
+        {
+            event->accept();
+            return;
+        }
+
+        if (m_keys.expand.contains(key) && !m_keys.collapse.contains(key))
+            m_listView->setExpanded(index, true);
+        else if (m_keys.collapse.contains(key) && !m_keys.expand.contains(key))
+            m_listView->setExpanded(index, false);
+        else
+            m_listView->setExpanded(index, !m_listView->isExpanded(index));
+
         event->accept();
     }
     else
@@ -218,13 +279,6 @@ void
 Picker::onItemActivated(const QModelIndex &index)
 {
     auto item = itemAtProxyIndex(index);
-
-    if (m_structureMode == StructureMode::Hierarchical
-        && m_proxy->rowCount(index) > 0)
-    {
-        m_listView->setExpanded(index, !m_listView->isExpanded(index));
-        return;
-    }
 
     emit itemSelected(item);
     onItemAccepted(item);
