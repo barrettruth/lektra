@@ -950,12 +950,16 @@ Lektra::initConfig() noexcept
                 };
 
                 m_picker_keybinds = Picker::Keybindings{
-                    .moveDown = get("down", defaults.moveDown),
-                    .pageDown = get("page_down", defaults.pageDown),
-                    .moveUp   = get("up", defaults.moveUp),
-                    .pageUp   = get("page_up", defaults.pageUp),
-                    .accept   = get("accept", defaults.accept),
-                    .dismiss  = get("dismiss", defaults.dismiss),
+                    .moveUp      = get("up", defaults.moveUp),
+                    .moveDown    = get("down", defaults.moveDown),
+                    .pageUp      = get("page_up", defaults.pageUp),
+                    .pageDown    = get("page_down", defaults.pageDown),
+                    .sectionPrev = get("section_prev", defaults.sectionPrev),
+                    .sectionNext = get("section_next", defaults.sectionNext),
+                    .accept      = get("accept", defaults.accept),
+                    .expand      = get("expand", defaults.expand),
+                    .collapse    = get("collapse", defaults.collapse),
+                    .dismiss     = get("dismiss", defaults.dismiss),
                 };
             }
         }
