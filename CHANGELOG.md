@@ -23,6 +23,7 @@
 
 ### Bug Fixes
 
+- Remove redundant file dialog formats
 - Picker `next`, `prev` navigation now goes through all the items instead of just the top level items when in `flat_mode = false` (hierarchical mode),
   which makes navigation in the picker more intuitive and consistent regardless of the mode.
 - Picker not navigable when search bar is opened. (Issue reported by: [@linewaytin](https://codeberg.org/linwaytin))

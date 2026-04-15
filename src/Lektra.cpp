@@ -48,10 +48,7 @@ supportedFormats()
            "EPUB (*.epub);;"
            "FictionBook (*.fb2 *.fbz);;"
            "Mobi (*.mobi);;"
-           "Images (*.jpg *.jpeg *.png *.tiff *.tif);;"
-           "SVG (*.svg);;"
-           "PNG (*.png);;"
-           "JPG (*.jpg *.jpeg);;"
+           "Images (*.jpg *.jpeg *.png *.tiff *.tif *.svg);;"
            "All Files (*.*)";
 }
 
