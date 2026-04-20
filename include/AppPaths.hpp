@@ -2,6 +2,7 @@
 
 #include "TranslationsDir.hpp"
 
+#include <QStandardPaths>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
@@ -64,8 +65,9 @@ appTutorialPath() noexcept
     return QString("%1/share/doc/%2/tutorial.pdf")
         .arg(APP_INSTALL_PREFIX)
         .arg(APP_NAME);
-#else
-    return {};
+#elif defined (_WIN32)
+    const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return QDir(appData).filePath("tutorial.pdf");
 #endif
 }
 

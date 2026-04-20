@@ -41,51 +41,64 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/include/mupdf/fitz/versi
     set(MUPDF_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/include")
     set(MUPDF_LIBRARIES
         "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
-        "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
     )
 endif()
 
 set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -fsanitize=address -Wall -Wextra)
 # set(DEBUG_FLAGS -fno-omit-frame-pointer -ggdb3 -O0 -Wall -Wextra)
-set(RELEASE_FLAGS -O3 -DNDEBUG -fno-rtti)
-set(REL_WITH_DEB_INFO -O2 -g -fno-omit-frame-pointer -DNDEBUG)
+if(MSVC)
+    set(RELEASE_FLAGS /O2 /DNDEBUG /GR-)
+    set(REL_WITH_DEB_INFO /O2 /Zi /DNDEBUG)
+else()
+    set(RELEASE_FLAGS -O3 -DNDEBUG -fno-rtti)
+    set(REL_WITH_DEB_INFO -O2 -g -fno-omit-frame-pointer -DNDEBUG)
+endif()
 
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer -DNDEBUG")
 
 include(ExternalProject)
-ExternalProject_Add(mupdf_external
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf"
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND
-    make -C <SOURCE_DIR>
-    build=release
-    shared=no
-    HAVE_TESSERACT=no
-    HAVE_CURL=no
-    HAVE_X11=no
-    HAVE_GLUT=no
-    HAVE_LIBCRYPTO=no
-    LIB_CFLAGS=-fPIC
-    libs
-    INSTALL_COMMAND
-    make -C <SOURCE_DIR>
-    build=release
-    shared=no
-    HAVE_TESSERACT=no
-    HAVE_CURL=no
-    HAVE_X11=no
-    HAVE_GLUT=no
-    HAVE_LIBCRYPTO=no
-    prefix="${MUPDF_INSTALL_DIR}"
-    install-libs
-    BUILD_BYPRODUCTS
-    "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
-    "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
-    UPDATE_COMMAND ""
-)
+
+if(MSVC)
+    set(MUPDF_SLN "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf/platform/win32/mupdf.sln")
+    add_compile_options(/Zc:__cplusplus)
+    # Optional: adds standard-conforming preprocessor which is often # needed for advanced C++23 features/libraries
+    add_compile_options(/Zc:preprocessor)
+    ExternalProject_Add(mupdf_external
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND
+            MSBuild "${MUPDF_SLN}"
+            /p:Configuration=Release
+            /p:Platform=x64
+            /t:libmupdf
+            /m:1
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E make_directory "${MUPDF_INSTALL_DIR}/lib"
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "<SOURCE_DIR>/platform/win32/x64/Release/libmupdf.lib"
+            "${MUPDF_INSTALL_DIR}/lib/libmupdf.lib"
+        BUILD_BYPRODUCTS
+            "${MUPDF_INSTALL_DIR}/lib/libmupdf.lib"
+        UPDATE_COMMAND ""
+    )
+
+    set(MUPDF_LIB_FILE "${MUPDF_INSTALL_DIR}/lib/libmupdf.lib")
+else()
+    # Your original 'make' logic for Linux/macOS goes here
+    ExternalProject_Add(mupdf_external
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mupdf"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND make -C <SOURCE_DIR> build=release shared=no HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no LIB_CFLAGS=-fPIC libs
+        INSTALL_COMMAND make -C <SOURCE_DIR> build=release shared=no HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no prefix="${MUPDF_INSTALL_DIR}" install-libs
+        BUILD_BYPRODUCTS "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+        UPDATE_COMMAND ""
+    )
+    set(MUPDF_LIB_FILE "${MUPDF_INSTALL_DIR}/lib/libmupdf.a")  # add this
+endif()
+
+
 add_library(mupdf_lib STATIC IMPORTED GLOBAL)
 set_target_properties(mupdf_lib PROPERTIES
-    IMPORTED_LOCATION "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+    IMPORTED_LOCATION "${MUPDF_LIB_FILE}"
     INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
 )
 add_dependencies(mupdf_lib mupdf_external)
@@ -193,13 +206,19 @@ target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 
 if (MUPDF_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        mupdf_lib
-        "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a"
-        z      # zlib
-        m      # libm (math, also needed by mupdf)
-        dl     # libdl
-    )
+    if (MSVC)
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            mupdf_lib
+        )
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            mupdf_lib
+            "${MUPDF_INSTALL_DIR}/lib/libmupdf.a"
+            z      # zlib
+            m      # libm (math, also needed by mupdf)
+            dl     # libdl
+        )
+    endif()
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
     add_dependencies(${PROJECT_NAME} mupdf_external)
 endif()
@@ -316,6 +335,10 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:RelWithDebInfo>:${REL_WITH_DEB_INFO_FLAGS}>
 )
 
+if (MSVC)
+    target_compile_options(lektra PRIVATE /W4)
+endif()
+
 target_link_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${RELEASE_FLAGS}>
@@ -332,7 +355,7 @@ endif()
 #Install icons to correct freedesktop - compliant locations
 
 if(LINUX)
-    qt_import_plugins(${CMAKE_PROJECT_NAME}
+    qt_import_plugins(${PROJECT_NAME}
         INCLUDE
         Qt6::QWaylandIntegrationPlugin      # Wayland support (libqwayland.so)
         Qt6::QXcbIntegrationPlugin          # X11 support

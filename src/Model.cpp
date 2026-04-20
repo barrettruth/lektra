@@ -8,7 +8,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <algorithm>
 #include <array>
-#include <pthread.h>
+
 #include <qbytearrayview.h>
 #include <qregularexpression.h>
 #include <qstyle.h>

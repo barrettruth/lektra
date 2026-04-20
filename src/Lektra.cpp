@@ -5028,6 +5028,7 @@ void
 Lektra::showTutorialFile() noexcept
 {
     const QString doc_path = AppPaths::appTutorialPath();
+    PPRINT("doc_path = ", doc_path);
     if (!doc_path.isEmpty() && QFileInfo::exists(doc_path))
     {
         OpenFileInNewTab(doc_path);
@@ -5037,7 +5038,7 @@ Lektra::showTutorialFile() noexcept
 #if defined(__linux__) || defined(__APPLE__) && defined(__MACH__)
     QMessageBox::warning(this, tr("Show Tutorial File"),
                          tr("Tutorial file could not be found."));
-#elif defined(_WIN64)
+#elif defined(_WIN32)
     QMessageBox::warning(this, "Show Tutorial File",
                          tr("Not yet implemented for Windows"));
 #endif

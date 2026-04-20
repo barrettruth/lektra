@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string_view>
 #include <vector>
+#include <locale>
 
 extern "C"
 {
@@ -105,7 +106,7 @@ trim_ws(std::wstring &s)
 {
     auto is_space = [](wchar_t c)
     {
-        return std::iswspace(c) != 0;
+        return std::isspace(c, std::locale(""));
     };
 
     while (!s.empty() && is_space(s.front()))
@@ -113,6 +114,8 @@ trim_ws(std::wstring &s)
     while (!s.empty() && is_space(s.back()))
         s.pop_back();
 }
+
+
 
 bool
 parseHexColor(std::string_view s, uint32_t &out);
