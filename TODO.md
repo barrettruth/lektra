@@ -4,6 +4,8 @@
 
 ## HIGH PRIORITY
 
+- [ ] Add copy text to text highlight annotation for convenience
+- [ ] Boundary of the annotations need to extend only for the annotation
 - [ ] Fix Input dialog buttons looking weird
 - [ ] Color dialog add initial color and set selected
 - [ ] Don't hide scrollbars when search hits have been drawn
@@ -55,10 +57,3 @@
 - [ ] Try to generate outline if not present somehow
 - [ ] Visual line mode, if starting fresh, enable at the viewport
 - [ ] Custom source DPI region copy to clipboard
-
-
-# DONE
-
-- [X] Thumbnail Panel
-- [X] Don't allow splitting thumbnail panel
-- [x] Do not show thumbnail panel in the total split count of tab
