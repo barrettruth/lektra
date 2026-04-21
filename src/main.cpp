@@ -10,17 +10,17 @@
 #include <qcoreapplication.h>
 #include <signal.h>
 
-#ifdef __LINUX__
-#include <sys/resource.h>
-#include <unistd.h>
+#ifdef linux
+    #include <sys/resource.h>
+    #include <unistd.h>
 #elif _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <string>
-#include <vector>
+    #define WIN32_LEAN_AND_MEAN
+    #include <Windows.h>
+    #include <string>
+    #include <vector>
 #endif
 
-#ifdef __LINUX__
+#ifdef linux
 static std::string
 get_self_executable_path()
 {
@@ -91,50 +91,60 @@ spawn_detached_child(int argc, char *argv[])
 }
 
 #elif _WIN32
-static std::string get_self_executable_path() {
+static std::string
+get_self_executable_path()
+{
     char buffer[MAX_PATH];
     DWORD size = GetModuleFileNameA(NULL, buffer, MAX_PATH);
-    if (size == 0) return "";
+    if (size == 0)
+        return "";
     return std::string(buffer, size);
 }
 
-static int spawn_detached_child(int argc, char* argv[]) {
+static int
+spawn_detached_child(int argc, char *argv[])
+{
     std::string exe = get_self_executable_path();
 
     // Construct the command line string
     // Windows requires a single string for arguments, not an array
     std::string commandLine = "\"" + exe + "\" --foreground";
 
-    for (int i = 1; i < argc; ++i) {
+    for (int i = 1; i < argc; ++i)
+    {
         std::string arg = argv[i];
-        if (arg == "--foreground") continue;
+        if (arg == "--foreground")
+            continue;
 
         commandLine += " ";
         // Wrap arguments in quotes to handle spaces in paths
         commandLine += "\"" + arg + "\"";
     }
 
-    STARTUPINFOA si = { sizeof(si) };
-    PROCESS_INFORMATION pi = { 0 };
+    STARTUPINFOA si        = {sizeof(si)};
+    PROCESS_INFORMATION pi = {0};
 
-    // DETACHED_PROCESS: Disconnects from the parent console (Windows equivalent of detaching stdio)
-    // CREATE_BREAKAWAY_FROM_JOB: Ensures the child isn't killed if the parent is in a job
-    DWORD flags = DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB | CREATE_NO_WINDOW;
+    // DETACHED_PROCESS: Disconnects from the parent console (Windows equivalent
+    // of detaching stdio) CREATE_BREAKAWAY_FROM_JOB: Ensures the child isn't
+    // killed if the parent is in a job
+    DWORD flags
+        = DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB | CREATE_NO_WINDOW;
 
     BOOL success = CreateProcessA(
-        NULL,                       // Application Name
-        &commandLine[0],            // Command Line (must be modifiable buffer)
-        NULL,                       // Process Attributes
-        NULL,                       // Thread Attributes
-        FALSE,                      // Inherit Handles
-        flags,                      // Creation Flags
-        NULL,                       // Environment
-        NULL,                       // Current Directory
-        &si,                        // Startup Info
-        &pi                         // Process Information
+        NULL,            // Application Name
+        &commandLine[0], // Command Line (must be modifiable buffer)
+        NULL,            // Process Attributes
+        NULL,            // Thread Attributes
+        FALSE,           // Inherit Handles
+        flags,           // Creation Flags
+        NULL,            // Environment
+        NULL,            // Current Directory
+        &si,             // Startup Info
+        &pi              // Process Information
     );
 
-    if (success) {
+    if (success)
+    {
         // We don't need to communicate with the child, so close these handles
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);

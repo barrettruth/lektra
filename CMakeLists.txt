@@ -108,12 +108,12 @@ if(MSVC)
         ${CMAKE_COMMAND} -E make_directory "${MUPDF_INSTALL_DIR}/lib"
         COMMAND ${CMAKE_COMMAND} -E copy
         "${MUPDF_SOURCE_DIR}/platform/win32/x64/Release/libmupdf.lib"
-        "${MUPDF_LIB_FILE}"
         BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}"
         UPDATE_COMMAND ""
     )
 else()
     set(MUPDF_LIB_FILE "${MUPDF_INSTALL_DIR}/lib/libmupdf.a")
+    set(MUPDF_LIB_THIRD_FILE "${MUPDF_INSTALL_DIR}/lib/libmupdf-third.a")
 
     ExternalProject_Add(mupdf_external
         SOURCE_DIR "${MUPDF_SOURCE_DIR}"
@@ -126,7 +126,7 @@ else()
         make -C <SOURCE_DIR> build=release shared=no
         HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no
         prefix="${MUPDF_INSTALL_DIR}" install-libs
-        BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}"
+        BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}" "${MUPDF_LIB_THIRD_FILE}"
         UPDATE_COMMAND ""
     )
 endif()
@@ -136,7 +136,13 @@ set_target_properties(mupdf_lib PROPERTIES
     IMPORTED_LOCATION             "${MUPDF_LIB_FILE}"
     INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
 )
-add_dependencies(mupdf_lib mupdf_external)
+
+add_library(mupdf_lib_third STATIC IMPORTED GLOBAL)
+set_target_properties(mupdf_lib_third PROPERTIES
+    IMPORTED_LOCATION             "${MUPDF_LIB_THIRD_FILE}"
+    INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
+)
+add_dependencies(mupdf_lib_third mupdf_external)
 
 # ---------------------------------------------------------------------------
 # Qt6 + optional system libraries
@@ -256,22 +262,23 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
 add_dependencies(${PROJECT_NAME} mupdf_external)
 
-if(MSVC)
-    target_link_libraries(${PROJECT_NAME} PRIVATE mupdf_lib)
-else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        mupdf_lib
-        z       # zlib
-        m       # libm
-        dl      # libdl
-    )
-endif()
-
 # --- Qt ---
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core Qt6::Gui Qt6::Widgets
     Qt6::Concurrent Qt6::OpenGLWidgets Qt6::Network
 )
+
+if(MSVC)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mupdf_lib mupdf_lib_third)
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        mupdf_lib
+        mupdf_lib_third
+        z       # zlib
+        m       # libm
+        dl      # libdl
+    )
+endif()
 
 # --- SyncTeX ---
 if(SYNCTEX_FOUND)
