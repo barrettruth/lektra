@@ -99,16 +99,16 @@ if(MSVC)
         SOURCE_DIR "${MUPDF_SOURCE_DIR}"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-            MSBuild "${MUPDF_SLN}"
-            /p:Configuration=Release
-            /p:Platform=x64
-            /t:libmupdf
-            /m
+        MSBuild "${MUPDF_SLN}"
+        /p:Configuration=Release
+        /p:Platform=x64
+        /t:libmupdf
+        /m
         INSTALL_COMMAND
-            ${CMAKE_COMMAND} -E make_directory "${MUPDF_INSTALL_DIR}/lib"
-            COMMAND ${CMAKE_COMMAND} -E copy
-                "${MUPDF_SOURCE_DIR}/platform/win32/x64/Release/libmupdf.lib"
-                "${MUPDF_LIB_FILE}"
+        ${CMAKE_COMMAND} -E make_directory "${MUPDF_INSTALL_DIR}/lib"
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${MUPDF_SOURCE_DIR}/platform/win32/x64/Release/libmupdf.lib"
+        "${MUPDF_LIB_FILE}"
         BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}"
         UPDATE_COMMAND ""
     )
@@ -119,13 +119,13 @@ else()
         SOURCE_DIR "${MUPDF_SOURCE_DIR}"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-            make -C <SOURCE_DIR> build=release shared=no
-            HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no
-            LIB_CFLAGS=-fPIC libs
+        make -C <SOURCE_DIR> build=release shared=no
+        HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no
+        LIB_CFLAGS=-fPIC libs
         INSTALL_COMMAND
-            make -C <SOURCE_DIR> build=release shared=no
-            HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no
-            prefix="${MUPDF_INSTALL_DIR}" install-libs
+        make -C <SOURCE_DIR> build=release shared=no
+        HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no
+        prefix="${MUPDF_INSTALL_DIR}" install-libs
         BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}"
         UPDATE_COMMAND ""
     )
@@ -163,7 +163,13 @@ file(GLOB LEKTRA_CORE_HEADERS       CONFIGURE_DEPENDS include/*.hpp)
 file(GLOB LEKTRA_ANNOTATION_HEADERS CONFIGURE_DEPENDS include/Annotations/*.hpp)
 file(GLOB LEKTRA_COMMAND_HEADERS    CONFIGURE_DEPENDS include/Commands/*.hpp)
 
+set(app_icon_resource_windows "")
+if(WIN32)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources/lektra.rc")
+endif()
+
 add_executable(${PROJECT_NAME}
+    ${app_icon_resource_windows}
     src/main.cpp
     src/Lektra.cpp
     src/Statusbar.cpp
@@ -206,6 +212,18 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/include   # generated headers (TranslationsDir.hpp etc.)
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
 )
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Windows executable properties
+# ---------------------------------------------------------------------------
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE   # use Windows subsystem (no console window)
+    )
+    # Qt6::EntryPoint provides the WinMain -> main shim required by the
+    # Windows subsystem. Without it the linker can't find `main`.
+endif()
 
 # ---------------------------------------------------------------------------
 # macOS bundle properties
@@ -292,9 +310,9 @@ target_link_options(${PROJECT_NAME} PRIVATE
 if(PLATFORM_LINUX)
     qt_import_plugins(${PROJECT_NAME}
         INCLUDE
-            Qt6::QWaylandIntegrationPlugin
-            Qt6::QXcbIntegrationPlugin
-            Qt6::QEglFSIntegrationPlugin
+        Qt6::QWaylandIntegrationPlugin
+        Qt6::QXcbIntegrationPlugin
+        Qt6::QEglFSIntegrationPlugin
     )
 elseif(APPLE)
     qt_import_plugins(${PROJECT_NAME}
@@ -357,10 +375,10 @@ endmacro()
 if(APPLE)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/tutorial.pdf"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/tutorial.pdf"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tutorial.pdf"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/tutorial.pdf"
         VERBATIM
     )
     foreach(qm_file ${QM_FILES})
@@ -370,10 +388,10 @@ if(APPLE)
         endif()
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${qm_file}"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations/"
+            "${qm_file}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/translations/"
             VERBATIM
         )
     endforeach()
@@ -418,8 +436,10 @@ endif()
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.pdf
     DESTINATION share/doc/${PROJECT_NAME})
 
-# Man pages (Linux/Unix only — not applicable on Windows)
+# Man pages (Unix only — not applicable on Windows)
 if(NOT WIN32)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra.1
         DESTINATION share/man/man1)
+    # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-config.5  DESTINATION share/man/man5)
+    # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-commands.7 DESTINATION share/man/man7)
 endif()

@@ -1,5 +1,6 @@
 #define MyAppExecName "lektra.exe"
 #define MyAppName "Lektra"
+
 [Setup]
 AppName={#MyAppName}
 AppVersion=0.7.0
@@ -11,17 +12,17 @@ ChangesAssociations=yes
 SetupIconFile=.\resources\lektra.ico
 
 [Files]
-Source: ".\build\release\*"; DestDir: "{app}"; Flags: recursesubdirs
-Source: ".\tutorial.pdf";     DestDir: "{userappdata}\{#MyAppName}";  Flags: ignoreversion
-Source: ".\resources\lektra.ico"; DestDir: "{app}"; Flags: ignoreversion
+; Icon is embedded in the exe via lektra.rc — no separate .ico needed here.
+Source: ".\build\release\*"; DestDir: "{app}";              Flags: recursesubdirs
+Source: ".\tutorial.pdf";    DestDir: "{userappdata}\{#MyAppName}"; Flags: ignoreversion
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Icons]
-Name: "{group}\Lektra"; Filename: "{app}\{#MyAppExecName}"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExecName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExecName}"; Tasks: desktopicon
+Name: "{group}\Lektra";                Filename: "{app}\{#MyAppExecName}"
+Name: "{commondesktop}\{#MyAppName}";  Filename: "{app}\{#MyAppExecName}"
+Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExecName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExecName}"; Description: "Launch {#MyAppName}"; Flags: postinstall
