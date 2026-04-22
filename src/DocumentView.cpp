@@ -553,7 +553,7 @@ DocumentView::handleLinkPreviewRequested(QPointF scenePos) noexcept
         return;
 
     // Get the link item at the clicked position, if any
-    BrowseLinkItem *clicked_link{nullptr};
+    BrowseLinkItem *clicked_link = nullptr;
     for (BrowseLinkItem *link : links_in_page)
     {
         if (link->contains(scenePos))
@@ -586,7 +586,7 @@ DocumentView::handleLinkCtrlClickRequested(QPointF scenePos) noexcept
         return;
 
     // Get the link item at the clicked position, if any
-    BrowseLinkItem *clicked_link{nullptr};
+    BrowseLinkItem *clicked_link = nullptr;
     for (BrowseLinkItem *link : links_in_page)
     {
         if (link->contains(scenePos))
@@ -3800,7 +3800,7 @@ DocumentView::renderAnnotations(
 
     for (const auto &annot : annotations)
     {
-        Annotation *annot_item{nullptr};
+        Annotation *annot_item = nullptr;
         switch (annot.type)
         {
             case PDF_ANNOT_HIGHLIGHT:
@@ -4218,7 +4218,7 @@ DocumentView::annotationsInArea(int pageno, QRectF area) noexcept
 Annotation *
 DocumentView::annotationAtPoint(int pageno, QPointF point) noexcept
 {
-    Annotation *foundAnnot{nullptr};
+    Annotation *foundAnnot = nullptr;
     if (!m_page_annotations_hash.contains(pageno))
         return foundAnnot;
 
@@ -4871,7 +4871,7 @@ DocumentView::Copy_page_image() noexcept
         return;
 
     int pageno{-1};
-    GraphicsImageItem *pageItem{nullptr};
+    GraphicsImageItem *pageItem = nullptr;
 
     if (!pageAtScenePos(m_gview->viewport()->rect().center(), pageno, pageItem))
         return;
