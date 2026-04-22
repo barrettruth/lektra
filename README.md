@@ -22,19 +22,7 @@
 
 ## Support file formats
 
-- PDF
-- XPS
-- CBZ
-- FB2
-- EPUB
-- FictionBook
-- Mobi
-- Images
-    - JPG
-    - PNG
-    - SVG
-    - TIFF
-- DjVu (if compiled)
+- PDF, XPS, OXPS, CBZ, FB2, EPUB, FictionBook, Mobi, JPG, PNG, SVG, TIFF, DjVu (if compiled)
 
 ## Screenshots
 
