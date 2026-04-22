@@ -120,7 +120,7 @@ alternating_row_color = true
 [layout]
 mode = "vertical"
 initial_fit = "width"
-auto_resize = false 
+auto_resize = false
 spacing = 9
 
 [zoom]
@@ -175,7 +175,7 @@ highlight_matches = true
 progressive = true
 match_color = "#55500033"
 index_color = "#55FF0055"
-absolute_jump = true
+absolute_jump = false
 
 [rendering]
 dpr = { "eDP-1" = 1.25, "DP-5" = 1.0, "DP-7" = 1.0 }
