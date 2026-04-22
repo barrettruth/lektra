@@ -51,6 +51,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override
     {
+        Q_UNUSED(widget);
+
         // Outer glow — drawn first, underneath everything.
         if (m_hovered && isGlowEnabled())
         {
@@ -76,8 +78,6 @@ public:
             painter->drawRect(m_rect);
             painter->restore();
         }
-
-        Q_UNUSED(widget);
     }
 
 protected:
