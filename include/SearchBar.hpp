@@ -16,6 +16,7 @@ public:
     explicit SearchBar(QWidget *parent = nullptr);
     void setSearchCount(int count) noexcept;
     void setSearchIndex(int index) noexcept;
+    void clearSearch() noexcept;
     void search(const QString &term) noexcept;
 
     inline void setRegexMode(bool state) noexcept

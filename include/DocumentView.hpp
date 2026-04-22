@@ -301,7 +301,6 @@ public:
     void setZoomAnchored(double factor, QPointF anchorScenePos) noexcept;
     void Search(const QString &term, bool useRegex) noexcept;
     void SearchInPage(int pageno, const QString &term) noexcept;
-    void SearchFromHere(const QString &term, bool useRegex) noexcept;
     void SearchCancel() noexcept;
     void ZoomIn() noexcept;
     void ZoomOut() noexcept;
@@ -363,6 +362,7 @@ signals:
     void fileNameChanged(const QString &name);
     void searchCountChanged(int count);
     void searchIndexChanged(int index);
+    void searchClearRequested();
     void totalPageCountChanged(int total);
     void clipboardContentChanged(const QString &content);
     void insertToDBRequested(const QString &filepath, int pageno);
@@ -462,6 +462,7 @@ private:
         const int pageno,
         const std::vector<Model::RenderAnnotation> &annots) noexcept;
     void buildFlatSearchHitIndex() noexcept;
+    int getClosestHitIndex() noexcept;
     void removeUnusedPageItems(const std::set<int> &visiblePages) noexcept;
     void clearDocumentItems() noexcept;
     void ensureVisiblePagePlaceholders() noexcept;

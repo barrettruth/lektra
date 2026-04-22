@@ -631,7 +631,10 @@ DocumentView::handleSearchResults(
 
     emit searchCountChanged(m_model->searchMatchesCount());
 
-    GotoHit(0);
+    if (m_config.search.absolute_jump)
+        GotoHit(m_search_index);
+    else
+        GotoHit(getClosestHitIndex());
 }
 
 void
@@ -651,7 +654,69 @@ DocumentView::handlePartialSearchResults(
 
     // Jump to first hit only on the very first partial result
     if (m_search_index == -1 && !m_search_hit_flat_refs.empty())
-        GotoHit(0);
+    {
+        if (m_config.search.absolute_jump)
+            GotoHit(0);
+        else
+            GotoHit(getClosestHitIndex());
+    }
+}
+
+int
+DocumentView::getClosestHitIndex() noexcept
+{
+    if (!m_model->supports_text_search() || m_search_hit_flat_refs.empty())
+        return -1;
+
+    int index;
+
+    // struct HitRef
+    // {
+    //     int page;
+    //     int indexInPage;
+    // };
+    //
+    // We want to find the hit closest to the current viewport position.
+    // We'll use the page number as the primary sorting key, and the index
+    // within the page as the secondary key. This way, if there are multiple
+    // hits on the same page, we'll jump to the one closest to the top of the
+    // page.
+    const int currentPage = m_pageno;
+
+    auto it = std::lower_bound(m_search_hit_flat_refs.begin(),
+                               m_search_hit_flat_refs.end(), currentPage,
+                               [](const HitRef &ref, int page)
+    { return ref.page < page; });
+
+    if (it == m_search_hit_flat_refs.end())
+    {
+        // All hits are before the current page, so wrap around to the first hit
+        index = 0;
+    }
+    else if (it == m_search_hit_flat_refs.begin())
+    {
+        // All hits are after the current page, so wrap around to the last hit
+        index = static_cast<int>(m_search_hit_flat_refs.size() - 1);
+    }
+    else
+    {
+        // Check the hit at 'it' and the one before it to see which is closer
+        const int nextPage = it->page;
+        const int prevPage = (it - 1)->page;
+
+        if (std::abs(nextPage - currentPage) < std::abs(currentPage - prevPage))
+        {
+            index = static_cast<int>(
+                std::distance(m_search_hit_flat_refs.begin(), it));
+        }
+        else
+        {
+            index = static_cast<int>(
+                std::distance(m_search_hit_flat_refs.begin(), it - 1));
+        }
+    }
+
+    return index;
 }
 
 void
@@ -1467,31 +1532,6 @@ DocumentView::clearSearchHits() noexcept
     m_vscroll->setSearchMarkers({});
 }
 
-// Perform search for the given term
-void
-DocumentView::Search(const QString &term, bool useRegex) noexcept
-{
-#ifndef NDEBUG
-    qDebug() << "DocumentView::Search(): Searching for term:" << term;
-#endif
-    if (!m_model->supports_text_search())
-        return;
-
-    clearSearchHits();
-    if (term.isEmpty())
-    {
-        m_current_search_hit_item->setPath(QPainterPath());
-        return;
-    }
-
-    // Check if term has atleast one uppercase letter
-    bool caseSensitive = std::any_of(term.cbegin(), term.cend(),
-                                     [](QChar c) { return c.isUpper(); });
-
-    emit searchBarSpinnerShow(true);
-    m_model->search(term, caseSensitive, -1, useRegex);
-}
-
 void
 DocumentView::SearchCancel() noexcept
 {
@@ -1507,7 +1547,7 @@ DocumentView::SearchCancel() noexcept
 }
 
 void
-DocumentView::SearchFromHere(const QString &term, bool useRegex) noexcept
+DocumentView::Search(const QString &term, bool useRegex) noexcept
 {
 #ifndef NDEBUG
     qDebug() << "DocumentView::SearchFromHere(): Searching for term:" << term;
@@ -1519,6 +1559,7 @@ DocumentView::SearchFromHere(const QString &term, bool useRegex) noexcept
     if (term.isEmpty())
     {
         m_current_search_hit_item->setPath(QPainterPath());
+        emit searchClearRequested();
         return;
     }
 
@@ -1527,7 +1568,10 @@ DocumentView::SearchFromHere(const QString &term, bool useRegex) noexcept
                                      [](QChar c) { return c.isUpper(); });
 
     emit searchBarSpinnerShow(true);
-    m_model->search(term, caseSensitive, m_pageno, useRegex);
+
+    // Always search from the first page, but hit index is determined by current
+    // location
+    m_model->search(term, caseSensitive, 0, useRegex);
 }
 
 void

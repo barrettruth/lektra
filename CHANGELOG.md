@@ -31,6 +31,7 @@
 
 ### Bug Fixes
 
+- Make search behave more like in vim/emacs
 - Fix linux `#ifdef`s
 - Set minimum size for the `InputDialog` widget
 - Remove redundant file dialog formats

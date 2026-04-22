@@ -207,3 +207,14 @@ SearchBar::search(const QString &term) noexcept
     emit searchRequested(term, m_regexButton->isChecked());
     m_history.push_back(term);
 }
+
+void
+SearchBar::clearSearch() noexcept
+{
+    m_searchInput->clear();
+    m_searchIndexLabel->clear();
+    m_searchCountLabel->clear();
+    m_searchIndexLabel->hide();
+    m_searchSeparator->hide();
+    m_searchCountLabel->hide();
+}

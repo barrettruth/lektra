@@ -1036,6 +1036,7 @@ Lektra::initConfig() noexcept
         // set(search["whole_words"], m_config.search.whole_words);
         set(search["highlight_matches"], m_config.search.highlight_matches);
         set(search["progressive"], m_config.search.progressive);
+        set(search["absolute_jump"], m_config.search.absolute_jump);
         set_color(search["match_color"], m_config.search.match_color);
         set_color(search["index_color"], m_config.search.index_color);
     }
@@ -3026,7 +3027,7 @@ Lektra::initConnections() noexcept
             [this](const QString &term, bool useRegex)
     {
         if (m_doc)
-            m_doc->SearchFromHere(term, useRegex);
+            m_doc->Search(term, useRegex);
     });
 
     connect(m_search_bar, &SearchBar::searchIndexChangeRequested, this,
@@ -3781,6 +3782,9 @@ Lektra::initTabConnections(DocumentView *docwidget) noexcept
 
     connect(docwidget, &DocumentView::searchCountChanged, m_search_bar,
             &SearchBar::setSearchCount);
+
+    connect(docwidget, &DocumentView::searchClearRequested, m_search_bar,
+            &SearchBar::clearSearch);
 
     // connect(docwidget, &DocumentView::searchModeChanged, m_statusbar,
     //         &SearchBar::setSearchMode);
