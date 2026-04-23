@@ -5039,6 +5039,12 @@ DocumentView::handleHScrollValueChanged(int value) noexcept
              << "changed to" << value;
 #endif
 
+    // Don't render on scroll for single-page documents or images
+    if (m_layout_mode == LayoutMode::SINGLE)
+        return;
+    if (m_model && isImageFileType(m_model->fileType()))
+        return;
+
     // During fast scrolling, only invalidate cache, don't trigger render
     invalidateVisiblePagesCache();
 
@@ -5054,6 +5060,12 @@ DocumentView::handleHScrollValueChanged(int value) noexcept
 void
 DocumentView::handleVScrollValueChanged(int /*value */) noexcept
 {
+    // Don't render on scroll for single-page documents or images
+    if (m_layout_mode == LayoutMode::SINGLE)
+        return;
+    if (m_model && isImageFileType(m_model->fileType()))
+        return;
+
     // During fast scrolling, only invalidate cache, don't trigger render
     invalidateVisiblePagesCache();
 
