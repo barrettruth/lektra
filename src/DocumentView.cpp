@@ -457,50 +457,52 @@ DocumentView::startGifPlayback() noexcept
             m_page_items_hash[0]->setImage(img);
         else
             createAndAddPageItem(0, img);
-
-        GraphicsImageItem *item = m_page_items_hash.value(0, nullptr);
-        if (!item)
-            return;
-
-        const QSizeF logicalSize = pageSceneSize(0);
-        if (!img.isNull() && img.width() > 0 && img.height() > 0
-            && logicalSize.width() > 0.0 && logicalSize.height() > 0.0)
-        {
-            const double imgLogicalW
-                = static_cast<double>(img.width())
-                  / std::max(1.0, static_cast<double>(img.devicePixelRatio()));
-            const double imgLogicalH
-                = static_cast<double>(img.height())
-                  / std::max(1.0, static_cast<double>(img.devicePixelRatio()));
-
-            item->setScale(1.0);
-            item->setTransform(
-                QTransform::fromScale(logicalSize.width() / imgLogicalW,
-                                      logicalSize.height() / imgLogicalH));
-        }
-
-        const QRectF sr = m_gview->sceneRect();
-        if (m_layout_mode == LayoutMode::HORIZONTAL)
-        {
-            const double yPos
-                = (m_max_page_cross_extent - logicalSize.height()) / 2.0;
-            item->setPos(pageOffset(0), yPos);
-        }
-        else if (m_layout_mode == LayoutMode::SINGLE)
-        {
-            item->setPos(sr.x() + (sr.width() - logicalSize.width()) / 2.0,
-                         sr.y() + (sr.height() - logicalSize.height()) / 2.0);
-        }
-        else
-        {
-            item->setPos(pageXOffset(0, logicalSize.width(), sr.width()),
-                         pageOffset(0));
-        }
-
-        updateCurrentHitHighlight();
     });
 
     m_gif_movie->start();
+    //     connect(m_gif_movie, &QMovie::frameChanged, this, [this](int)
+    //     {
+    //         if (!m_gif_movie)
+    //             return;
+    //
+    //         const QImage frame = m_gif_movie->currentImage();
+    //         if (frame.isNull())
+    //             return;
+    //
+    //         QImage img = frame;
+    //         if (m_model->invertColor())
+    //             img.invertPixels();
+    //         img.setDevicePixelRatio(m_model->DPR());
+    //
+    //         if (m_page_items_hash.contains(0))
+    //             m_page_items_hash[0]->setImage(img);
+    //         else
+    //             createAndAddPageItem(0, img);
+    //
+    //         GraphicsImageItem *item = m_page_items_hash.value(0, nullptr);
+    //         if (!item)
+    //             return;
+    //
+    //         const QSizeF logicalSize = pageSceneSize(0);
+    //         if (!img.isNull() && img.width() > 0 && img.height() > 0
+    //             && logicalSize.width() > 0.0 && logicalSize.height() > 0.0)
+    //         {
+    //             QImage scaled
+    //                 = img.scaled(logicalSize.width() * m_model->DPR(),
+    //                              logicalSize.height() * m_model->DPR(),
+    //                              Qt::IgnoreAspectRatio,
+    //                              Qt::SmoothTransformation);
+    //             scaled.setDevicePixelRatio(m_model->DPR());
+    //             m_page_items_hash[0]->setImage(scaled);
+    //         }
+    //
+    //         const QRectF sr = m_gview->sceneRect();
+    //         item->setPos(sr.x() + (sr.width() - logicalSize.width()) / 2.0,
+    //                      sr.y() + (sr.height() - logicalSize.height())
+    //                      / 2.0);
+    //
+    //         updateCurrentHitHighlight();
+    //     });
 }
 
 void
