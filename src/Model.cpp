@@ -17,6 +17,11 @@
 
 #ifdef HAS_MAGICKPP
     #include <Magick++.h>
+struct MagickDocument
+{
+    std::vector<Magick::Image> frames;
+};
+
 static bool
 isImageFormat(Model::FileType ft) noexcept
 {
@@ -885,7 +890,7 @@ Model::cleanup_magick() noexcept
 {
     {
         std::lock_guard<std::mutex> lock(m_doc_mutex);
-        m_magick_image.reset();
+        m_magick_doc.reset();
     }
 
     {
@@ -965,10 +970,12 @@ Model::openAsync_magick(const QString &canonPath) noexcept
 {
     return QtConcurrent::run([this, canonPath]
     {
-        Magick::Image image;
+        std::vector<Magick::Image> frames;
         try
         {
-            image.read(canonPath.toStdString());
+            Magick::readImages(&frames, canonPath.toStdString());
+            if (frames.empty())
+                throw std::runtime_error("No image frames found");
         }
         catch (const std::exception &e)
         {
@@ -979,12 +986,15 @@ Model::openAsync_magick(const QString &canonPath) noexcept
         }
 
         const int page_count = 1;
-        const float w
-            = static_cast<float>(image.columns()) / image.density().x() * 72.0f;
-        const float h
-            = static_cast<float>(image.rows()) / image.density().y() * 72.0f;
 
-        QMetaObject::invokeMethod(this, [this, image = std::move(image), w, h]()
+        const double density_x = frames[0].density().x();
+        const double density_y = frames[0].density().y();
+        const double safe_density_x = density_x > 1.0 ? density_x : 72.0;
+        const double safe_density_y = density_y > 1.0 ? density_y : 72.0;
+        const float w = static_cast<float>(frames[0].columns() / safe_density_x * 72.0);
+        const float h = static_cast<float>(frames[0].rows() / safe_density_y * 72.0);
+
+        QMetaObject::invokeMethod(this, [this, frames = std::move(frames), page_count, w, h]() mutable
         {
             waitForPendingRenders();
             m_render_cancelled.store(false, std::memory_order_release);
@@ -994,9 +1004,11 @@ Model::openAsync_magick(const QString &canonPath) noexcept
 #endif
             cleanup_magick();
 
-            m_magick_image = std::make_unique<Magick::Image>(std::move(image));
+            m_magick_doc = std::make_unique<MagickDocument>();
+            m_magick_doc->frames = std::move(frames);
             m_page_count = page_count;
             m_success    = true;
+            m_text_cache.setCapacity(std::min(page_count, 1024));
 
             {
                 std::lock_guard<std::mutex> lk(m_page_dim_mutex);
@@ -1622,15 +1634,12 @@ Model::buildPageCache(int pageno) noexcept
 void
 Model::buildPageCache_magick(int pageno) noexcept
 {
-    if (pageno != 0)
-        return;
-
     Magick::Image source;
     {
         std::lock_guard<std::mutex> lock(m_doc_mutex);
-        if (!m_magick_image)
+        if (!m_magick_doc || m_magick_doc->frames.empty() || pageno != 0)
             return;
-        source = *m_magick_image;
+        source = m_magick_doc->frames.front();
     }
 
     const double density_x = source.density().x();
