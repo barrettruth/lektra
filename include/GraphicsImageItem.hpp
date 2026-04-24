@@ -83,16 +83,25 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override
     {
-        Q_UNUSED(option);
         Q_UNUSED(widget);
 
         if (m_image.isNull())
             return;
 
-        // Draw the image scaled to its logical size (accounting for DPR)
-        // painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        // painter->setRenderHint(QPainter::Antialiasing, true);
+        const QRectF exposed
+            = option ? option->exposedRect.intersected(m_bounding_rect)
+                     : m_bounding_rect;
+        if (exposed.isEmpty())
+            return;
+
+        painter->save();
+        painter->setClipRect(exposed);
+
+        // Draw only the exposed region (scissored by clip rect), while still
+        // using the full image mapping for correct DPR and transforms.
         painter->drawImage(m_bounding_rect, m_image);
+
+        painter->restore();
     }
 
     // Inside GraphicsImageItem or a subclass
