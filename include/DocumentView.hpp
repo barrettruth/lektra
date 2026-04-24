@@ -35,10 +35,6 @@ extern "C"
 #include <qevent.h>
 #include <set>
 
-#ifdef WITH_IMAGE
-    #include <QMovie>
-#endif
-
 // Z-values for various overlay items
 #define ZVALUE_PAGE 0
 #define ZVALUE_ANNOTATION 5
@@ -288,7 +284,9 @@ public:
     bool DecryptDocument() noexcept;
     void ReselectLastTextSelection() noexcept;
     void createAndAddPageItem(int pageno, const QImage &image) noexcept;
+#ifdef WITH_IMAGE
     void renderImage() noexcept;
+#endif
     void renderPages() noexcept;
     void renderPage() noexcept;
     void handleTextHighlightRequested() noexcept;
@@ -507,6 +505,8 @@ private:
 #ifdef WITH_IMAGE
     void startGifPlayback() noexcept;
     void stopGifPlayback() noexcept;
+    void setCurrentAnimFrame(int index) noexcept;
+    QTimer *m_anim_timer = nullptr;
 #endif
 
 #ifdef HAS_SYNCTEX
@@ -556,9 +556,6 @@ private:
     int m_visual_line_index                  = -1;
     bool m_visual_line_mode                  = false;
     bool m_thumbnail_mode                    = false;
-#ifdef WITH_IMAGE
-    QMovie *m_gif_movie = nullptr;
-#endif
 #ifdef HAS_SYNCTEX
     synctex_scanner_p m_synctex_scanner = nullptr;
 #endif
