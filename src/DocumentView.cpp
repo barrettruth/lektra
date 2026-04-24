@@ -2786,7 +2786,8 @@ DocumentView::renderImage() noexcept
     }
 #endif
 
-    QImage img = m_model->requestImageRender();
+    const bool highQuality = !m_hq_render_timer->isActive();
+    QImage img             = m_model->requestImageRender(highQuality);
     if (img.isNull())
     {
         qWarning() << "Failed to render image";

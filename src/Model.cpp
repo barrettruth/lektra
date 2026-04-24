@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <QImageReader>
 #include <qbytearrayview.h>
 #include <qregularexpression.h>
 #include <qstyle.h>
@@ -962,6 +963,49 @@ Model::openAsync_image(const QString &canonPath) noexcept
 {
     return QtConcurrent::run([this, canonPath]
     {
+        if (m_filetype == FileType::GIF)
+        {
+            QImageReader reader(canonPath);
+            reader.setAutoTransform(true);
+
+            if (!reader.canRead())
+            {
+                qWarning() << "Failed to open GIF:" << reader.errorString();
+                QMetaObject::invokeMethod(this, &Model::openFileFailed,
+                                          Qt::QueuedConnection);
+                return;
+            }
+
+            QImage firstFrame = reader.read();
+            if (firstFrame.isNull())
+            {
+                qWarning() << "Failed to decode first GIF frame:" << reader.errorString();
+                QMetaObject::invokeMethod(this, &Model::openFileFailed,
+                                          Qt::QueuedConnection);
+                return;
+            }
+
+            const float w = static_cast<float>(firstFrame.width());
+            const float h = static_cast<float>(firstFrame.height());
+
+            QMetaObject::invokeMethod(this,
+                                      [this, base = std::move(firstFrame), w, h]() mutable
+            {
+                cleanup_image();
+                m_is_image         = true;
+                m_page_count       = 1;
+                m_success          = true;
+                m_default_page_dim = {w, h};
+                m_page_dim_cache.dimensions.assign(m_page_count, m_default_page_dim);
+                m_page_dim_cache.known.assign(m_page_count, false);
+                m_page_dim_cache.known[0] = true;
+                m_image_cache = std::move(base);
+                emit openFileFinished();
+            },
+                                      Qt::QueuedConnection);
+            return;
+        }
+
         CImg<unsigned char> img;
         try
         {
@@ -2246,7 +2290,7 @@ Model::createRenderJob(int pageno) const noexcept
 }
 
 QImage
-Model::requestImageRender() noexcept
+Model::requestImageRender(bool highQuality) noexcept
 {
 #ifndef WITH_IMAGE
     return {};
@@ -2257,11 +2301,38 @@ Model::requestImageRender() noexcept
     if (m_image_cache.isNull())
         return {};
 
-    const int rw = std::max(1, (int)(m_image_cache.width() * m_zoom * m_dpr));
-    const int rh = std::max(1, (int)(m_image_cache.height() * m_zoom * m_dpr));
+    int rw = std::max(1, (int)(m_image_cache.width() * m_zoom * m_dpr));
+    int rh = std::max(1, (int)(m_image_cache.height() * m_zoom * m_dpr));
 
-    QImage scaled = m_image_cache.scaled(rw, rh, Qt::KeepAspectRatio,
-                                         Qt::FastTransformation);
+    constexpr int MAX_RENDER_EDGE = 16384;
+    constexpr double MAX_RENDER_PIXELS = 64.0 * 1024.0 * 1024.0;
+
+    const double pixel_count = static_cast<double>(rw) * static_cast<double>(rh);
+    double cap_scale         = 1.0;
+
+    if (rw > MAX_RENDER_EDGE || rh > MAX_RENDER_EDGE)
+    {
+        const double edge_scale_x = static_cast<double>(MAX_RENDER_EDGE) / rw;
+        const double edge_scale_y = static_cast<double>(MAX_RENDER_EDGE) / rh;
+        cap_scale                 = std::min(cap_scale, std::min(edge_scale_x, edge_scale_y));
+    }
+
+    if (pixel_count > MAX_RENDER_PIXELS)
+    {
+        const double pixel_scale = std::sqrt(MAX_RENDER_PIXELS / pixel_count);
+        cap_scale                = std::min(cap_scale, pixel_scale);
+    }
+
+    if (cap_scale < 1.0)
+    {
+        rw = std::max(1, static_cast<int>(rw * cap_scale));
+        rh = std::max(1, static_cast<int>(rh * cap_scale));
+    }
+
+    const Qt::TransformationMode mode
+        = highQuality ? Qt::SmoothTransformation : Qt::FastTransformation;
+
+    QImage scaled = m_image_cache.scaled(rw, rh, Qt::KeepAspectRatio, mode);
     scaled.setDevicePixelRatio(m_dpr);
     if (m_invert_color)
         scaled.invertPixels();

@@ -443,7 +443,7 @@ public:
     void requestPageRender(
         const RenderJob &job,
         const std::function<void(PageRenderResult)> &callback) noexcept;
-    QImage requestImageRender() noexcept;
+    QImage requestImageRender(bool highQuality = false) noexcept;
     PageRenderResult renderPageWithExtrasAsync(const RenderJob &job) noexcept;
 
     Properties properties() noexcept;
