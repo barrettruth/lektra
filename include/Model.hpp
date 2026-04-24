@@ -265,10 +265,17 @@ public:
         m_rotation = angle;
     }
 
+#ifdef WITH_IMAGE
+    inline bool isAnimated() const noexcept
+    {
+        return m_is_animated;
+    }
+
     inline bool isImage() noexcept
     {
         return m_is_image;
     }
+#endif
 
     inline float rotation() const noexcept
     {
@@ -458,6 +465,7 @@ public:
 #ifdef WITH_IMAGE
     QFuture<void> openAsync_image(const QString &canonicalPath) noexcept;
     void cleanup_image() noexcept;
+    void setCurrentAnimFrame(int index) noexcept;
 #endif
     void _continueOpen(fz_context *ctx, fz_document *doc) noexcept;
 
@@ -766,9 +774,32 @@ private:
     std::atomic<int> m_search_match_count = 0;
     std::atomic<bool> m_search_cancelled  = false;
 
-    bool m_is_image = false;
 #ifdef WITH_IMAGE
     QImage m_image_cache;
+    bool m_is_image    = false;
+    bool m_is_animated = false;
+    QList<QImage> m_animated_frames;
+    QList<int> m_frame_delays_ms;
+    QImage getAnimatedFrame(int index) noexcept;
+    int m_frame_count   = 0;
+    int m_current_frame = 0;
+
+    int currentAnimFrame() const noexcept
+    {
+        return m_current_frame;
+    }
+
+    int frameCount() const noexcept
+    {
+        return m_frame_count;
+    }
+
+    int frameDelayMs(int i) const noexcept
+    {
+        if (i < 0 || i >= m_frame_delays_ms.size())
+            return 100;
+        return m_frame_delays_ms[i];
+    }
 #endif
 
     const Config &m_config;
