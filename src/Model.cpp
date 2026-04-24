@@ -828,14 +828,14 @@ Model::~Model() noexcept
 #ifdef HAS_DJVU
     if (m_filetype == FileType::DJVU)
         cleanup_djvu();
-#ifdef HAS_MAGICKPP
-    else if (isImageFormat(m_filetype))
+    #ifdef HAS_MAGICKPP
+    if (m_is_image)
         cleanup_magick();
-#endif
+    #endif
     else
 #endif
 #if !defined(HAS_DJVU) && defined(HAS_MAGICKPP)
-    if (isImageFormat(m_filetype))
+        if (m_is_image)
         cleanup_magick();
     else
 #endif
@@ -958,7 +958,7 @@ Model::openAsync(const QString &filePath) noexcept
         return openAsync_djvu(canonPath);
 #endif
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if ((m_is_image = isImageFormat(m_filetype)))
         return openAsync_magick(canonPath);
 #endif
     return openAsync_mupdf(canonPath);
@@ -987,27 +987,30 @@ Model::openAsync_magick(const QString &canonPath) noexcept
 
         const int page_count = 1;
 
-        const double density_x = frames[0].density().x();
-        const double density_y = frames[0].density().y();
+        const double density_x      = frames[0].density().x();
+        const double density_y      = frames[0].density().y();
         const double safe_density_x = density_x > 1.0 ? density_x : 72.0;
         const double safe_density_y = density_y > 1.0 ? density_y : 72.0;
-        const float w = static_cast<float>(frames[0].columns() / safe_density_x * 72.0);
-        const float h = static_cast<float>(frames[0].rows() / safe_density_y * 72.0);
+        const float w
+            = static_cast<float>(frames[0].columns() / safe_density_x * 72.0);
+        const float h
+            = static_cast<float>(frames[0].rows() / safe_density_y * 72.0);
 
-        QMetaObject::invokeMethod(this, [this, frames = std::move(frames), page_count, w, h]() mutable
+        QMetaObject::invokeMethod(
+            this, [this, frames = std::move(frames), page_count, w, h]() mutable
         {
             waitForPendingRenders();
             m_render_cancelled.store(false, std::memory_order_release);
             cleanup_mupdf(); // drops MuPDF state
-#ifdef HAS_DJVU
-            cleanup_djvu();  // drops any previous DjVu state
-#endif
+    #ifdef HAS_DJVU
+            cleanup_djvu(); // drops any previous DjVu state
+    #endif
             cleanup_magick();
 
-            m_magick_doc = std::make_unique<MagickDocument>();
+            m_magick_doc         = std::make_unique<MagickDocument>();
             m_magick_doc->frames = std::move(frames);
-            m_page_count = page_count;
-            m_success    = true;
+            m_page_count         = page_count;
+            m_success            = true;
             m_text_cache.setCapacity(std::min(page_count, 1024));
 
             {
@@ -1071,9 +1074,9 @@ Model::openAsync_djvu(const QString &canonPath) noexcept
             m_render_cancelled.store(false, std::memory_order_release);
             cleanup_mupdf(); // drops MuPDF state
             cleanup_djvu();  // drops any previous DjVu state
-#ifdef HAS_MAGICKPP
+    #ifdef HAS_MAGICKPP
             cleanup_magick();
-#endif
+    #endif
 
             m_ddjvu_ctx  = ctx;
             m_ddjvu_doc  = doc;
@@ -1287,7 +1290,7 @@ Model::close() noexcept
     }
 #endif
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if (m_is_image)
     {
         cleanup_magick();
         return;
@@ -1451,7 +1454,7 @@ Model::buildPageCache(int pageno) noexcept
 #endif
 
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if (m_is_image)
     {
         buildPageCache_magick(pageno);
         return;
@@ -1642,17 +1645,21 @@ Model::buildPageCache_magick(int pageno) noexcept
         source = m_magick_doc->frames.front();
     }
 
-    const double density_x = source.density().x();
-    const double density_y = source.density().y();
+    const double density_x      = source.density().x();
+    const double density_y      = source.density().y();
     const double safe_density_x = density_x > 1.0 ? density_x : 72.0;
     const double safe_density_y = density_y > 1.0 ? density_y : 72.0;
 
-    const float w_pts = static_cast<float>(source.columns() / safe_density_x * 72.0);
-    const float h_pts = static_cast<float>(source.rows() / safe_density_y * 72.0);
+    const float w_pts
+        = static_cast<float>(source.columns() / safe_density_x * 72.0);
+    const float h_pts
+        = static_cast<float>(source.rows() / safe_density_y * 72.0);
 
     const double render_dpi = m_zoom * m_dpi * m_dpr;
-    const size_t rw = static_cast<size_t>(std::max(1.0, source.columns() * render_dpi / safe_density_x));
-    const size_t rh = static_cast<size_t>(std::max(1.0, source.rows() * render_dpi / safe_density_y));
+    const size_t rw         = static_cast<size_t>(
+        std::max(1.0, source.columns() * render_dpi / safe_density_x));
+    const size_t rh = static_cast<size_t>(
+        std::max(1.0, source.rows() * render_dpi / safe_density_y));
 
     QImage image;
     try
@@ -1670,7 +1677,7 @@ Model::buildPageCache_magick(int pageno) noexcept
             return;
         }
 
-        const size_t row_bytes  = rw * 4;
+        const size_t row_bytes   = rw * 4;
         const size_t total_bytes = row_bytes * rh;
         std::vector<unsigned char> rgba(total_bytes);
 
@@ -2312,6 +2319,22 @@ Model::createRenderJob(int pageno) const noexcept
     return job;
 }
 
+QImage
+Model::requestImageRender() noexcept
+{
+#ifdef HAS_MAGICKPP
+    if (m_is_image)
+    {
+        image.invertPixels();
+
+        image.setDotsPerMeterX(static_cast<int>((job.dpi * 1000) / 25.4));
+        image.setDotsPerMeterY(static_cast<int>((job.dpi * 1000) / 25.4));
+        image.setDevicePixelRatio(job.dpr);
+        return image;
+    }
+#endif
+}
+
 void
 Model::requestPageRender(
     const RenderJob &job,
@@ -2354,22 +2377,6 @@ Model::requestPageRender(
             });
         }
     });
-
-    // auto future
-    //     = QtConcurrent::run([this, job /*, callback */]() -> PageRenderResult
-    // {
-    //     if (m_render_cancelled.load())
-    //         return {};
-    //
-    //     ensurePageCached(job.pageno);
-    //
-    //     if (m_render_cancelled.load())
-    //         return {};
-    //
-    //     return renderPageWithExtrasAsync(job);
-    // });
-    //
-    // watcher->setFuture(future);
 
     // In requestPageRender - worker lambda:
     auto future = QtConcurrent::run([this, job]() -> PageRenderResult
@@ -2426,30 +2433,6 @@ Model::renderPageWithExtrasAsync(const RenderJob &job) noexcept
         result.image = std::move(image);
         // DjVu has no links or annotations — result.links/annotations stay
         // empty
-        return result;
-    }
-#endif
-
-#ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
-    {
-        std::lock_guard<std::recursive_mutex> cache_lock(m_page_cache_mutex);
-        const PageCacheEntry *entry = m_page_lru_cache.get(job.pageno);
-        if (!entry || entry->cached_image.isNull())
-        {
-            qWarning() << "Image page not cached:" << job.pageno;
-            return result;
-        }
-
-        QImage image = entry->cached_image;
-
-        if (job.invert_color)
-            image.invertPixels();
-
-        image.setDotsPerMeterX(static_cast<int>((job.dpi * 1000) / 25.4));
-        image.setDotsPerMeterY(static_cast<int>((job.dpi * 1000) / 25.4));
-        image.setDevicePixelRatio(job.dpr);
-        result.image = std::move(image);
         return result;
     }
 #endif
@@ -4610,7 +4593,7 @@ Model::setZoom(float zoom) noexcept
 #endif
 
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if (m_is_image)
         invalidatePageCaches();
 #endif
 }
@@ -4631,7 +4614,7 @@ Model::rotateClock() noexcept
 #endif
 
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if (m_is_image)
         invalidatePageCaches();
 #endif
 }
@@ -4652,7 +4635,7 @@ Model::rotateAnticlock() noexcept
 #endif
 
 #ifdef HAS_MAGICKPP
-    if (isImageFormat(m_filetype))
+    if (m_is_image)
         invalidatePageCaches();
 #endif
 }
