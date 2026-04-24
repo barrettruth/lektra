@@ -4,8 +4,9 @@
 
 ### Features
 
+
 - Add optional `Imagemagick` image rendering library support for handling more image file formats.
-    - Automatically added support if `Imagemagick` is found on the system, otherwise it will fall back to the default rendering method which only supports basic image formats (e.g. PNG, JPEG, TIFF, SVG)
+    - **Requires ImageMagick to be installed on the system and `Magick++` development libraries for compilation.**
 
 - Hide unrelevant actions from the menu bar based on the file type of the currently opened document.
 
