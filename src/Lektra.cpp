@@ -1555,7 +1555,7 @@ Lektra::updateUiEnabledState() noexcept
         m_statusbar->setMode(GraphicsView::Mode::None);
         m_statusbar->setModeVisible(false);
         m_statusbar->setProgressVisible(false);
-        m_statusbar->setPageInfoVisible(false);
+        m_statusbar->setPageInfoVisible(true);
     }
     else
     {
@@ -3943,19 +3943,19 @@ Lektra::updateStatusbar() noexcept
         const int numPages = model->numPages();
         if (numPages > 0)
         {
-            m_statusbar->setPageInfoVisible(false);
+            m_statusbar->setPageInfoVisible(model->isImage());
             m_statusbar->setTotalPageCount(numPages);
             m_statusbar->setPageNo(m_doc->pageNo() + 1);
         }
         else
         {
             // File still loading — hide until openFileFinished fires
-            m_statusbar->setPageInfoVisible(true);
+            m_statusbar->setPageInfoVisible(!model->isImage());
         }
     }
     else
     {
-        m_statusbar->setPageInfoVisible(true);
+        m_statusbar->setPageInfoVisible(false);
         m_statusbar->setFilePath("");
         m_statusbar->setHighlightColor("");
     }
