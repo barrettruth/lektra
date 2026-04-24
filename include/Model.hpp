@@ -102,11 +102,11 @@ public:
     {
         QString uri;
         fz_link_dest dest;
-        BrowseLinkItem::LinkType type{BrowseLinkItem::LinkType::External};
-        int target_page{-1};
-        BrowseLinkItem::PageLocation target_loc{0, 0, 0};
-        BrowseLinkItem::PageLocation source_loc{0, 0, 0};
-        int source_page{-1};
+        BrowseLinkItem::LinkType type = BrowseLinkItem::LinkType::External;
+        int target_page               = -1;
+        BrowseLinkItem::PageLocation target_loc = {0, 0, 0};
+        BrowseLinkItem::PageLocation source_loc = {0, 0, 0};
+        int source_page                         = -1;
     };
 
     struct SearchHit
@@ -134,8 +134,8 @@ public:
     {
         QString user_password;
         QString owner_password;
-        int perm_flags{0};
-        int enc_level{128}; // 40, 128, 256
+        int perm_flags = 0;
+        int enc_level  = 128; // 40, 128, 256
     };
 
     struct RenderJob
@@ -146,7 +146,7 @@ public:
         double dpi;
         double dpr;
         bool invert_color;
-        fz_colorspace *colorspace;
+        fz_colorspace *colorspace = nullptr;
         QString filepath; // path to PDF
     };
 
@@ -154,11 +154,11 @@ public:
     {
         QRectF rect;
         QString uri;
-        BrowseLinkItem::LinkType type{BrowseLinkItem::LinkType::External};
-        bool boundary{false};
-        int target_page{-1};
-        BrowseLinkItem::PageLocation target_loc{0, 0, 0};
-        BrowseLinkItem::PageLocation source_loc{0, 0, 0};
+        BrowseLinkItem::LinkType type = BrowseLinkItem::LinkType::External;
+        bool boundary                 = false;
+        int target_page               = -1;
+        BrowseLinkItem::PageLocation target_loc = {0, 0, 0};
+        BrowseLinkItem::PageLocation source_loc = {0, 0, 0};
     };
 
     struct RenderAnnotation
@@ -167,7 +167,7 @@ public:
         enum pdf_annot_type type;
         QColor color;
         QString text;
-        int index{-1};
+        int index = -1;
     };
 
     struct PageRenderResult
@@ -542,8 +542,8 @@ private:
 
         // optional extras
         int target_page = -1;
-        fz_point target_loc{}; // It's target location
-        fz_point source_loc{}; // It's own location
+        fz_point target_loc; // It's target location
+        fz_point source_loc; // It's own location
         float zoom = 0.0f;
     };
 
@@ -559,7 +559,7 @@ private:
 
     struct PageDimension
     {
-        float width_pts{0.0f}, height_pts{0.0f};
+        float width_pts = 0.0f, height_pts = 0.0f;
     };
 
     // Cache for page dimensions (W, H)
@@ -619,13 +619,13 @@ private:
     struct PageCacheEntry
     {
         int pageno;
-        fz_display_list *display_list{nullptr};
-        fz_rect bounds{};
+        fz_display_list *display_list = nullptr;
+        fz_rect bounds;
 
 #if defined(HAS_DJVU) || defined(HAS_MAGICKPP)
         QImage cached_image; // for DJVU
 #endif
-        PageDimension dimension{};
+        PageDimension dimension;
         std::vector<CachedLink> links;
         std::vector<CachedAnnotation> annotations;
     };
@@ -646,14 +646,14 @@ private:
     {
         fz_device super;
         fz_point query;
-        fz_image *img{nullptr};
+        fz_image *img = nullptr;
     };
 
     // Used for password handling
     struct PendingOpen
     {
-        fz_context *ctx{nullptr};
-        fz_document *doc{nullptr};
+        fz_context *ctx  = nullptr;
+        fz_document *doc = nullptr;
 
         void clear() noexcept
         {
@@ -669,10 +669,10 @@ private:
     getPageDimensions(int pageno) const noexcept;
 
     QString m_filepath;
-    int m_page_count{0};
-    float m_dpr{1.0f}, m_dpi{96.0f}, m_zoom{1.0f}, m_rotation{0.0f},
-        m_inv_dpr{1.0f};
-    bool m_invert_color{false};
+    int m_page_count = 0;
+    float m_dpr = 1.0f, m_dpi = 96.0f, m_zoom = 1.0f, m_rotation = 0.0f,
+          m_inv_dpr     = 1.0f;
+    bool m_invert_color = false;
 
     // private helper in Model
     std::vector<QPolygonF> selectAtHelper(int pageno, fz_point pt,
@@ -702,49 +702,50 @@ private:
     std::vector<Model::RenderLink>
     detectUrlLinksForPage(const RenderJob &job) noexcept;
     FileType getFileType(const QString &filepath) noexcept;
-
-    QUndoStack *m_undo_stack{nullptr};
+    bool reloadDocument() noexcept;
+    void waitForPendingRenders() noexcept;
+    QUndoStack *m_undo_stack = nullptr;
     // std::optional<std::wstring>
     // get_paper_name_at_position(const int pageno, const fz_point) noexcept;
 
-    float m_popup_color[4]{1.0f, 1.0f, 0.8f, 0.8f},
-        m_highlight_color[4]{1.0f, 1.0f, 0.0f, 0.5f},
-        m_selection_color[4]{0.0f, 0.0f, 1.0f, 0.3f},
-        m_annot_rect_color[4]{1.0f, 0.0f, 0.0f, 0.5f};
-    uint32_t m_bg_color{0};
-    uint32_t m_fg_color{0};
-    bool m_success{false};
+    float m_popup_color[4]      = {1.0f, 1.0f, 0.8f, 0.8f},
+          m_highlight_color[4]  = {1.0f, 1.0f, 0.0f, 0.5f},
+          m_selection_color[4]  = {0.0f, 0.0f, 1.0f, 0.3f},
+          m_annot_rect_color[4] = {1.0f, 0.0f, 0.0f, 0.5f};
+    uint32_t m_bg_color         = 0;
+    uint32_t m_fg_color         = 0;
+    bool m_success              = false;
 
     mutable std::recursive_mutex m_page_cache_mutex;
     LRUCache<int, PageCacheEntry> m_page_lru_cache;
     LRUCache<int, CachedTextPage> m_text_cache;
     LRUCache<int, fz_stext_page *> m_stext_page_cache;
 
-    bool reloadDocument() noexcept;
-    PageDimensionCache m_page_dim_cache{};
+    PageDimensionCache m_page_dim_cache;
     mutable std::mutex m_page_dim_mutex;
-    PageDimension m_default_page_dim{};
+    PageDimension m_default_page_dim;
+
+    pdf_write_options m_pdf_write_options = pdf_default_write_options;
+    bool m_link_show_boundary             = false;
+    bool m_detect_url_links               = false;
+    FileType m_filetype                   = FileType::NONE;
 
     mutable std::mutex m_doc_mutex;
     QFuture<void> m_search_future;
-    pdf_write_options m_pdf_write_options{pdf_default_write_options};
-    bool m_link_show_boundary{false};
-    bool m_detect_url_links{false};
     QRegularExpression m_url_link_re;
-    FileType m_filetype{FileType::NONE};
     PendingOpen m_pending;
 
     // MuPDF core objects
     fz_locks_context m_fz_locks;
-    fz_context *m_ctx{nullptr};
-    fz_document *m_doc{nullptr};
-    pdf_document *m_pdf_doc{nullptr};
-    fz_colorspace *m_colorspace{nullptr};
-    fz_outline *m_outline{nullptr};
+    fz_context *m_ctx           = nullptr;
+    fz_document *m_doc          = nullptr;
+    pdf_document *m_pdf_doc     = nullptr;
+    fz_colorspace *m_colorspace = nullptr;
+    fz_outline *m_outline       = nullptr;
 
 #ifdef HAS_DJVU
-    ddjvu_context_t *m_ddjvu_ctx{nullptr};
-    ddjvu_document_t *m_ddjvu_doc{nullptr};
+    ddjvu_context_t *m_ddjvu_ctx  = nullptr;
+    ddjvu_document_t *m_ddjvu_doc = nullptr;
 #endif
 
 #ifdef HAS_MAGICKPP
@@ -769,14 +770,15 @@ private:
     friend class DeleteAnnotationsCommand;
     friend class DocumentView;
 
-    void waitForPendingRenders() noexcept;
-    std::atomic<int> m_active_renders{0};
+    std::atomic<int> m_active_renders = 0;
     std::mutex m_renders_mutex;
     std::condition_variable m_renders_cv;
 
-    std::atomic<bool> m_render_cancelled{false};
-    std::atomic<int> m_search_match_count{0};
-    std::atomic<bool> m_search_cancelled{false};
+    std::atomic<bool> m_render_cancelled  = false;
+    std::atomic<int> m_search_match_count = 0;
+    std::atomic<bool> m_search_cancelled  = false;
+
+    bool m_is_image = false;
 
     const Config &m_config;
 };
