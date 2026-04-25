@@ -1,5 +1,15 @@
 # LEKTRA CHANGELOG
 
+## 0.7.1
+
+### Features
+
+- Add image rotation support
+
+### Bug Fixes
+
+- Fix image zoom anchoring
+
 ## 0.7.0
 
 ### Features
