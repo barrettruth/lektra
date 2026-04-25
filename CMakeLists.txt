@@ -139,7 +139,7 @@ find_package(djvulibre CONFIG QUIET)
 find_package(synctex CONFIG QUIET)
 
 if (WITH_IMAGE)
-    find_package(ImageMagick QUIET COMPONENTS MagickCore Magick++)  # drop REQUIRED
+    find_package(ImageMagick QUIET COMPONENTS MagickCore Magick++)
     if (ImageMagick_FOUND AND ImageMagick_MagickCore_FOUND AND ImageMagick_Magick++_FOUND)
         message(STATUS "Image support: enabled (ImageMagick version: ${ImageMagick_VERSION_STRING})")
     else()
