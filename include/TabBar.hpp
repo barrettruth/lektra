@@ -18,17 +18,19 @@ class TabBar : public QTabBar
     Q_OBJECT
 
 public:
-    static inline std::atomic<bool> s_drop_accepted{false};
-    static constexpr const char *MIME_TYPE = "application/lektra-tab";
     explicit TabBar(QWidget *parent = nullptr);
+
+    static inline std::atomic<bool> s_drop_accepted = false;
+    static constexpr const char *MIME_TYPE          = "application/lektra-tab";
+
     struct TabData
     {
         QString filePath;
-        int currentPage{1};
-        double zoom{1.0};
-        bool invertColor{false};
-        int rotation{0};
-        int fitMode{0};
+        int currentPage  = 1;
+        double zoom      = 1.0;
+        bool invertColor = false;
+        int rotation     = 0;
+        int fitMode      = 0;
 
         QByteArray serialize() const noexcept
         {
@@ -78,5 +80,5 @@ protected:
 
 private:
     QPoint m_drag_start_pos;
-    int m_drag_tab_index{-1};
+    int m_drag_tab_index = -1;
 };
