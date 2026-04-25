@@ -340,10 +340,9 @@ endif()
 
 # --- DjVuLibre ---
 if(DJVULIBRE_FOUND)
-    # target_include_directories(${PROJECT_NAME} PRIVATE ${DJVULIBRE_INCLUDE_DIRS})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${DJVULIBRE_INCLUDE_DIRS})
     target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_DJVU=1)
-    target_link_libraries(${PROJECT_NAME} PRIVATE djvulibre::djvulibre)
-    # target_link_libraries(${PROJECT_NAME} PRIVATE ${DJVULIBRE_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${DJVULIBRE_LIBRARIES})
 endif()
 
 # ---------------------------------------------------------------------------
