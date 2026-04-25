@@ -507,7 +507,6 @@ private:
     void visual_line_move(Direction direction) noexcept;
     void snapVisualLine(bool centerView = true) noexcept;
 #ifdef WITH_IMAGE
-    void setCurrentAnimFrame(int index) noexcept;
     QTimer *m_anim_timer = nullptr;
 #endif
 

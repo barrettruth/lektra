@@ -954,7 +954,6 @@ Model::openAsync(const QString &filePath) noexcept
 }
 
 #ifdef WITH_IMAGE
-
 QFuture<void>
 Model::openAsync_image(const QString &canonPath) noexcept
 {
@@ -4782,5 +4781,4 @@ Model::setCurrentAnimFrame(int index) noexcept
     m_current_frame = index;
     m_image_cache   = m_animated_frames[index];
 }
-
 #endif

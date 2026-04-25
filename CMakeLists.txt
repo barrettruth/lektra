@@ -27,25 +27,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# ---------------------------------------------------------------------------
-# Per-config compile/link flags
-# NOTE: define the variable name that the generator expressions actually use.
-# ---------------------------------------------------------------------------
 if(MSVC)
-    set(DEBUG_FLAGS          /Od /Zi /RTC1 /W4 /fsanitize=address)
-    set(RELEASE_FLAGS        /O2 /DNDEBUG /GR- /W4)
-    set(REL_WITH_DEB_INFO_FLAGS /O2 /Zi /DNDEBUG /W4)
-    # MSVC standard-conforming preprocessor (needed for some C++23 headers)
     add_compile_options(/Zc:__cplusplus /Zc:preprocessor)
+    set(DEBUG_FLAGS          /Od;/Zi;/RTC1;/W4;/fsanitize=address)
+    set(RELEASE_FLAGS        /O2;/DNDEBUG;/GR-;/W4)
+    set(REL_WITH_DEB_INFO_FLAGS /O2;/Zi;/DNDEBUG;/W4)
 else()
-    set(DEBUG_FLAGS          -fno-omit-frame-pointer -ggdb3 -O0 -fsanitize=address -Wall -Wextra)
-    # set(DEBUG_FLAGS        -fno-omit-frame-pointer -ggdb3 -O0 -Wall -Wextra)
-    set(RELEASE_FLAGS        -O3 -DNDEBUG -fno-rtti)
-    set(REL_WITH_DEB_INFO_FLAGS -O2 -g -fno-omit-frame-pointer -DNDEBUG)
+    set(DEBUG_FLAGS          -fno-omit-frame-pointer;-ggdb3;-O0;-fsanitize=address;-Wall;-Wextra)
+    set(RELEASE_FLAGS        -O3;-DNDEBUG;-fno-rtti)
+    set(REL_WITH_DEB_INFO_FLAGS -O2;-g;-fno-omit-frame-pointer;-DNDEBUG)
 endif()
-
-# Override CMake's built-in RelWithDebInfo flags so they match ours exactly.
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "" CACHE STRING "" FORCE)
 
 # ---------------------------------------------------------------------------
 # Platform helpers  (CMake does not define LINUX; derive it)
@@ -100,16 +91,19 @@ if(MSVC)
     ExternalProject_Add(mupdf_external
         SOURCE_DIR "${MUPDF_SOURCE_DIR}"
         CONFIGURE_COMMAND ""
+
         BUILD_COMMAND
         MSBuild "${MUPDF_SLN}"
-        /p:Configuration=Release
+        /p:Configuration=$<CONFIG>
         /p:Platform=x64
-        /t:libmupdf
         /m
+
         INSTALL_COMMAND
         ${CMAKE_COMMAND} -E make_directory "${MUPDF_INSTALL_DIR}/lib"
-        COMMAND ${CMAKE_COMMAND} -E copy
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${MUPDF_SOURCE_DIR}/platform/win32/x64/Release/libmupdf.lib"
+        MUPDF_LIB_FILE
+
         BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}"
         UPDATE_COMMAND ""
     )
@@ -121,11 +115,11 @@ else()
         SOURCE_DIR "${MUPDF_SOURCE_DIR}"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-        make -C <SOURCE_DIR> build=release shared=yes
+        make -C <SOURCE_DIR> build=release shared=no
         HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no USE_SYSTEM_LIBS=yes
         LIB_CFLAGS="-fPIC -fvisibility=hidden" libs
         INSTALL_COMMAND
-        make -C <SOURCE_DIR> build=release shared=yes
+        make -C <SOURCE_DIR> build=release shared=no
         HAVE_TESSERACT=no HAVE_CURL=no HAVE_X11=no HAVE_GLUT=no HAVE_LIBCRYPTO=no USE_SYSTEM_LIBS=yes
         prefix="${MUPDF_INSTALL_DIR}" install-libs
         BUILD_BYPRODUCTS "${MUPDF_LIB_FILE}" "${MUPDF_LIB_THIRD_FILE}"
@@ -133,18 +127,7 @@ else()
     )
 endif()
 
-add_library(mupdf_lib SHARED IMPORTED)
-set_target_properties(mupdf_lib PROPERTIES
-    IMPORTED_LOCATION             "${MUPDF_LIB_FILE}"
-    INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
-)
-
-add_library(mupdf_lib_third SHARED IMPORTED)
-set_target_properties(mupdf_lib_third PROPERTIES
-    IMPORTED_LOCATION             "${MUPDF_LIB_THIRD_FILE}"
-    INTERFACE_INCLUDE_DIRECTORIES "${MUPDF_INCLUDE_DIRS}"
-)
-add_dependencies(mupdf_lib_third mupdf_external)
+# add_dependencies(mupdf_lib_third mupdf_external)
 
 # ---------------------------------------------------------------------------
 # Qt6 + optional system libraries
@@ -152,16 +135,24 @@ add_dependencies(mupdf_lib_third mupdf_external)
 find_package(Qt6 REQUIRED COMPONENTS
     Core Gui Widgets Concurrent LinguistTools OpenGLWidgets Network)
 
-find_package(PkgConfig REQUIRED)
+find_package(djvulibre CONFIG QUIET)
+find_package(synctex CONFIG QUIET)
 
-pkg_check_modules(DJVULIBRE QUIET ddjvuapi)
-pkg_check_modules(SYNCTEX QUIET synctex)
+if (WITH_IMAGE)
+    find_package(ImageMagick QUIET COMPONENTS MagickCore Magick++)  # drop REQUIRED
+    if (ImageMagick_FOUND AND ImageMagick_MagickCore_FOUND AND ImageMagick_Magick++_FOUND)
+        message(STATUS "Image support: enabled (ImageMagick version: ${ImageMagick_VERSION_STRING})")
+    else()
+        message(WARNING "ImageMagick/Magick++ not found – image support disabled")
+        set(WITH_IMAGE OFF)
+    endif()
+endif()
 
 if(NOT DJVULIBRE_FOUND)
-    message(STATUS "DjVuLibre not found – DjVu support disabled")
+    message(WARNING "DjVuLibre not found – DjVu support disabled")
 endif()
 if(NOT SYNCTEX_FOUND)
-    message(STATUS "SyncTeX not found – SyncTeX support disabled")
+    message(WARNING "SyncTeX not found – SyncTeX support disabled")
 endif()
 
 # ---------------------------------------------------------------------------
@@ -260,18 +251,23 @@ target_sources(${PROJECT_NAME} PRIVATE ${RESOURCES})
 # ---------------------------------------------------------------------------
 
 if(WITH_IMAGE)
-    PKG_CHECK_MODULES(MAGICK Magick++ REQUIRED)
-    if(MAGICK_FOUND)
-        target_include_directories(lektra PRIVATE ${MAGICK_INCLUDE_DIRS})
-        target_link_libraries(lektra PRIVATE ${MAGICK_LIBRARIES})
-        target_compile_options(lektra PRIVATE ${MAGICK_CFLAGS_OTHER})
-        target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_IMAGE=1)
+    if(ImageMagick_FOUND AND ImageMagick_MagickCore_FOUND AND ImageMagick_Magick++_FOUND)
+        target_include_directories(${PROJECT_NAME} PRIVATE
+            ${ImageMagick_INCLUDE_DIRS}
+            ${ImageMagick_MagickCore_INCLUDE_DIRS}
+            ${ImageMagick_Magick++_INCLUDE_DIRS}
+        )
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            ${ImageMagick_LIBRARIES}
+            ${ImageMagick_MagickCore_LIBRARIES}
+            ${ImageMagick_Magick++_LIBRARIES})
+        target_compile_definitions(${PROJECT_NAME} PRIVATE
+            WITH_IMAGE=1
+            MAGICKCORE_QUANTUM_DEPTH=16
+            MAGICKCORE_HDRI_ENABLE=1)
     endif()
 endif()
 
-# --- MuPDF ---
-target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_MUPDF=1)
 add_dependencies(${PROJECT_NAME} mupdf_external)
 
 # --- Qt ---
@@ -280,8 +276,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Concurrent Qt6::OpenGLWidgets Qt6::Network
 )
 
+# --- MuPDF ---
+target_include_directories(${PROJECT_NAME} PRIVATE ${MUPDF_INCLUDE_DIRS})
+target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_MUPDF=1)
+
 if(MSVC)
-    target_link_libraries(${PROJECT_NAME} PRIVATE mupdf_lib mupdf_lib_third)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        "${MUPDF_SOURCE_DIR}/platform/win32/x64/Release/libmupdf.lib"
+    )
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE
         mupdf_lib
@@ -294,16 +296,17 @@ endif()
 
 # --- SyncTeX ---
 if(SYNCTEX_FOUND)
-    target_include_directories(${PROJECT_NAME} PRIVATE "${SYNCTEX_INCLUDE_DIRS}")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_SYNCTEX=1)
-    target_link_libraries(${PROJECT_NAME} PRIVATE synctex)
+    # target_include_directories(${PROJECT_NAME} PRIVATE "${SYNCTEX_INCLUDE_DIRS}")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_SYNCTEX=1)
+    target_link_libraries(${PROJECT_NAME} PRIVATE synctex::synctex)
 endif()
 
 # --- DjVuLibre ---
 if(DJVULIBRE_FOUND)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${DJVULIBRE_INCLUDE_DIRS})
-    target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_DJVU=1)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${DJVULIBRE_LIBRARIES})
+    # target_include_directories(${PROJECT_NAME} PRIVATE ${DJVULIBRE_INCLUDE_DIRS})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_DJVU=1)
+    target_link_libraries(${PROJECT_NAME} PRIVATE djvulibre::djvulibre)
+    # target_link_libraries(${PROJECT_NAME} PRIVATE ${DJVULIBRE_LIBRARIES})
 endif()
 
 # ---------------------------------------------------------------------------
@@ -318,9 +321,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
-    $<$<CONFIG:Release>:${RELEASE_FLAGS}>
-    $<$<CONFIG:RelWithDebInfo>:${REL_WITH_DEB_INFO_FLAGS}>
+    $<$<CONFIG:Debug>:$<IF:$<CXX_COMPILER_ID:MSVC>,/DEBUG,--fsanitize=address>>
+    # nothing needed for Release/RelWithDebInfo
 )
 
 # ---------------------------------------------------------------------------
