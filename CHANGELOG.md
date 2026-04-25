@@ -39,6 +39,7 @@
 
 ### Bug Fixes
 
+- Add ImageMagick to the `AboutDialog`'s `libraries used` section
 - Stop animated image playback when not visible (different tab) to save resources and avoid unnecessary CPU usage.
 - Hide mode, color and progress info in the statusbar when in non-supported file types (e.g. images) to avoid confusion
 - Fix `invert color` menu button not working

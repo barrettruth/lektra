@@ -7,6 +7,10 @@
 #include <qfont.h>
 #include <qnamespace.h>
 
+#ifdef WITH_IMAGE
+    #include <Magick++.h>
+#endif
+
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent), infoLabel(new QLabel),
       closeButton(new QPushButton("Close"))
@@ -96,6 +100,11 @@ AboutDialog::softwaresUsedSection() noexcept
     layout->addRow(
         "DjVuLibre",
         new QLabel(QString(ddjvu_get_version_string()).split("-").last()));
+#endif
+#ifdef WITH_IMAGE
+    layout->addRow(
+        "ImageMagick",
+        new QLabel(QString(MagickppLibVersionText).split(" ").first()));
 #endif
 
     outerLayout->addLayout(layout, Qt::AlignCenter);
