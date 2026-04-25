@@ -1179,6 +1179,14 @@ DocumentView::RotateAnticlock() noexcept
 void
 DocumentView::rotateHelper() noexcept
 {
+#ifdef WITH_IMAGE
+    if (m_model->isImage())
+    {
+        // stopGifPlayback();
+        renderImage();
+        return;
+    }
+#endif
     cachePageStride();
     const std::set<int> &trackedPages = getVisiblePages();
 

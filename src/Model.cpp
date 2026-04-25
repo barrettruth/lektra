@@ -2331,32 +2331,46 @@ Model::createRenderJob(int pageno) const noexcept
     return job;
 }
 
+#ifdef WITH_IMAGE
 QImage
 Model::requestImageRender(bool highQuality) noexcept
 {
-#ifndef WITH_IMAGE
-    return {};
-#else
-    if (!m_is_image)
+    if (!m_is_image || m_image_cache.isNull())
         return {};
 
-    if (m_image_cache.isNull())
-        return {};
-
-    // For animated images, skip the expensive per-frame scale.
-    // DocumentView applies zoom via the scene transform instead.
+    // 1. Handle Animated Images
     if (m_is_animated)
     {
-        QImage frame = m_image_cache; // shallow copy
+        QImage frame = m_image_cache;
+        if (m_rotation != 0)
+        {
+            QTransform trans;
+            trans.rotate(m_rotation);
+            frame = frame.transformed(trans, Qt::SmoothTransformation);
+        }
         frame.setDevicePixelRatio(m_dpr);
         if (m_invert_color)
-            frame.invertPixels(); // this will detach — acceptable
+            frame.invertPixels();
         return frame;
     }
 
-    int rw = std::max(1, (int)(m_image_cache.width() * m_zoom * m_dpr));
-    int rh = std::max(1, (int)(m_image_cache.height() * m_zoom * m_dpr));
+    // 2. Determine base dimensions after rotation
+    // Use QTransform to see how dimensions swap at 90/270 degrees
+    QTransform rotationTransform;
+    rotationTransform.rotate(m_rotation);
 
+    // Calculate the size the image would be if it were scaled at 100% zoom but
+    // rotated
+    QRectF rotatedRect
+        = rotationTransform.mapRect(QRectF(m_image_cache.rect()));
+    const double rotatedWidth  = rotatedRect.width();
+    const double rotatedHeight = rotatedRect.height();
+
+    // 3. Calculate target dimensions with zoom and DPR
+    int rw = std::max(1, (int)(rotatedWidth * m_zoom * m_dpr));
+    int rh = std::max(1, (int)(rotatedHeight * m_zoom * m_dpr));
+
+    // 4. Capping Logic (Remains largely the same, but uses new rw/rh)
     constexpr int MAX_RENDER_EDGE      = 16384;
     constexpr double MAX_RENDER_PIXELS = 64.0 * 1024.0 * 1024.0;
 
@@ -2366,15 +2380,14 @@ Model::requestImageRender(bool highQuality) noexcept
 
     if (rw > MAX_RENDER_EDGE || rh > MAX_RENDER_EDGE)
     {
-        const double edge_scale_x = static_cast<double>(MAX_RENDER_EDGE) / rw;
-        const double edge_scale_y = static_cast<double>(MAX_RENDER_EDGE) / rh;
-        cap_scale = std::min(cap_scale, std::min(edge_scale_x, edge_scale_y));
+        cap_scale = std::min((double)MAX_RENDER_EDGE / rw,
+                             (double)MAX_RENDER_EDGE / rh);
     }
 
     if (pixel_count > MAX_RENDER_PIXELS)
     {
-        const double pixel_scale = std::sqrt(MAX_RENDER_PIXELS / pixel_count);
-        cap_scale                = std::min(cap_scale, pixel_scale);
+        cap_scale
+            = std::min(cap_scale, std::sqrt(MAX_RENDER_PIXELS / pixel_count));
     }
 
     if (cap_scale < 1.0)
@@ -2383,16 +2396,30 @@ Model::requestImageRender(bool highQuality) noexcept
         rh = std::max(1, static_cast<int>(rh * cap_scale));
     }
 
+    // 5. Perform Transformation
     const Qt::TransformationMode mode
         = highQuality ? Qt::SmoothTransformation : Qt::FastTransformation;
 
-    QImage scaled = m_image_cache.scaled(rw, rh, Qt::KeepAspectRatio, mode);
-    scaled.setDevicePixelRatio(m_dpr);
+    // To prevent double-processing, we combine scale and rotation into one
+    // transform This is more efficient than calling .scaled() then
+    // .transformed()
+    QTransform finalTransform;
+    finalTransform.rotate(m_rotation);
+
+    // Calculate the actual scale needed to reach our capped rw/rh from the
+    // original source We scale the original cache pixels to fit the calculated
+    // bounding box
+    QImage result = m_image_cache.transformed(finalTransform, mode)
+                        .scaled(rw, rh, Qt::IgnoreAspectRatio, mode);
+
+    result.setDevicePixelRatio(m_dpr);
+
     if (m_invert_color)
-        scaled.invertPixels();
-    return scaled;
-#endif
+        result.invertPixels();
+
+    return result;
 }
+#endif
 
 void
 Model::requestPageRender(
@@ -2408,8 +2435,8 @@ Model::requestPageRender(
     connect(watcher, &QFutureWatcher<PageRenderResult>::finished, this,
             [this, watcher, callback, job]()
     {
-        // TODO: This is a hack, this shouldn't actually happen, check why it
-        // happens, but for now, just guard against invalid futures.
+        // TODO: This is a hack, this shouldn't actually happen, check why
+        // it happens, but for now, just guard against invalid futures.
         if (!watcher->future().isValid())
         {
             watcher->deleteLater();
@@ -2536,8 +2563,8 @@ Model::renderPageWithExtrasAsync(const RenderJob &job) noexcept
     fz_always(ctx)
     {
         // We will drop the context at the end of this function, which will
-        // also drop the display list reference we just kept. If we failed to
-        // keep the display list, dropping a null pointer is safe.
+        // also drop the display list reference we just kept. If we failed
+        // to keep the display list, dropping a null pointer is safe.
     }
     fz_catch(ctx)
     {
