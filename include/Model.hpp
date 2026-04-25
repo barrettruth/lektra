@@ -450,7 +450,9 @@ public:
     void requestPageRender(
         const RenderJob &job,
         const std::function<void(PageRenderResult)> &callback) noexcept;
+#ifdef WITH_IMAGE
     QImage requestImageRender(bool highQuality = false) noexcept;
+#endif
     PageRenderResult renderPageWithExtrasAsync(const RenderJob &job) noexcept;
 
     Properties properties() noexcept;
