@@ -4,6 +4,7 @@
 
 ## HIGH PRIORITY
 
+- [ ] Open in existing window, using IPC or something, instead of opening a new window every time
 - [ ] Tab detach drag and drop to new window spawns new useless window
 - [ ] Add copy text to text highlight annotation for convenience
 - [ ] Boundary of the annotations need to extend only for the annotation
