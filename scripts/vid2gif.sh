@@ -4,13 +4,15 @@
 INPUT=""
 OUTPUT=""
 FPS=20        # Slightly higher for smoother motion
-WIDTH=1080    # High definition width
+DURATION=-1
 
-while getopts "i:o:" opt; do
+while getopts "i:o:d:f:" opt; do
   case $opt in
     i) INPUT="$OPTARG" ;;
     o) OUTPUT="$OPTARG" ;;
-    *) echo "Usage: $0 -i input.mp4 -o output.gif"; exit 1 ;;
+    d) DURATION="$OPTARG" ;;
+    f) FPS="$OPTARG" ;;
+    *) echo "Usage: $0 -i input.mp4 -o output.gif -d 10 -f 20"; exit 1 ;;
   esac
 done
 
@@ -25,11 +27,13 @@ fi
 
 echo "Generating high-quality GIF..."
 
-# Complex filter explanation:
-# 1. split: creates two streams of the input
-# 2. [0:v]palettegen: takes the first stream and creates a global palette
-# 3. [1:v][p]paletteuse: takes the second stream and applies the palette
-# stats_mode=diff: optimizes palette for moving parts vs static backgrounds
-ffmpeg -i "$INPUT" -vf "fps=$FPS,scale=$WIDTH:-1:flags=lanczos,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=sierra2_4a" -y "$OUTPUT"
+
+if [[ $DURATION -gt 0 ]]; then
+    echo "Trimming video to $DURATION seconds..."
+    ffmpeg -i "$INPUT" -ss 0 -t $DURATION -vf "fps=$FPS,split[s0][s1];[s0]palettegen=stats_mode=diff:max_colors=64[p];[s1][p]paletteuse=dither=sierra2_4a" -y "$OUTPUT"
+else
+    echo "Using full video duration."
+    ffmpeg -i "$INPUT" -vf "fps=$FPS,split[s0][s1];[s0]palettegen=stats_mode=diff:max_colors=64[p];[s1][p]paletteuse=dither=sierra2_4a" -y "$OUTPUT"
+fi
 
 echo "Success: $OUTPUT"
