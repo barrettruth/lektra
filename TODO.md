@@ -4,7 +4,7 @@
 
 ## HIGH PRIORITY
 
-- [ ] Tab reordering not working
+- [ ] Tab detach drag and drop to new window spawns new useless window
 - [ ] Add copy text to text highlight annotation for convenience
 - [ ] Boundary of the annotations need to extend only for the annotation
 - [ ] Fix Input dialog buttons looking weird
