@@ -16,7 +16,7 @@ fi
 ARCH=${ARCH:-$(command -v dpkg >/dev/null 2>&1 && dpkg --print-architecture || uname -m)}
 JOBS=${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)}
 BUILD_TYPE=${BUILD_TYPE:-Release}
-ENABLE_LLM_SUPPORT=${ENABLE_LLM_SUPPORT:-OFF}
+WITH_IMAGE=${WITH_IMAGE:-ON}
 CLEAN_BUILD=${CLEAN_BUILD:-0}
 
 need() {
@@ -37,7 +37,7 @@ fi
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DENABLE_LLM_SUPPORT="$ENABLE_LLM_SUPPORT"
+    -DWITH_IMAGE="$WITH_IMAGE"
 cmake --build "$BUILD_DIR" -j"$JOBS"
 
 rm -rf "$STAGE_DIR" "$PKG_DIR"
@@ -57,10 +57,10 @@ Architecture: $ARCH
 Maintainer: Dheeraj Vittal Shenoy <dheerajshenoy22@gmail.com>
 Homepage: https://codeberg.org/lektra/lektra
 Installed-Size: ${INSTALLED_SIZE:-0}
-Build-Depends: cmake ninja-build
-Depends: qt6-base-dev, curl, libsynctex-dev
+Build-Depends: build-essential pkgconf cmake ninja-build g++
+Depends: qt6-base-dev qt6-tools-dev qt6-l10n-tools unzip zlib1g-dev libgl1-mesa-dri mesa-common-dev
 Suggests: qt6-style-kvantum
-Description: A fast, keyboard-based, configurable PDF reader
+Description: High performance Document and Image viewer
 EOF
 
 mkdir -p "$OUT_DIR"
