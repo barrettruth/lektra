@@ -32,7 +32,9 @@ public:
     enum class MouseAction
     {
         None = 0,
+#ifdef WITH_SYNCTEX
         SynctexJump,
+#endif
         Portal,
         Preview,
         Pan,
@@ -166,7 +168,7 @@ signals:
     void rightClickRequested(QPointF scenePos);
     void smartJumpRequested(QPointF scenePos);
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     void synctexJumpRequested(QPointF scenePos);
 #endif
 

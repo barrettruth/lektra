@@ -196,7 +196,7 @@ init_args(argparse::ArgumentParser &program)
         .default_value(false)
         .implicit_value(true);
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     program.add_argument("--synctex-forward")
         .help(
             "Format: "

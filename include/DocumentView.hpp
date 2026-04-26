@@ -12,12 +12,12 @@
 #include "ScrollBar.hpp"
 #include "WaitingSpinnerWidget.hpp"
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
 extern "C"
 {
-    #include <synctex/synctex_parser.h>
-    #include <synctex/synctex_parser_utils.h>
-    #include <synctex/synctex_version.h>
+    #include "synctex_parser.h"
+    #include "synctex_parser_utils.h"
+    #include "synctex_version.h"
 }
 #endif
 
@@ -400,7 +400,7 @@ private slots:
     void handleReloadRequested(int pageno = -1) noexcept;
     void handleDeferredResize() noexcept;
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     void handleSynctexJumpRequested(QPointF scenePos) noexcept;
 #endif
     void handleOpenFileFinished() noexcept;
@@ -510,7 +510,7 @@ private:
     QTimer *m_anim_timer = nullptr;
 #endif
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     void initSynctex() noexcept;
     void synctexLocateInDocument(const char *fileName, int line) noexcept;
 #endif
@@ -557,7 +557,7 @@ private:
     int m_visual_line_index                  = -1;
     bool m_visual_line_mode                  = false;
     bool m_thumbnail_mode                    = false;
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     synctex_scanner_p m_synctex_scanner = nullptr;
 #endif
 

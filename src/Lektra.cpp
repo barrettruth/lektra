@@ -1061,7 +1061,7 @@ Lektra::initConfig() noexcept
         set_color(search["index_color"], m_config.search.index_color);
     }
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     if (auto synctex = toml["synctex"])
     {
         set(synctex["enabled"], m_config.synctex.enabled);
@@ -1240,7 +1240,9 @@ Lektra::initDefaultMousebinds() noexcept
     setupMousebinding("pan", "Alt+LeftButton");
     setupMousebinding("preview", "Alt+Shift+LeftButton");
     setupMousebinding("portal", "Ctrl+LeftButton");
+#ifdef WITH_SYNCTEX
     setupMousebinding("synctex_jump", "Shift+LeftButton");
+#endif
 }
 
 // Initialize the keybindings related stuff
@@ -1684,8 +1686,10 @@ Lektra::setupMousebinding(const QString &action_str,
     if (action_str == "portal")
         action = GraphicsView::MouseAction::Portal;
 
+#ifdef WITH_SYNCTEX
     else if (action_str == "synctex_jump")
         action = GraphicsView::MouseAction::SynctexJump;
+#endif
 
     else if (action_str == "preview")
         action = GraphicsView::MouseAction::Preview;
@@ -1840,7 +1844,7 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
     if (argparser.is_used("page"))
         m_config.behavior._startpage_override = argparser.get<int>("--page");
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     if (argparser.is_used("synctex-forward"))
     {
         m_config.behavior._startpage_override = -1; // do not override the page
@@ -6155,7 +6159,9 @@ Lektra::checkConfigFile(const QString &path) noexcept
     static const QHash<QString, QSet<QString>> knownKeys = {
         {"page", {"bg", "fg"}},
 
+#ifdef WITH_SYNCTEX
         {"synctex", {"enabled", "editor_command"}},
+#endif
 
         {"portal",
          {"border_color", "enabled", "border_width", "respect_parent",
@@ -6236,7 +6242,12 @@ Lektra::checkConfigFile(const QString &path) noexcept
           "open_last_visited", "file_name_only", "cache_pages"}},
 
         {"keybindings", {}},
-        {"mousebindings", {"pan", "portal", "synctex_jump", "preview"}},
+        {"mousebindings",
+         {"pan", "portal",
+#ifdef WITH_SYNCTEX
+          "synctex_jump",
+#endif
+          "preview"}},
 
     };
 

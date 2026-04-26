@@ -87,7 +87,7 @@ DocumentView::DocumentView(const Config &config, float dpr, QWidget *parent,
 
     initGui();
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     initSynctex();
 #endif
 }
@@ -102,7 +102,7 @@ DocumentView::~DocumentView() noexcept
     stopPendingRenders();
     resetConnections();
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     synctex_scanner_free(m_synctex_scanner);
 #endif
 
@@ -277,7 +277,7 @@ DocumentView::setLayoutMode(const LayoutMode &mode) noexcept
     GotoPage(m_pageno);
 }
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
 void
 DocumentView::initSynctex() noexcept
 {
@@ -492,7 +492,7 @@ DocumentView::initConnections() noexcept
     qDebug() << "DocumentView::initConnections(): Initializing connections";
 #endif
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     connect(m_gview, &GraphicsView::synctexJumpRequested, this,
             &DocumentView::handleSynctexJumpRequested);
 #endif
@@ -932,7 +932,7 @@ DocumentView::handleClickSelection(int clickType, QPointF scenePos) noexcept
 }
 
 // Handle SyncTeX jump request
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
 void
 DocumentView::handleSynctexJumpRequested(QPointF scenePos) noexcept
 {
@@ -976,7 +976,7 @@ DocumentView::handleSynctexJumpRequested(QPointF scenePos) noexcept
 }
 #endif
 
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
 void
 DocumentView::synctexLocateInDocument(const char *texFileName,
                                       int line) noexcept
@@ -4781,7 +4781,7 @@ DocumentView::tryReloadLater(int attempt) noexcept
         }
         else
         {
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
             initSynctex();
 #endif
             {

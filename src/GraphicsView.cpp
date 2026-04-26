@@ -214,8 +214,8 @@ GraphicsView::mousePressEvent(QMouseEvent *event)
 
     const QPointF scenePos = mapToScene(event->pos());
 
+#ifdef WITH_SYNCTEX
     // --- SynctexJump (only valid in TextSelection mode) ---
-#ifdef HAS_SYNCTEX
     if (action == MouseAction::SynctexJump && m_mode == Mode::TextSelection)
     {
         if (!m_config.synctex.enabled)

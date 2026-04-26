@@ -93,7 +93,7 @@ AboutDialog::softwaresUsedSection() noexcept
     layout->setAlignment(Qt::AlignCenter);
     layout->addRow("Qt", new QLabel(QT_VERSION_STR));
     layout->addRow("MuPDF", new QLabel(QString(FZ_VERSION)));
-#ifdef HAS_SYNCTEX
+#ifdef WITH_SYNCTEX
     layout->addRow("SyncTeX", new QLabel(QString(SYNCTEX_VERSION_STRING)));
 #endif
 #ifdef HAS_DJVU
