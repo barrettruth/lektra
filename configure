@@ -69,6 +69,11 @@ if [ ! -d "thirdparty/mupdf" ] || [ -z "$(ls -A "thirdparty/mupdf")" ]; then
     git submodule update --init --recursive
 fi
 
+if [ ! -d "thirdparty/synctex" ] || [ -z "$(ls -A "thirdparty/synctex")" ]; then
+    echo "Error: The directory 'thirdparty/synctex' does not exist or is empty."
+    git submodule update --init --recursive
+fi
+
 # Create the build directory if it doesn't exist
 mkdir -p build
 
