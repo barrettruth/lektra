@@ -17,6 +17,7 @@ ARCH=${ARCH:-$(command -v dpkg >/dev/null 2>&1 && dpkg --print-architecture || u
 JOBS=${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)}
 BUILD_TYPE=${BUILD_TYPE:-Release}
 WITH_IMAGE=${WITH_IMAGE:-ON}
+WITH_SYNCTEX=${WITH_SYNCTEX:-ON}
 CLEAN_BUILD=${CLEAN_BUILD:-0}
 
 need() {
@@ -37,7 +38,8 @@ fi
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DWITH_IMAGE="$WITH_IMAGE"
+    -DWITH_IMAGE="$WITH_IMAGE" \
+    -DWITH_SYNCTEX="$WITH_SYNCTEX"
 cmake --build "$BUILD_DIR" -j"$JOBS"
 
 rm -rf "$STAGE_DIR" "$PKG_DIR"
@@ -58,7 +60,7 @@ Maintainer: Dheeraj Vittal Shenoy <dheerajshenoy22@gmail.com>
 Homepage: https://codeberg.org/lektra/lektra
 Installed-Size: ${INSTALLED_SIZE:-0}
 Build-Depends: build-essential pkgconf cmake ninja-build g++
-Depends: qt6-base-dev qt6-tools-dev qt6-l10n-tools unzip zlib1g-dev libgl1-mesa-dri mesa-common-dev
+Depends: qt6-base-dev, qt6-tools-dev, qt6-l10n-tools, unzip, zlib1g-dev, libgl1-mesa-dri, mesa-common-dev
 Suggests: qt6-style-kvantum
 Description: High performance Document and Image viewer
 EOF
