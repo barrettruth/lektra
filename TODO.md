@@ -4,6 +4,7 @@
 
 ## HIGH PRIORITY
 
+- [ ] Render large gifs quickly and efficiently
 - [ ] Switching to images in tab doesn't update the statusbar info
 - [ ] Fix conflicting shortcuts to override default shortcuts
 - [ ] Open in existing window, using IPC or something, instead of opening a new window every time
