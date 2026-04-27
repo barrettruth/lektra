@@ -4,6 +4,8 @@
 
 ## HIGH PRIORITY
 
+- [ ] Switching to images in tab doesn't update the statusbar info
+- [ ] Fix conflicting shortcuts to override default shortcuts
 - [ ] Open in existing window, using IPC or something, instead of opening a new window every time
 - [ ] Tab detach drag and drop to new window spawns new useless window
 - [ ] Add copy text to text highlight annotation for convenience
