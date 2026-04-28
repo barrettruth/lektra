@@ -6402,4 +6402,6 @@ Lektra::RemoveBookmark() noexcept
 {
     if (!m_doc)
         return;
+
+    m_bookmark_manager.removeBookmark(m_doc->filePath());
 }
