@@ -40,6 +40,14 @@
 #include <QStandardPaths>
 #include <QTabWidget>
 
+// In Lektra.hpp
+struct LazyCallback
+{
+    std::function<void()> fn;
+};
+
+// Q_DECLARE_METATYPE(LazyCallback)
+
 class Lektra : public QMainWindow
 {
     Q_OBJECT
@@ -111,8 +119,7 @@ public:
     void OpenFilesInHSplit(const std::vector<std::string> &files = {}) noexcept;
 
     void OpenFiles(const std::vector<std::string> &filenames = {}) noexcept;
-    void OpenFilesInNewTab(const std::vector<std::string> &files = {}) noexcept;
-    void OpenFilesInNewTab(const QList<QString> &files = {}) noexcept;
+    void OpenFilesInNewTab(const QStringList &files = {}) noexcept;
     DocumentView *OpenFileInNewTab(const QString &filename = {},
                                    const std::function<void()> &callback
                                    = {}) noexcept;

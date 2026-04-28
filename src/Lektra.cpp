@@ -2492,10 +2492,33 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
 }
 
 void
-Lektra::OpenFiles(const std::vector<std::string> &filenames) noexcept
+Lektra::OpenFiles(const std::vector<std::string> &files) noexcept
 {
-    for (const std::string &f : filenames)
-        OpenFileInNewTab(QString::fromStdString(f));
+    bool isFirst = true;
+    for (const std::string &file : files)
+    {
+        if (!m_config.tabs.lazy_load || isFirst)
+        {
+            OpenFileInNewTab(QString::fromStdString(file));
+        }
+        else
+        {
+            const QString filePath = QString::fromStdString(file);
+            auto *placeholder      = new QWidget(this);
+            placeholder->setProperty("tabRole", "lazy");
+            placeholder->setProperty("filePath", filePath);
+            // No callback for plain multi-file open, but store an empty
+            // one so materialization code is uniform
+            placeholder->setProperty("callback",
+                                     QVariant::fromValue(LazyCallback{}));
+
+            const QString title = m_config.tabs.full_path
+                                      ? filePath
+                                      : QFileInfo(filePath).fileName();
+            m_tab_widget->addTab(placeholder, title);
+        }
+        isFirst = false;
+    }
 }
 
 void
@@ -2537,20 +2560,37 @@ Lektra::OpenFilesInHSplit(const std::vector<std::string> &files) noexcept
     });
 }
 
-// Opens multiple files given a list of file paths
-void
-Lektra::OpenFilesInNewTab(const std::vector<std::string> &files) noexcept
-{
-    for (const std::string &s : files)
-        OpenFileInNewTab(QString::fromStdString(s));
-}
-
-// Opens multiple files given a list of file paths
 void
 Lektra::OpenFilesInNewTab(const QStringList &files) noexcept
 {
+#ifndef NDEBUG
+    qDebug() << "Lektra::OpenFilesInNewTab(): Opening files in new tabs:"
+             << files.size();
+#endif
+
+    bool isFirst = true;
     for (const QString &file : files)
-        OpenFileInNewTab(file);
+    {
+        if (!m_config.tabs.lazy_load || isFirst)
+        {
+            OpenFileInNewTab(file);
+        }
+        else
+        {
+            auto *placeholder = new QWidget(this);
+            placeholder->setProperty("tabRole", "lazy");
+            placeholder->setProperty("filePath", file);
+            // No callback for plain multi-file open, but store an empty
+            // one so materialization code is uniform
+            placeholder->setProperty("callback",
+                                     QVariant::fromValue(LazyCallback{}));
+
+            const QString title
+                = m_config.tabs.full_path ? file : QFileInfo(file).fileName();
+            m_tab_widget->addTab(placeholder, title);
+        }
+        isFirst = false;
+    }
 }
 
 DocumentView *
@@ -3285,6 +3325,32 @@ Lektra::handleFileNameChanged(const QString &name) noexcept
 void
 Lektra::handleCurrentTabChanged(int index) noexcept
 {
+    QWidget *w = m_tab_widget->widget(index);
+
+    // Lazy load materialization: if the tab has the "lazy" role, it means it's
+    // a placeholder for a file that hasn't been loaded yet. We need to load the
+    // file, create a DocumentView for it, and replace the placeholder widget
+    // with the new view.
+    if (w && w->property("tabRole").toString() == "lazy")
+    {
+        const QString filePath  = w->property("filePath").toString();
+        const LazyCallback lazy = w->property("callback").value<LazyCallback>();
+
+        // Block signals to prevent recursion/cascading loads
+        m_tab_widget->blockSignals(true);
+
+        m_tab_widget->removeTab(index);
+        w->deleteLater();
+
+        DocumentView *view = OpenFileInNewTab(filePath, lazy.fn);
+
+        m_tab_widget->tabBar()->moveTab(m_tab_widget->count() - 1, index);
+        m_tab_widget->setCurrentIndex(index);
+
+        m_tab_widget->blockSignals(false);
+        return;
+    }
+
 #ifdef WITH_IMAGE
     // Stop animation on all views in the outgoing tab
     if (auto *oldContainer = m_tab_widget->rootContainer(m_prev_tab_index))
@@ -5136,7 +5202,12 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
             if (filePath.isEmpty())
                 continue;
 
-            OpenFileInNewTab(filePath, [this, page, zoom, fitMode, invert]()
+            auto *placeholder = new QWidget(this);
+            placeholder->setProperty("tabRole", "lazy");
+            placeholder->setProperty("filePath", filePath);
+            placeholder->setProperty("callback",
+                                     QVariant::fromValue(LazyCallback{
+                                         [this, page, zoom, fitMode, invert]()
             {
                 if (!m_doc)
                     return;
@@ -5145,7 +5216,18 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
                 m_doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
                 m_doc->setZoom(zoom);
                 m_doc->GotoPage(page);
-            });
+            }}));
+
+            // OpenFileInNewTab(filePath, [this, page, zoom, fitMode, invert]()
+            // {
+            //     if (!m_doc)
+            //         return;
+            //     if (invert)
+            //         m_doc->setInvertColor(true);
+            //     m_doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
+            //     m_doc->setZoom(zoom);
+            //     m_doc->GotoPage(page);
+            // });
             continue;
         }
 
