@@ -341,6 +341,7 @@ DocumentView::handleOpenFileFinished() noexcept
 
     m_spinner->stop();
     m_spinner->hide();
+
 #ifdef WITH_IMAGE
     stopGifPlayback();
 #endif
