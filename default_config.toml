@@ -189,7 +189,7 @@ backend = "raster"
 
 [behavior]
 initial_mode = "text_select_mode"
-always_open_in_new_window = false
+single_instance = false
 remember_last_visited = true
 confirm_on_quit = false
 invert_mode = false
