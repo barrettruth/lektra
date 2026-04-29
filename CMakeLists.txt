@@ -495,3 +495,69 @@ if(NOT WIN32)
     # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-config.5  DESTINATION share/man/man5)
     # install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/lektra-commands.7 DESTINATION share/man/man7)
 endif()
+
+if(WIN32)
+    # Find windeployqt executable
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt
+        HINTS "${Qt${QT_VERSION_MAJOR}_DIR}/../../../bin"
+    )
+
+    if(WINDEPLOYQT_EXECUTABLE)
+        message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+
+        # Run windeployqt after build (for development/debugging)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${WINDEPLOYQT_EXECUTABLE}
+            --release
+            --no-translations
+            --compiler-runtime
+            $<TARGET_FILE:${PROJECT_NAME}>
+            COMMENT "Running windeployqt for development build..."
+        )
+    else()
+        message(WARNING "windeployqt not found - Qt dependencies won't be deployed automatically")
+    endif()
+endif()
+
+# Install Qt dependencies during cmake --install
+if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
+    install(CODE "
+    message(STATUS \"Deploying Qt dependencies with windeployqt...\")
+    execute_process(
+        COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
+        --release
+        --no-translations
+        --compiler-runtime
+        \"\${CMAKE_INSTALL_PREFIX}/bin/YourApp.exe\"
+        RESULT_VARIABLE WINDEPLOYQT_RESULT
+    )
+    if(NOT WINDEPLOYQT_RESULT EQUAL 0)
+        message(WARNING \"windeployqt failed with code \${WINDEPLOYQT_RESULT}\")
+    endif()
+    " COMPONENT Runtime)
+endif()
+
+if (WIN32)
+    # Define runtime DLLs for third-party libraries
+    set(RUNTIME_DLLS "")
+
+    # OpenSSL DLLs
+    if(EXISTS "${IMAGEMAGICK_ROOT}/")
+        file(GLOB OPENSSL_DLLS "${OPENSSL_ROOT}/bin/*.dll")
+        list(APPEND RUNTIME_DLLS ${OPENSSL_DLLS})
+    endif()
+
+    # Install third-party DLLs
+    if(RUNTIME_DLLS)
+        install(FILES ${RUNTIME_DLLS}
+            DESTINATION bin
+            CONFIGURATIONS Release RelWithDebInfo
+        )
+
+        # Also copy to build directory for debugging
+        add_custom_command(TARGET YourApp POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${RUNTIME_DLLS} $<TARGET_FILE_DIR:YourApp>
+            COMMENT "Copying third-party DLLs to build directory..."
+        )
+    endif()
+endif()
