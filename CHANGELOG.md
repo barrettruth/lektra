@@ -17,6 +17,8 @@
 
 ### Bug Fixes
 
+- Fix `openSessionFromArray` function loading files incorrectly and breaking
+- Fix segfault in `buildPageCache` because of double free of mupdf context
 - Add implementation for `file_reload` command
 - Fix synctex initialisation
 - Fix synctex optional macro in the source code `HAS_SYNCTEX` -> `WITH_SYNCTEX`

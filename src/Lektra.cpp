@@ -2455,16 +2455,6 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
         return false;
     }
 
-    // if (DocumentView *existing = findOpenView(filename))
-    // {
-    //     DocumentContainer *container = existing->container();
-    //     m_tab_widget->setCurrentIndex(m_tab_widget->indexOf(container));
-    //     container->focusView(existing);
-    //     if (callback)
-    //         callback();
-    //     return true;
-    // }
-
     DocumentView *view = targetView ? targetView : container->view();
     if (!view)
         return false;
@@ -2491,24 +2481,21 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
 
     setCurrentDocumentView(view); // immediate, like OpenFileInNewTab
 
-    // Restore saved page number after file loads (if remember_last_visited
-    // is enabled)
-    if (m_config.behavior.remember_last_visited)
+    if (m_config.behavior.remember_last_visited || callback)
     {
-        const int savedPage = m_recent_files_store.pageNumber(filename);
-        if (savedPage > 0)
-        {
-            connect(view, &DocumentView::openFileFinished, this,
-                    [view, savedPage](DocumentView *, Model::FileType)
-            { view->GotoPage(savedPage - 1); }, Qt::SingleShotConnection);
-        }
-    }
+        const int savedPage = m_config.behavior.remember_last_visited
+                                  ? m_recent_files_store.pageNumber(filename)
+                                  : 0;
 
-    if (callback)
-    {
         connect(view, &DocumentView::openFileFinished, this,
-                [callback](DocumentView *, Model::FileType) { callback(); },
-                Qt::SingleShotConnection);
+                [callback, savedPage](DocumentView *view, Model::FileType)
+        {
+            // savedPage takes lower priority than session callback
+            if (savedPage > 0 && !callback)
+                view->GotoPage(savedPage - 1);
+            if (callback)
+                callback();
+        }, Qt::SingleShotConnection);
     }
 
     return true;
@@ -2645,17 +2632,6 @@ Lektra::OpenFileInNewTab(const QString &filename,
         return nullptr;
     }
 
-    // Check if file is already open
-    // if (DocumentView *existing = findOpenView(filename))
-    // {
-    //     DocumentContainer *container = existing->container();
-    //     m_tab_widget->setCurrentIndex(m_tab_widget->indexOf(container));
-    //     container->focusView(existing);
-    //     if (callback)
-    //         callback();
-    //     return true;
-    // }
-
     // Create a new DocumentView
     DocumentView *view = new DocumentView(m_config, m_dpr, this);
 
@@ -2758,17 +2734,6 @@ Lektra::openFileSplitHelper(const QString &filename,
         }
         return nullptr;
     }
-
-    // Check if file is already open
-    // if (DocumentView *existing = findOpenView(filename))
-    // {
-    //     DocumentContainer *container = existing->container();
-    //     m_tab_widget->setCurrentIndex(m_tab_widget->indexOf(container));
-    //     container->focusView(existing);
-    //     if (callback)
-    //         callback();
-    //     return true;
-    // }
 
     const int tabIndex = m_tab_widget->currentIndex();
 
@@ -2876,16 +2841,6 @@ Lektra::OpenFileInNewWindow(const QString &filePath,
     // make absolute
     if (QDir::isRelativePath(fp))
         fp = QDir::current().absoluteFilePath(fp);
-
-    // if (DocumentView *existing = findOpenView(filePath))
-    // {
-    //     DocumentContainer *container = existing->container();
-    //     m_tab_widget->setCurrentIndex(m_tab_widget->indexOf(container));
-    //     container->focusView(existing);
-    //     if (callback)
-    //         callback();
-    //     return true;
-    // }
 
     if (!QFile::exists(fp))
     {
@@ -5218,54 +5173,42 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
         if (splitsNode.isEmpty() && tabObj.contains("file_path"))
         {
             const QString filePath = tabObj["file_path"].toString();
-            const int page         = tabObj["current_page"].toInt();
-            const double zoom      = tabObj["zoom"].toDouble();
-            const int fitMode      = tabObj["fit_mode"].toInt();
-            const bool invert      = tabObj["invert_color"].toBool();
-
             if (filePath.isEmpty())
                 continue;
 
-            auto *placeholder = new QWidget(this);
-            placeholder->setProperty("tabRole", "lazy");
-            placeholder->setProperty("filePath", filePath);
-            placeholder->setProperty("callback",
-                                     QVariant::fromValue(LazyCallback{
-                                         [this, page, zoom, fitMode, invert]()
-            {
-                if (!m_doc)
-                    return;
-                if (invert)
-                    m_doc->setInvertColor(true);
-                m_doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
-                m_doc->setZoom(zoom);
-                m_doc->GotoPage(page);
-            }}));
+            const int page    = tabObj["current_page"].toInt();
+            const double zoom = tabObj["zoom"].toDouble();
+            const int fitMode = tabObj["fit_mode"].toInt();
+            const bool invert = tabObj["invert_color"].toBool();
 
-            // OpenFileInNewTab(filePath, [this, page, zoom, fitMode, invert]()
-            // {
-            //     if (!m_doc)
-            //         return;
-            //     if (invert)
-            //         m_doc->setInvertColor(true);
-            //     m_doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
-            //     m_doc->setZoom(zoom);
-            //     m_doc->GotoPage(page);
-            // });
+            DocumentView *view = OpenFileInNewTab(filePath, {});
+            if (!view)
+                continue;
+
+            connect(view, &DocumentView::openFileFinished, this,
+                    [view, page, zoom, fitMode, invert](DocumentView *,
+                                                        Model::FileType)
+            {
+                if (invert)
+                    view->setInvertColor(true);
+                view->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
+                view->setZoom(zoom);
+                view->GotoPage(page);
+            },
+                    Qt::SingleShotConnection);
+
             continue;
         }
 
         if (splitsNode.isEmpty())
             continue;
 
-        // Recursive lambda to find the first file path in the splits tree
-        // for this tab
+        // Find the first file path in the splits tree to open the tab with
         std::function<QString(const QJsonObject &)> firstFilePath
             = [&firstFilePath](const QJsonObject &node) -> QString
         {
             if (node["type"].toString() == "view")
                 return node["file_path"].toString();
-
             const QJsonArray children = node["children"].toArray();
             for (const QJsonValue &child : children)
             {
@@ -5277,27 +5220,31 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
         };
 
         const QString startFile = firstFilePath(splitsNode);
-
         if (startFile.isEmpty())
             continue;
 
-        OpenFileInNewTab(startFile, [this, splitsNode]()
+        DocumentView *view = OpenFileInNewTab(startFile, {});
+        if (!view)
+            continue;
+
+        connect(view, &DocumentView::openFileFinished, this,
+                [this, view, splitsNode](DocumentView *, Model::FileType)
         {
-            int idx                      = m_tab_widget->currentIndex();
+            int idx = m_tab_widget->indexOf(view->container());
+            if (idx < 0)
+                return;
             DocumentContainer *container = m_tab_widget->rootContainer(idx);
             if (!container)
                 return;
-
-            DocumentView *rootView = container->view();
-            if (!rootView)
-                return;
-
-            restoreSplitNode(container, rootView, splitsNode, nullptr);
-
+            restoreSplitNode(container, view, splitsNode, nullptr);
             m_tab_widget->tabBar()->set_split_count(idx,
                                                     container->getViewCount());
-        });
+        }, Qt::SingleShotConnection);
     }
+
+    // Restore focus to first tab after all tabs are queued
+    if (m_tab_widget->count() > 0)
+        m_tab_widget->setCurrentIndex(0);
 }
 
 void
