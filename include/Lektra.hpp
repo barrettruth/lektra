@@ -278,7 +278,6 @@ private:
     void handleFileNameChanged(const QString &name) noexcept;
     void handleCurrentTabChanged(int index) noexcept;
     void openInExplorerForIndex(int index) noexcept;
-    void filePropertiesForIndex(int index) noexcept;
     void updateStatusbar() noexcept;
     QStringList getSessionFiles() noexcept;
     void insertFileToDB(const QString &fname, int pageno) noexcept;

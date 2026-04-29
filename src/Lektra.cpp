@@ -3749,11 +3749,6 @@ void
 Lektra::handleTabContextMenu(int index, const QPoint &globalPos) noexcept
 {
     QMenu menu;
-    menu.addAction(tr("Open Location"), this,
-                   [this, index]() { openInExplorerForIndex(index); });
-    menu.addAction(tr("File Properties"), this,
-                   [this, index]() { filePropertiesForIndex(index); });
-    menu.addSeparator();
     menu.addAction(tr("Move Tab to New Window"), this, [this, index]()
     {
         TabBar::TabData data;
@@ -3872,17 +3867,6 @@ Lektra::openInExplorerForIndex(int index) noexcept
             QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
         }
     }
-}
-
-// Shows the properties of file of tab with index `index`
-void
-Lektra::filePropertiesForIndex(int index) noexcept
-{
-    DocumentView *doc
-        = qobject_cast<DocumentView *>(m_tab_widget->widget(index));
-    // doc->setInvertColor(!doc->invertColor());
-    if (doc)
-        doc->FileProperties();
 }
 
 // Initialize connections on each tab addition
