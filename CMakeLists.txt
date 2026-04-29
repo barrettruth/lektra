@@ -537,7 +537,7 @@ if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
     " COMPONENT Runtime)
 endif()
 
-if (WIN32)
+if (WIN32 AND WITH_IMAGE)
     # Define runtime DLLs for third-party libraries
     set(RUNTIME_DLLS "")
 
