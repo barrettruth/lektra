@@ -4,6 +4,7 @@
 
 ## HIGH PRIORITY
 
+- [ ] Allow for command arguments
 - [ ] Allow opening multiple files from the file dialog
 - [ ] Render large gifs quickly and efficiently
 - [ ] Fix conflicting shortcuts to override default shortcuts
