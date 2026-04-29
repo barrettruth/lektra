@@ -33,7 +33,6 @@
 - [ ] Show text highlight brush cursor when highlighting text
 - [ ] Drag and drop tabs not working, also get it to work with splits
 - [ ] Export highlight annotations
-- [ ] Persistent bookmarks, recent files
 - [ ] Shell Scripting
 - [ ] lektra.readthedocs.io page
 
