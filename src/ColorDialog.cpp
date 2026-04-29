@@ -4,8 +4,9 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-ColorDialog::ColorDialog(const std::vector<QColor> &colors, QWidget *parent)
-    : QDialog(parent), m_colors(colors)
+ColorDialog::ColorDialog(const std::vector<QColor> &colors,
+                         const QColor &initial_color, QWidget *parent)
+    : QDialog(parent), m_colors(colors), m_initial_color(initial_color)
 {
     initUI();
 }
@@ -51,6 +52,25 @@ ColorDialog::initUI()
 
         colorGrid->addWidget(btn, row, col);
         m_color_button_group->addButton(btn, static_cast<int>(i));
+    }
+
+    // Inside initUI, after the for loop:
+    if (m_initial_color.isValid())
+    {
+        for (size_t i = 0; i < m_colors.size(); ++i)
+        {
+            if (m_colors[i] == m_initial_color)
+            {
+                if (auto *btn
+                    = m_color_button_group->button(static_cast<int>(i)))
+                {
+                    qDebug() << "Pre-selecting color: %s"
+                             << m_initial_color.name().toStdString().c_str();
+                    btn->setChecked(true);
+                }
+                break;
+            }
+        }
     }
 
     mainLayout->addLayout(colorGrid);

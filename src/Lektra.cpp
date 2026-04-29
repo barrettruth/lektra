@@ -5230,7 +5230,7 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
 void
 Lektra::modeColorChangeRequested(const GraphicsView::Mode mode) noexcept
 {
-    ColorDialog colorDialog(m_config.misc.color_dialog_colors, this);
+    ColorDialog colorDialog(m_config.misc.color_dialog_colors, QColor(), this);
     colorDialog.setWindowTitle(tr("Select Color"));
 
     if (colorDialog.exec() == QDialog::Accepted)

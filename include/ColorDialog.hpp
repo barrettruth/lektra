@@ -11,8 +11,10 @@ class ColorDialog : public QDialog
     Q_OBJECT
 public:
     explicit ColorDialog(const std::vector<QColor> &colors,
-                         QWidget *parent = nullptr);
-    QColor selectedColor() const
+                         const QColor &initial_color = QColor(),
+                         QWidget *parent             = nullptr);
+
+    inline const QColor &selectedColor() const
     {
         return m_selected_color;
     }
@@ -22,7 +24,10 @@ signals:
 
 private:
     void initUI();
+
+private:
     std::vector<QColor> m_colors;
     QColor m_selected_color;
-    QButtonGroup *m_color_button_group;
+    QColor m_initial_color;
+    QButtonGroup *m_color_button_group = nullptr;
 };
