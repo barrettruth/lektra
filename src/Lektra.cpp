@@ -40,7 +40,8 @@ namespace
 static inline QString
 supportedFormats()
 {
-    return "PDF (*.pdf);;"
+    return "Documents ("
+           "PDF (*.pdf);;"
 #ifdef HAS_DJVU
            "DjVu (*.djvu *.djv);;"
 #endif
@@ -49,6 +50,7 @@ supportedFormats()
            "EPUB (*.epub);;"
            "FictionBook (*.fb2 *.fbz);;"
            "Mobi (*.mobi);;"
+           ");;"
 #ifdef WITH_IMAGE
            "Images ("
            "*.jpg *.jpeg "
@@ -2401,7 +2403,7 @@ Lektra::Selection_copy() noexcept
 // TODO: Fix DWIM version
 bool
 Lektra::OpenFileDWIM(const QString &filename,
-                     const std::function<void()> &callback) noexcept
+                     const CallbackFn &callback) noexcept
 {
     if (m_tab_widget->count() == 0)
         return OpenFileInNewTab(filename, callback);
@@ -2424,8 +2426,7 @@ Lektra::OpenFileDWIM(const QString &filename,
 
 bool
 Lektra::OpenFileInContainer(DocumentContainer *container,
-                            const QString &filename,
-                            const std::function<void()> &callback,
+                            const QString &filename, const CallbackFn &callback,
                             DocumentView *targetView) noexcept
 {
     if (!container)
@@ -2521,7 +2522,7 @@ Lektra::OpenFiles(const std::vector<std::string> &files) noexcept
             // No callback for plain multi-file open, but store an empty
             // one so materialization code is uniform
             placeholder->setProperty("callback",
-                                     QVariant::fromValue(LazyCallback{}));
+                                     QVariant::fromValue(CallbackFn{}));
 
             const QString title = m_config.tabs.full_path
                                       ? filePath
@@ -2572,19 +2573,33 @@ Lektra::OpenFilesInHSplit(const std::vector<std::string> &files) noexcept
 }
 
 void
-Lektra::OpenFilesInNewTab(const QStringList &files) noexcept
+Lektra::OpenFilesInNewTab(const QStringList &files,
+                          const std::vector<CallbackFn> &callbacks) noexcept
 {
 #ifndef NDEBUG
     qDebug() << "Lektra::OpenFilesInNewTab(): Opening files in new tabs:"
              << files.size();
 #endif
 
-    bool isFirst = true;
-    for (const QString &file : files)
+    if (static_cast<size_t>(files.size()) != callbacks.size())
     {
+        qWarning()
+            << "Number of files and callbacks do not match in"
+               "OpenFilesInNewTab. Callbacks will be assigned to files in"
+               "order, and extra files will have no callback.";
+        return;
+    }
+
+    bool isFirst = true;
+    for (int i = 0; i < files.size(); ++i)
+    {
+        const QString &file = files.at(i);
+        const CallbackFn callback
+            = i < callbacks.size() ? callbacks.at(i) : CallbackFn{};
+
         if (!m_config.tabs.lazy_load || isFirst)
         {
-            OpenFileInNewTab(file);
+            OpenFileInNewTab(file, callback);
         }
         else
         {
@@ -2594,7 +2609,7 @@ Lektra::OpenFilesInNewTab(const QStringList &files) noexcept
             // No callback for plain multi-file open, but store an empty
             // one so materialization code is uniform
             placeholder->setProperty("callback",
-                                     QVariant::fromValue(LazyCallback{}));
+                                     QVariant::fromValue(CallbackFn{}));
 
             const QString title
                 = m_config.tabs.full_path ? file : QFileInfo(file).fileName();
@@ -2606,7 +2621,7 @@ Lektra::OpenFilesInNewTab(const QStringList &files) noexcept
 
 DocumentView *
 Lektra::OpenFileInNewTab(const QString &filename,
-                         const std::function<void()> &callback) noexcept
+                         const CallbackFn &callback) noexcept
 {
     if (filename.isEmpty())
     {
@@ -2715,8 +2730,7 @@ Lektra::OpenFileInNewTab(const QString &filename,
 }
 
 DocumentView *
-Lektra::openFileSplitHelper(const QString &filename,
-                            const std::function<void()> &callback,
+Lektra::openFileSplitHelper(const QString &filename, const CallbackFn &callback,
                             Qt::Orientation orientation)
 {
     if (filename.isEmpty())
@@ -2784,15 +2798,13 @@ Lektra::openFileSplitHelper(const QString &filename,
 }
 
 DocumentView *
-Lektra::OpenFileVSplit(const QString &filename,
-                       const std::function<void()> &callback)
+Lektra::OpenFileVSplit(const QString &filename, const CallbackFn &callback)
 {
     return openFileSplitHelper(filename, callback, Qt::Vertical);
 }
 
 DocumentView *
-Lektra::OpenFileHSplit(const QString &filename,
-                       const std::function<void()> &callback)
+Lektra::OpenFileHSplit(const QString &filename, const CallbackFn &callback)
 {
     return openFileSplitHelper(filename, callback, Qt::Horizontal);
 }
@@ -2811,7 +2823,7 @@ Lektra::OpenFilesInNewWindow(const QStringList &filenames) noexcept
 
 bool
 Lektra::OpenFileInNewWindow(const QString &filePath,
-                            const std::function<void()> &callback) noexcept
+                            const CallbackFn &callback) noexcept
 {
     if (filePath.isEmpty())
     {
@@ -3312,8 +3324,8 @@ Lektra::handleCurrentTabChanged(int index) noexcept
     // with the new view.
     if (w && w->property("tabRole").toString() == "lazy")
     {
-        const QString filePath  = w->property("filePath").toString();
-        const LazyCallback lazy = w->property("callback").value<LazyCallback>();
+        const QString filePath = w->property("filePath").toString();
+        const CallbackFn lazy  = w->property("callback").value<CallbackFn>();
 
         // Block signals to prevent recursion/cascading loads
         m_tab_widget->blockSignals(true);
@@ -3321,7 +3333,7 @@ Lektra::handleCurrentTabChanged(int index) noexcept
         m_tab_widget->removeTab(index);
         w->deleteLater();
 
-        DocumentView *_ = OpenFileInNewTab(filePath, lazy.fn);
+        DocumentView *_ = OpenFileInNewTab(filePath, lazy);
 
         m_tab_widget->tabBar()->moveTab(m_tab_widget->count() - 1, index);
         m_tab_widget->setCurrentIndex(index);
@@ -5587,7 +5599,7 @@ Lektra::focusSplitHelper(DocumentContainer::Direction direction) noexcept
 void
 Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
                          const QJsonObject &node,
-                         std::function<void()> onAllDone) noexcept
+                         const CallbackFn &callback) noexcept
 {
     const QString type = node["type"].toString();
 
@@ -5600,21 +5612,21 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
         const bool invert  = node["invert_color"].toBool();
 
         auto applyState
-            = [page, zoom, fitMode, invert, onAllDone](DocumentView *doc)
+            = [page, zoom, fitMode, invert, callback](DocumentView *doc)
         {
             doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
             doc->setZoom(zoom);
             doc->GotoPage(page - 1);
             if (invert)
                 doc->setInvertColor(true);
-            if (onAllDone)
-                onAllDone();
+            if (callback)
+                callback();
         };
 
         if (path.isEmpty())
         {
-            if (onAllDone)
-                onAllDone();
+            if (callback)
+                callback();
             return;
         }
 
@@ -5652,8 +5664,8 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
 
         if (children.isEmpty())
         {
-            if (onAllDone)
-                onAllDone();
+            if (callback)
+                callback();
             return;
         }
 
@@ -5692,11 +5704,11 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
             const QJsonObject child = children[i].toObject();
             DocumentView *pane      = panes[i];
 
-            restoreSplitNode(container, pane, child, [remaining, onAllDone]()
+            restoreSplitNode(container, pane, child, [remaining, callback]()
             {
                 --(*remaining);
-                if (*remaining == 0 && onAllDone)
-                    onAllDone();
+                if (*remaining == 0 && callback)
+                    callback();
             });
         }
     }

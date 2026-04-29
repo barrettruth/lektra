@@ -41,12 +41,7 @@
 #include <QTabWidget>
 
 // In Lektra.hpp
-struct LazyCallback
-{
-    std::function<void()> fn;
-};
-
-// Q_DECLARE_METATYPE(LazyCallback)
+using CallbackFn = std::function<void()>;
 
 class Lektra : public QMainWindow
 {
@@ -109,28 +104,28 @@ public:
     void LastPage() noexcept;
     void NextPage() noexcept;
     void OpenContainingFolder() noexcept;
-    bool OpenFileDWIM(const QString &filename               = {},
-                      const std::function<void()> &callback = {}) noexcept;
+    bool OpenFileDWIM(const QString &filename    = {},
+                      const CallbackFn &callback = {}) noexcept;
     bool OpenFileInContainer(DocumentContainer *container,
-                             const QString &filename               = {},
-                             const std::function<void()> &callback = {},
-                             DocumentView *targetView = nullptr) noexcept;
+                             const QString &filename    = {},
+                             const CallbackFn &callback = {},
+                             DocumentView *targetView   = nullptr) noexcept;
     void OpenFilesInVSplit(const std::vector<std::string> &files = {}) noexcept;
     void OpenFilesInHSplit(const std::vector<std::string> &files = {}) noexcept;
 
     void OpenFiles(const std::vector<std::string> &filenames = {}) noexcept;
-    void OpenFilesInNewTab(const QStringList &files = {}) noexcept;
-    DocumentView *OpenFileInNewTab(const QString &filename = {},
-                                   const std::function<void()> &callback
-                                   = {}) noexcept;
-    bool OpenFileInNewWindow(const QString &filename = {},
-                             const std::function<void()> &callback
-                             = {}) noexcept;
+    void OpenFilesInNewTab(const QStringList &files = {},
+                           const std::vector<CallbackFn> &callbacks
+                           = {}) noexcept;
+    DocumentView *OpenFileInNewTab(const QString &filename    = {},
+                                   const CallbackFn &callback = {}) noexcept;
+    bool OpenFileInNewWindow(const QString &filename    = {},
+                             const CallbackFn &callback = {}) noexcept;
     void OpenFilesInNewWindow(const QStringList &filenames) noexcept;
-    DocumentView *OpenFileVSplit(const QString &filename               = {},
-                                 const std::function<void()> &callback = {});
-    DocumentView *OpenFileHSplit(const QString &filename               = {},
-                                 const std::function<void()> &callback = {});
+    DocumentView *OpenFileVSplit(const QString &filename    = {},
+                                 const CallbackFn &callback = {});
+    DocumentView *OpenFileHSplit(const QString &filename    = {},
+                                 const CallbackFn &callback = {});
     void PrevPage() noexcept;
     void FirstPage() noexcept;
     void Selection_copy() noexcept;
@@ -219,15 +214,15 @@ private:
 
     void restoreSplitNode(DocumentContainer *container,
                           DocumentView *targetView, const QJsonObject &node,
-                          std::function<void()> onAllDone) noexcept;
+                          const CallbackFn &callback) noexcept;
     void focusSplitHelper(DocumentContainer::Direction direction) noexcept;
     void splitHelper(Qt::Orientation orientation) noexcept;
     bool checkConfigFile(const QString &path) noexcept;
 
-    DocumentView *
-    openFileSplitHelper(const QString &filename               = {},
-                        const std::function<void()> &callback = {},
-                        Qt::Orientation orientation           = Qt::Horizontal);
+    DocumentView *openFileSplitHelper(const QString &filename    = {},
+                                      const CallbackFn &callback = {},
+                                      Qt::Orientation orientation
+                                      = Qt::Horizontal);
 
     void setCurrentDocumentView(DocumentView *view) noexcept;
     void centerMouseInDocumentView(DocumentView *view) noexcept;
