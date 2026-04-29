@@ -4785,22 +4785,27 @@ DocumentView::tryReloadLater(int attempt) noexcept
     if (waitUntilReadableAsync())
     {
         if (!m_model->reloadDocument())
-        {
             return;
-        }
         else
         {
-#ifdef WITH_SYNCTEX
-            initSynctex();
-#endif
+            if (m_model->isImage())
             {
-                clearDocumentItems();
-                cachePageStride();
-                updateSceneRect();
-                invalidateVisiblePagesCache();
-                renderPages();
+                renderImage();
             }
-            emit totalPageCountChanged(m_model->m_page_count);
+            else
+            {
+#ifdef WITH_SYNCTEX
+                initSynctex();
+#endif
+                {
+                    clearDocumentItems();
+                    cachePageStride();
+                    updateSceneRect();
+                    invalidateVisiblePagesCache();
+                    renderPages();
+                }
+                emit totalPageCountChanged(m_model->m_page_count);
+            }
         }
 
         const QString &filepath = m_model->filePath();
