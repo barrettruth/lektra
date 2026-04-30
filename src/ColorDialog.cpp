@@ -6,8 +6,7 @@
 #include <QPushButton>
 
 ColorDialog::ColorDialog(const std::vector<QColor> &colors,
-                         const QColor &initial_color, bool fill_required,
-                         QWidget *parent)
+                         const QColor &initial_color, QWidget *parent)
     : QDialog(parent), m_colors(colors)
 {
     setWindowTitle(tr("Select Color"));
@@ -83,15 +82,6 @@ ColorDialog::ColorDialog(const std::vector<QColor> &colors,
 
     mainLayout->addLayout(colorGrid);
 
-    mainLayout->addWidget(m_custom_widget);
-
-    auto *fillCheckBox = new QCheckBox(tr("Fill"));
-
-    if (fill_required)
-    {
-        mainLayout->addWidget(fillCheckBox);
-    }
-
     // Standard Dialog Buttons
     auto *buttonBox = new QHBoxLayout();
     auto *okBtn     = new QPushButton(tr("OK"));
@@ -104,15 +94,12 @@ ColorDialog::ColorDialog(const std::vector<QColor> &colors,
     mainLayout->addLayout(buttonBox);
 
     // Logic
-    connect(okBtn, &QPushButton::clicked, this,
-            [this, fill_required, fillCheckBox]()
+    connect(okBtn, &QPushButton::clicked, this, [this]()
     {
         int id = m_color_button_group->checkedId();
         if (id != -1)
         {
             m_selected_color = m_colors[static_cast<size_t>(id)];
-            if (fill_required)
-                m_fill_required = fillCheckBox->isChecked();
             accept();
         }
     });

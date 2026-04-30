@@ -3556,7 +3556,7 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
             }
 
             ColorDialog cp(m_config.misc.color_dialog_colors, current_color,
-                           false, this);
+                           this);
 
             cp.setWindowTitle(tr("Select Annotation Color"));
 
@@ -4122,13 +4122,12 @@ DocumentView::renderAnnotations(
         });
 
         connect(annot_item, &Annotation::annotColorChangeRequested, this,
-                [this, annot_item, pageno](bool fill_required)
+                [this, annot_item, pageno]()
         {
             QColor oldColor
                 = m_model->getAnnotColor(m_pageno, annot_item->index());
             ColorDialog colorDialog(m_config.misc.color_dialog_colors,
-                                    QColor::fromRgba(oldColor.rgba()),
-                                    fill_required, this);
+                                    QColor::fromRgba(oldColor.rgba()), this);
             colorDialog.setWindowTitle(tr("Select Annotation Color"));
 
             if (colorDialog.exec() == QDialog::Accepted)
