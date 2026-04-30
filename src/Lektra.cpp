@@ -638,6 +638,12 @@ Lektra::initConfig() noexcept
         }
     }
 
+    if (auto page = toml["page"])
+    {
+        set_color(page["bg"], m_config.page.bg);
+        set_color(page["fg"], m_config.page.fg);
+    }
+
     // Portals
     if (auto portal = toml["portal"])
     {
