@@ -3001,9 +3001,9 @@ int
 Model::addRectAnnotation(const int pageno, const fz_rect &rect,
                          const QString &content) noexcept
 {
-    int objNum{-1};
-    pdf_annot *annot{nullptr};
-    pdf_page *page{nullptr};
+    int objNum       = -1;
+    pdf_annot *annot = nullptr;
+    pdf_page *page   = nullptr;
 
     fz_try(m_ctx)
     {
