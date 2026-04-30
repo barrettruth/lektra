@@ -769,63 +769,43 @@ DocumentView::handlePartialSearchResults(
 }
 
 int
-DocumentView::getClosestHitIndex() noexcept
+DocumentView::getClosestHitIndex(bool above) noexcept
 {
     if (!m_model->supports_text_search() || m_search_hit_flat_refs.empty())
         return -1;
 
-    int index;
-
-    // struct HitRef
-    // {
-    //     int page;
-    //     int indexInPage;
-    // };
-    //
-    // We want to find the hit closest to the current viewport position.
-    // We'll use the page number as the primary sorting key, and the index
-    // within the page as the secondary key. This way, if there are multiple
-    // hits on the same page, we'll jump to the one closest to the top of
-    // the page.
     const int currentPage = m_pageno;
+    const int n           = static_cast<int>(m_search_hit_flat_refs.size());
 
-    auto it = std::lower_bound(m_search_hit_flat_refs.begin(),
-                               m_search_hit_flat_refs.end(), currentPage,
-                               [](const HitRef &ref, int page)
-    { return ref.page < page; });
+    if (above)
+    {
+        // First hit on a page strictly before currentPage
+        auto it = std::lower_bound(m_search_hit_flat_refs.begin(),
+                                   m_search_hit_flat_refs.end(), currentPage,
+                                   [](const HitRef &ref, int page)
+        { return ref.page < page; });
 
-    if (it == m_search_hit_flat_refs.end())
-    {
-        // All hits are before the current page, so wrap around to the first
-        // hit
-        index = 0;
-    }
-    else if (it == m_search_hit_flat_refs.begin())
-    {
-        // All hits are after the current page, so wrap around to the last
-        // hit
-        index = static_cast<int>(m_search_hit_flat_refs.size() - 1);
+        if (it == m_search_hit_flat_refs.begin())
+            return n - 1; // wrap to last
+
+        --it;
+        return static_cast<int>(
+            std::distance(m_search_hit_flat_refs.begin(), it));
     }
     else
     {
-        // Check the hit at 'it' and the one before it to see which is
-        // closer
-        const int nextPage = it->page;
-        const int prevPage = (it - 1)->page;
+        // First hit on a page strictly after currentPage
+        auto it = std::upper_bound(m_search_hit_flat_refs.begin(),
+                                   m_search_hit_flat_refs.end(), currentPage,
+                                   [](int page, const HitRef &ref)
+        { return page < ref.page; });
 
-        if (std::abs(nextPage - currentPage) < std::abs(currentPage - prevPage))
-        {
-            index = static_cast<int>(
-                std::distance(m_search_hit_flat_refs.begin(), it));
-        }
-        else
-        {
-            index = static_cast<int>(
-                std::distance(m_search_hit_flat_refs.begin(), it - 1));
-        }
+        if (it == m_search_hit_flat_refs.end())
+            return 0; // wrap to first
+
+        return static_cast<int>(
+            std::distance(m_search_hit_flat_refs.begin(), it));
     }
-
-    return index;
 }
 
 void
@@ -1819,18 +1799,30 @@ DocumentView::ZoomReset() noexcept
     zoomHelper(loc);
 }
 
-// Navigate to the next search hit
 void
 DocumentView::NextHit() noexcept
 {
-    GotoHit(m_search_index + 1);
+    if (m_config.search.absolute_jump)
+    {
+        const int n    = static_cast<int>(m_search_hit_flat_refs.size());
+        m_search_index = (m_search_index + 1) % n;
+        GotoHit(m_search_index);
+    }
+    else
+        GotoHit(getClosestHitIndex(false));
 }
 
-// Navigate to the previous search hit
 void
 DocumentView::PrevHit() noexcept
 {
-    GotoHit(m_search_index - 1);
+    if (m_config.search.absolute_jump)
+    {
+        const int n    = static_cast<int>(m_search_hit_flat_refs.size());
+        m_search_index = (m_search_index - 1 + n) % n;
+        GotoHit(m_search_index);
+    }
+    else
+        GotoHit(getClosestHitIndex(true));
 }
 
 // Navigate to a specific search hit by index

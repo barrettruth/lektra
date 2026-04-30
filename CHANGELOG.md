@@ -4,6 +4,7 @@
 
 ### Features
 
+- Vim/Emacs like search hit indexing navigation if `absolute_jump = false` in `[search]`
 - Add bookmarks support with a bookmark picker to view and manage bookmarks. Bookmarks allow users to save specific locations
   in the document for quick access later.
 - New bookmark related commands:

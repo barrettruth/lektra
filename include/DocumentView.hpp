@@ -474,7 +474,7 @@ private:
         const int pageno,
         const std::vector<Model::RenderAnnotation> &annots) noexcept;
     void buildFlatSearchHitIndex() noexcept;
-    int getClosestHitIndex() noexcept;
+    int getClosestHitIndex(bool above = false) noexcept;
     void removeUnusedPageItems(const std::set<int> &visiblePages) noexcept;
     void clearDocumentItems() noexcept;
     void ensureVisiblePagePlaceholders() noexcept;
