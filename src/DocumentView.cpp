@@ -314,8 +314,10 @@ DocumentView::openAsync(const QString &filePath) noexcept
 
     QFuture<void> future = m_model->openAsync(QDir::cleanPath(filePath));
     m_open_future_watcher.setFuture(future);
+    m_open_future_watcher.disconnect(this);
     connect(&m_open_future_watcher, &QFutureWatcher<void>::finished, this,
-            &DocumentView::handleOpenFileFinished);
+            &DocumentView::handleOpenFileFinished,
+            Qt::SingleShotConnection);
 }
 
 void
@@ -341,6 +343,9 @@ DocumentView::handleOpenFileFinished() noexcept
 
     m_spinner->stop();
     m_spinner->hide();
+
+    if (!m_model->success())
+        return;
 
 #ifdef WITH_IMAGE
     stopGifPlayback();

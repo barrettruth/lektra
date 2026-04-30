@@ -945,6 +945,7 @@ Model::openAsync(const QString &filePath) noexcept
 {
     m_filepath              = QFileInfo(filePath).canonicalFilePath();
     const QString canonPath = m_filepath;
+    m_success               = false;
 
     // Detect file type before launching the background task, so we can fail
     // fast for unsupported types without incurring the overhead of starting a
