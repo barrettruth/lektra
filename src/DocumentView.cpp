@@ -308,7 +308,7 @@ DocumentView::openAsync(const QString &filePath) noexcept
     qDebug() << "DocumentView::openAsync(): Opening file:" << filePath;
 #endif
 
-    clearDocumentItems();
+    CloseFile();
 
     m_spinner->start();
     m_spinner->show();
@@ -317,8 +317,7 @@ DocumentView::openAsync(const QString &filePath) noexcept
     m_open_future_watcher.setFuture(future);
     m_open_future_watcher.disconnect(this);
     connect(&m_open_future_watcher, &QFutureWatcher<void>::finished, this,
-            &DocumentView::handleOpenFileFinished,
-            Qt::SingleShotConnection);
+            &DocumentView::handleOpenFileFinished, Qt::SingleShotConnection);
 }
 
 void
