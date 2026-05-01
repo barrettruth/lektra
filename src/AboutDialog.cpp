@@ -7,6 +7,10 @@
 #include <qfont.h>
 #include <qnamespace.h>
 
+#ifdef WITH_LUA
+    #include <lua.hpp>
+#endif
+
 #ifdef WITH_IMAGE
     #include <Magick++.h>
 #endif
@@ -93,18 +97,28 @@ AboutDialog::softwaresUsedSection() noexcept
     layout->setAlignment(Qt::AlignCenter);
     layout->addRow("Qt", new QLabel(QT_VERSION_STR));
     layout->addRow("MuPDF", new QLabel(QString(FZ_VERSION)));
+
 #ifdef WITH_SYNCTEX
     layout->addRow("SyncTeX", new QLabel(QString(SYNCTEX_VERSION_STRING)));
 #endif
+
 #ifdef HAS_DJVU
     layout->addRow(
         "DjVuLibre",
         new QLabel(QString(ddjvu_get_version_string()).split("-").last()));
 #endif
+
 #ifdef WITH_IMAGE
     layout->addRow(
         "ImageMagick",
         new QLabel(QString(MagickppLibVersionText).split(" ").first()));
+#endif
+
+#ifdef WITH_LUA
+    #define STRINGIFY(x) #x
+    layout->addRow("Lua",
+                   new QLabel(LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
+                                                "." LUA_VERSION_RELEASE));
 #endif
 
     outerLayout->addLayout(layout, Qt::AlignCenter);
