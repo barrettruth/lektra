@@ -55,7 +55,7 @@ class DocumentView : public QWidget
 {
     Q_OBJECT
 public:
-    using Id                  = uint32_t;
+    using Id                  = int;
     using SelectedAnnotations = std::vector<std::pair<int, Annotation *>>;
 
     DocumentView(const Config &config, const float dpr = 1.0f,
