@@ -454,12 +454,27 @@ private:
 
 #ifdef WITH_LUA
     void initLua() noexcept;
+
+    // lektra.opt
     void initLuaOpt() noexcept;
-    void initLuaAPI() noexcept;
+
+    // lektra.cmd
     void initLuaCmd() noexcept;
+
+    // lektra.ui
     void initLuaUI() noexcept;
+
+    // lektra.tabs
+    void initLuaTabs() noexcept;
+
+    // lektra.event
     void initLuaEventDispatcher() noexcept;
+
+    // lektra.views
+    void initLuaViews() noexcept;
+
     void dispatchLuaEvent(DispatchType type) noexcept;
+    void executeLuaCode(const QString &code) noexcept;
 
     lua_State *m_L = nullptr;
     std::unordered_map<DispatchType, std::vector<CallbackFn>>
