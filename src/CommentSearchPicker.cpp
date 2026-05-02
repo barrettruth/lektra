@@ -49,6 +49,8 @@ CommentSearchPicker::CommentSearchPicker(const Config::Picker &config,
             repopulate();
         }
     });
+
+    setPrompt("Search Comments");
 }
 
 void

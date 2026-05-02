@@ -9,8 +9,8 @@ BookmarkPicker::BookmarkPicker(const Config::Picker &config,
     : Picker(config, parent), m_bookmark_manager(manager)
 {
     setColumns({{.header = "Bookmarks", .stretch = 1}});
-
     setStructureMode(StructureMode::Flat);
+    setPrompt("Bookmarks");
 }
 
 QList<Picker::Item>

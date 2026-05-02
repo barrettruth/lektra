@@ -43,6 +43,8 @@ HighlightSearchPicker::HighlightSearchPicker(
         setLoading(false);
         repopulate();
     });
+
+    setPrompt(config.prompt);
 }
 
 void

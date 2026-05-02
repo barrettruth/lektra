@@ -23,6 +23,8 @@ CommandPicker::CommandPicker(const Config::CommandPalette &config,
     setColumns(cols);
 
     setStructureMode(StructureMode::Flat);
+
+    setPrompt(config.prompt);
 }
 
 QList<Picker::Item>
