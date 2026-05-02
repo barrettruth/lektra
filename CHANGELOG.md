@@ -37,6 +37,9 @@
 
 ### Breaking Changes
 
+- Remove `placeholder_text` option from `[command_palette]` section of the config.
+- Add `prompt` option in `[picker]` common to all pickers, which allows for a
+  customizable prompt text shown next to the input field.
 - Rename `always_open_in_new_window` to `single_instance`.
 - C++ version requirement has been downgraded to C++20 (previously it was C++23) to allow
   for wider compatibility with different platforms and compilers, as C++20 is now widely
