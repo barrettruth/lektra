@@ -168,6 +168,10 @@ file(GLOB LEKTRA_CORE_HEADERS       CONFIGURE_DEPENDS include/*.hpp)
 file(GLOB LEKTRA_ANNOTATION_HEADERS CONFIGURE_DEPENDS include/Annotations/*.hpp)
 file(GLOB LEKTRA_COMMAND_HEADERS    CONFIGURE_DEPENDS include/Commands/*.hpp)
 
+if (WITH_LUA)
+    file(GLOB LEKTRA_LUA_HEADERS        CONFIGURE_DEPENDS include/lua/*.hpp)
+endif()
+
 set(app_icon_resource_windows "")
 if(WIN32)
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources/lektra.rc")
@@ -214,6 +218,16 @@ add_executable(${PROJECT_NAME}
     ${LEKTRA_ANNOTATION_HEADERS}
     ${LEKTRA_COMMAND_HEADERS}
 )
+
+if (WITH_LUA)
+    # Glob for lua source files in the src/lua directory
+    file(GLOB LEKTRA_LUA_SOURCES CONFIGURE_DEPENDS src/lua/*.cpp)
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${LEKTRA_LUA_SOURCES}
+        ${LEKTRA_LUA_HEADERS}
+    )
+    target_include_directories(${PROJECT_NAME} PRIVATE include/lua)
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include
