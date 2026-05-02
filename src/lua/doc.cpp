@@ -1,44 +1,5 @@
 #include "Lektra.hpp"
 
-// Options for the open() API function, parsed from the Lua table passed by the
-// user.
-struct OpenFileopts
-{
-    bool dwim       = false;
-    bool vsplit     = false;
-    bool hsplit     = false;
-    bool new_window = false;
-};
-
-// Read an optional boolean field from a Lua table at stack index `table_idx`.
-static void
-read_bool_field(lua_State *L, int table_idx, const char *field, bool &out)
-{
-    lua_getfield(L, table_idx, field);
-    if (lua_isboolean(L, -1))
-        out = lua_toboolean(L, -1);
-    lua_pop(L, 1);
-}
-
-static OpenFileopts
-read_open_file_opts(lua_State *L, int idx)
-{
-    OpenFileopts opts;
-    if (lua_isnoneornil(L, idx))
-        return opts;
-    if (!lua_istable(L, idx))
-    {
-        luaL_error(L, "open: 'opts' must be a table, got %s",
-                   luaL_typename(L, idx));
-        return opts;
-    }
-    read_bool_field(L, idx, "dwim", opts.dwim);
-    read_bool_field(L, idx, "vsplit", opts.vsplit);
-    read_bool_field(L, idx, "hsplit", opts.hsplit);
-    read_bool_field(L, idx, "new_window", opts.new_window);
-    return opts;
-}
-
 static void
 initDocAPI(lua_State *L, Lektra *lektra) noexcept
 {
@@ -229,9 +190,7 @@ initDocAPI(lua_State *L, Lektra *lektra) noexcept
 }
 
 void
-Lektra::initLuaAPI() noexcept
+Lektra::initLuaDoc() noexcept
 {
-    lua_newtable(m_L);
     initDocAPI(m_L, this);
-    lua_setfield(m_L, -2, "doc"); // lektra.api
 }

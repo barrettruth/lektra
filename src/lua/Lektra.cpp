@@ -1,6 +1,7 @@
 #include "Lektra.hpp"
 
 #include "api.cpp"
+#include "cmd.cpp"
 #include "event.cpp"
 #include "opt.cpp"
 #include "ui.cpp"
@@ -17,6 +18,7 @@ Lektra::initLua() noexcept
     // Register functions
     initLuaOpt();
     initLuaAPI();
+    initLuaCmd();
     initLuaUI();
     initLuaEventDispatcher();
 

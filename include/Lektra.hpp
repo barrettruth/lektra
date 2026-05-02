@@ -456,6 +456,7 @@ private:
     void initLua() noexcept;
     void initLuaOpt() noexcept;
     void initLuaAPI() noexcept;
+    void initLuaCmd() noexcept;
     void initLuaUI() noexcept;
     void initLuaEventDispatcher() noexcept;
     void dispatchLuaEvent(DispatchType type) noexcept;
