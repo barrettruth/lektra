@@ -34,10 +34,6 @@
 #include <QWindow>
 #include <variant>
 
-#ifdef WITH_LUA
-    #include "lua/Lektra.cpp"
-#endif
-
 namespace
 {
 
@@ -1036,8 +1032,7 @@ Lektra::initConfig() noexcept
         // TODO: Implement grid in command palette
         set(command_palette["show_shortcuts"],
             m_config.command_palette.show_shortcuts);
-        set(command_palette["placeholder_text"],
-            m_config.command_palette.placeholder_text);
+        set(command_palette["prompt"], m_config.command_palette.prompt);
     }
 
     // Markers
