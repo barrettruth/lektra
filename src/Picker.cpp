@@ -43,10 +43,21 @@ Picker::Picker(const Config::Picker &config, QWidget *parent) noexcept
     innerLayout->setContentsMargins(8, 8, 8, 8);
     innerLayout->setSpacing(4);
 
+    auto *hboxLayout = new QHBoxLayout();
+    hboxLayout->setContentsMargins(0, 0, 0, 0);
+    hboxLayout->setSpacing(4);
+
     m_searchBox = new QLineEdit(m_frame);
-    m_searchBox->setPlaceholderText("Search...");
     m_searchBox->setClearButtonEnabled(true);
-    innerLayout->addWidget(m_searchBox);
+
+    m_promptLabel = new QLabel(m_frame);
+    m_promptLabel->setText("Prompt:");
+    m_promptLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    hboxLayout->addWidget(m_promptLabel);
+    hboxLayout->addWidget(m_searchBox);
+
+    innerLayout->addLayout(hboxLayout);
     m_searchBox->installEventFilter(this);
 
     m_listView = new QTreeView(m_frame);
@@ -405,4 +416,19 @@ Picker::setStructureMode(StructureMode mode) noexcept
 
     m_listView->setRootIsDecorated(mode == StructureMode::Hierarchical);
     m_listView->setItemsExpandable(mode == StructureMode::Hierarchical);
+}
+
+void
+Picker::setPrompt(const QString &prompt) noexcept
+{
+    if (prompt.isEmpty())
+    {
+        m_promptLabel->hide();
+        return;
+    }
+    else
+    {
+        m_promptLabel->setText(prompt);
+        m_promptLabel->show();
+    }
 }

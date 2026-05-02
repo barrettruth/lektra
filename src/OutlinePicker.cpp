@@ -19,6 +19,8 @@ OutlinePicker::OutlinePicker(const Config::Outline &config,
     {
         setColumns({{.header = tr("Title"), .stretch = 1}});
     }
+
+    setPrompt(config.prompt);
 }
 
 void
