@@ -4923,7 +4923,10 @@ Model::getTextInPage(const int pageno, bool formatted) noexcept
         char *page_text
             = fz_copy_selection(m_ctx, stext_page, {0, 0}, {1e6f, 1e6f}, 0);
         if (page_text)
+        {
             result = page_text;
+            fz_free(m_ctx, page_text);
+        }
     }
     fz_always(m_ctx)
     {

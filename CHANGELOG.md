@@ -20,6 +20,7 @@
 
 ### Bug Fixes
 
+- Fix memory leak in `extractText` function in `Model` class
 - Add UTF-8 text conversion for file paths on Windows to fix issues with opening files with non-ASCII characters in their paths on Windows.
 - Reset `m_success = false` at the start of every open in `Model.cpp`
 - [DocumentView.cpp] Made the future watcher connection single-shot and cleared stale connections before reconnecting and
