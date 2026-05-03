@@ -666,6 +666,7 @@ private:
     };
     void initMuPDF() noexcept;
 
+    std::string getTextInPage(const int pageno, bool formatted) noexcept;
     [[nodiscard]] std::string getTextInArea(const int pageno, QPointF start,
                                             QPointF end) noexcept;
     [[nodiscard]] std::tuple<float, float>

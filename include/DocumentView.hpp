@@ -297,6 +297,12 @@ public:
                                           formatted);
     }
 
+    inline QString extractText(bool formatted) const noexcept
+    {
+        return QString::fromStdString(
+            m_model->getTextInPage(m_pageno, formatted));
+    }
+
 #ifdef WITH_LUA
     inline void addEventListener(DispatchType type, int handle, bool is_once,
                                  CallbackFn callback) noexcept
