@@ -1,5 +1,7 @@
 #include "Lektra.hpp"
 
+#include <QMessageBox>
+
 void
 Lektra::executeLuaCode(const QString &code) noexcept
 {
@@ -60,6 +62,9 @@ Lektra::initLua() noexcept
         {
             qWarning() << "Failed to execute init.lua:"
                        << lua_tostring(m_L, -1);
+            QMessageBox::critical(nullptr, "Lua Error",
+                                  "Failed to execute init.lua:\n"
+                                      + QString(lua_tostring(m_L, -1)));
             lua_pop(m_L, 1); // Remove error message from stack
         }
     }
