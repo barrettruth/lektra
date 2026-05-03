@@ -4,6 +4,8 @@
 
 #include <lua.h>
 
+namespace
+{
 struct LuaField
 {
     const char *key;
@@ -1600,6 +1602,7 @@ initLuaSections(lua_State *L, Config &config, Lektra *lektra)
     // lektra.opt
     lua_setfield(L, -2, "opt");
 }
+} // namespace
 
 void
 Lektra::initLuaOpt() noexcept

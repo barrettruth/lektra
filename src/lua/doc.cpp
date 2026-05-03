@@ -1,8 +1,63 @@
 #include "Lektra.hpp"
 
-void
-Lektra::initLuaView() noexcept
+namespace
 {
+
+#define VIEW_METHOD(name, body)                                                \
+    {name, [](lua_State *L) -> int                                             \
+    {                                                                          \
+        auto **view = static_cast<DocumentView **>(                            \
+            luaL_checkudata(L, 1, "DocumentViewMetaTable"));                   \
+        body                                                                   \
+    }}
+
+static const luaL_Reg DocumentViewMethods[]
+    = {VIEW_METHOD("close",
+                   {
+                       if (*view)
+                           (*view)->close();
+                       return 0;
+                   }),
+       VIEW_METHOD("pageno",
+                   {
+                       lua_pushinteger(L, (*view)->pageNo() + 1);
+                       return 1;
+                   }),
+       VIEW_METHOD("goto_page",
+                   {
+                       if (*view)
+                           (*view)->GotoPage(luaL_checkinteger(L, 2) - 1);
+                       return 0;
+                   }),
+       {nullptr, nullptr}};
+
+#undef VIEW_METHOD
+
+static void
+registerDocumentView(lua_State *L)
+{
+    // 1. Create the metatable
+    luaL_newmetatable(L, "DocumentViewMetaTable");
+
+    // 2. Set __index to itself
+    // This trick means: "if a key isn't in the userdata, look in this
+    // metatable"
+    lua_pushvalue(L, -1);
+    lua_setfield(L, -2, "__index");
+
+    // 3. Register the methods into the metatable
+    luaL_setfuncs(L, DocumentViewMethods, 0);
+
+    lua_pop(L, 1); // Pop the metatable
+}
+} // namespace
+
+// Register the DocumentView* type with lua
+void
+Lektra::initLuaDocumentView() noexcept
+{
+    registerDocumentView(m_L);
+
     lua_newtable(m_L);
 
     // lektra.view.current() -> id
@@ -74,5 +129,5 @@ Lektra::initLuaView() noexcept
     }, 1);
     lua_setfield(m_L, -2, "list");
 
-    lua_setfield(m_L, -2, "views");
+    lua_setfield(m_L, -2, "view");
 }

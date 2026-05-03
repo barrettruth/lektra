@@ -3,6 +3,9 @@
 
 #include <QMessageBox>
 
+namespace
+{
+
 // lektra.ui.picker(prompt, items, options)
 static int
 lua_ui_picker(lua_State *L, Lektra *lektra)
@@ -157,6 +160,7 @@ lua_ui_picker(lua_State *L, Lektra *lektra)
     picker->launch();
     return 0;
 }
+} // namespace
 
 void
 Lektra::initLuaUI() noexcept

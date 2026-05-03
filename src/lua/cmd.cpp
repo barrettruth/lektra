@@ -1,5 +1,7 @@
 #include "Lektra.hpp"
 
+namespace
+{
 static void
 initCmd(lua_State *L, Lektra *lektra) noexcept
 {
@@ -125,6 +127,7 @@ initCmd(lua_State *L, Lektra *lektra) noexcept
 
     lua_setfield(L, -2, "execute");
 }
+} // namespace
 
 void
 Lektra::initLuaCmd() noexcept

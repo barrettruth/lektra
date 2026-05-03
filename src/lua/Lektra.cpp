@@ -45,8 +45,9 @@ Lektra::initLua() noexcept
     initLuaCmd();
     initLuaUI();
     initLuaTabs();
-    initLuaView();
+    initLuaDocumentView();
     initLuaEventDispatcher();
+    initLuaView();
 
     lua_setglobal(m_L, "lektra");
 
