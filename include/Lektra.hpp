@@ -205,6 +205,12 @@ public:
     void Reopen_last_closed_file() noexcept;
     void AddBookmark() noexcept;
     void RemoveBookmark() noexcept;
+    void setupKeybinding(const QString &action,
+                         const QStringList &keys) noexcept;
+    void unsetKeybinding(const QString &action) noexcept;
+    void setupMousebinding(const QString &action,
+                           const QString &trigger) noexcept;
+    void unsetMousebinding(const QString &action) noexcept;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -265,10 +271,6 @@ private:
     void initDefaultKeybinds() noexcept;
     void initDefaultMousebinds() noexcept;
     void warnShortcutConflicts() noexcept;
-    void setupKeybinding(const QString &action,
-                         const QStringList &keys) noexcept;
-    void setupMousebinding(const QString &action,
-                           const QString &trigger) noexcept;
     void populateRecentFiles() noexcept;
     void populateBookmarks() noexcept;
     void updateUiEnabledState() noexcept;
