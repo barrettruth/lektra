@@ -109,10 +109,10 @@ if %errorlevel% neq 0 (
 if not exist build mkdir build
 
 :: Note: For MSVC, CMAKE_BUILD_TYPE is ignored at this stage.
-cmake -S . -B build -G "Visual Studio 18 2026" -A x64
-    -DCMAKE_INSTALL_PREFIX="%PREFIX%"
-    -DWITH_IMAGE="%WITH_IMAGE%"
-    -DWITH_SYNCTEX="%WITH_SYNCTEX%"
+cmake -S . -B build -G "Visual Studio 18 2026" -A x64^
+    -DCMAKE_INSTALL_PREFIX="%PREFIX%"^
+    -DWITH_IMAGE="%WITH_IMAGE%"^
+    -DWITH_SYNCTEX="%WITH_SYNCTEX%"^
     -DWITH_LUA="%WITH_LUA%"
 
 if %errorlevel% neq 0 exit /b %errorlevel%
