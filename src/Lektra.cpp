@@ -2,6 +2,7 @@
 
 #include "AboutDialog.hpp"
 #include "AppPaths.hpp"
+#include "DispatchType.hpp"
 #include "DocumentContainer.hpp"
 #include "DocumentView.hpp"
 #include "EditLastPagesWidget.hpp"
@@ -36,45 +37,6 @@
 
 namespace
 {
-
-static inline QString
-supportedFormats()
-{
-    return "Documents ("
-           "PDF (*.pdf);;"
-#ifdef HAS_DJVU
-           "DjVu (*.djvu *.djv);;"
-#endif
-           "XPS (*.oxps *.xps);;"
-           "CBZ (*.cbz *.cbt);;"
-           "EPUB (*.epub);;"
-           "FictionBook (*.fb2 *.fbz);;"
-           "Mobi (*.mobi);;"
-           ");;"
-#ifdef WITH_IMAGE
-           "Images ("
-           "*.jpg *.jpeg "
-           "*.png *.apng "
-           "*.tiff *.tif "
-           "*.svg"
-           "*.bmp "
-           "*.gif "
-           "*.webp "
-           "*.avif "
-           "*.heic *.heif "
-           "*.jxl "
-           "*.qoi "
-           "*.psd "
-           "*.exr "
-           "*.hdr "
-           "*.tga "
-           "*.ico "
-           "*.ppm *.pgm *.pbm "
-           "*.pcx"
-           ");;"
-#endif
-           "All Files (*.*)";
-}
 
 static inline void
 set_title_format_if_present(toml::node_view<toml::node> n,
@@ -206,7 +168,7 @@ Lektra::construct() noexcept
     resize(m_config.window.initial_size[0], m_config.window.initial_size[1]);
     installEventFilter(this);
 #ifdef WITH_LUA
-    dispatchLuaEvent(DispatchType::OnReady);
+    dispatchLuaEvent(DispatchType::OnAppReady);
 #endif
 }
 
@@ -1600,8 +1562,8 @@ Lektra::updateUiEnabledState() noexcept
 void
 Lektra::setupKeybinding(const QString &action, const QStringList &keys) noexcept
 {
-    const Command *command = m_command_manager->find(action);
-    if (!command)
+    Command command = m_command_manager->find(action);
+    if (command.name.isEmpty())
         return;
 
     const auto existing = findChildren<QShortcut *>(action);
@@ -1616,7 +1578,7 @@ Lektra::setupKeybinding(const QString &action, const QStringList &keys) noexcept
         QShortcut *shortcut = new QShortcut(QKeySequence(key), this);
         shortcut->setObjectName(action);
         connect(shortcut, &QShortcut::activated,
-                [command]() { command->action({}); });
+                [command]() { command.action({}); });
 #ifndef NDEBUG
         qDebug() << "Keybinding set:" << action << "->" << key;
 #endif
@@ -1977,8 +1939,9 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
 
             const QString cmd_name = parts[0];
             const QStringList args = parts.mid(1);
-            if (auto *c = m_command_manager->find(cmd_name))
-                c->action(args);
+            auto c                 = m_command_manager->find(cmd_name);
+            if (!c.name.isEmpty())
+                c.action(args);
             else
                 err << tr("Unknown command from command line:") << cmd_name
                     << Qt::endl;
@@ -2005,8 +1968,8 @@ Lektra::Read_args_parser(const argparse::ArgumentParser &argparser) noexcept
             {
                 if (qtFiles.size() == 1)
                 {
-                    OpenFileInNewTab(qtFiles[0],
-                                     [pageOverride, this, runCliCommands]()
+                    OpenFileInNewTab(qtFiles[0], [pageOverride, this,
+                                                  runCliCommands](Lektra *)
                     {
                         if (pageOverride > 0)
                             gotoPage(pageOverride);
@@ -2130,8 +2093,9 @@ Lektra::populateRecentFiles() noexcept
         const QString path  = entry.file_path;
         const int page      = entry.page_number;
         QAction *fileAction = new QAction(path, m_recentFilesMenu);
-        connect(fileAction, &QAction::triggered, this, [this, path, page]()
-        { OpenFileInNewTab(path, [this, page]() { gotoPage(page); }); });
+        connect(fileAction, &QAction::triggered, this, [this, path, page]() {
+            OpenFileInNewTab(path, [this, page](Lektra *) { gotoPage(page); });
+        });
 
         m_recentFilesMenu->addAction(fileAction);
     }
@@ -2500,12 +2464,12 @@ Lektra::OpenFileInContainer(DocumentContainer *container,
                                   ? m_recent_files_store.pageNumber(filename)
                                   : 0;
         connect(view, &DocumentView::openFileFinished, this,
-                [callback, savedPage](DocumentView *view, Model::FileType)
+                [this, callback, savedPage](DocumentView *view, Model::FileType)
         {
             if (savedPage > 0 && !callback)
                 view->GotoPage(savedPage - 1);
             if (callback)
-                callback();
+                callback(this);
         }, Qt::SingleShotConnection);
     }
     else
@@ -2572,7 +2536,7 @@ Lektra::OpenFilesInVSplit(const QStringList &files) noexcept
         return;
 
     // First file always opens in a new tab
-    OpenFileInNewTab(files[0], [this, files]()
+    OpenFileInNewTab(files[0], [this, files](Lektra *)
     {
         // Subsequent files split into that tab
         for (int i = 1; i < files.size(); ++i)
@@ -2592,7 +2556,7 @@ Lektra::OpenFilesInHSplit(const QStringList &files) noexcept
         return;
 
     // First file always opens in a new tab
-    OpenFileInNewTab(files[0], [this, files]()
+    OpenFileInNewTab(files[0], [this, files](Lektra *)
     {
         // Subsequent files split into that tab
         for (int i = 1; i < files.size(); ++i)
@@ -2747,10 +2711,10 @@ Lektra::OpenFileInNewTab(const QString &filename,
     if (callback)
     {
         connect(view, &DocumentView::openFileFinished, this,
-                [callback](DocumentView *view, Model::FileType)
+                [this, callback](DocumentView *view, Model::FileType)
         {
             Q_UNUSED(view);
-            callback();
+            callback(this);
         }, Qt::SingleShotConnection);
     }
 
@@ -2818,8 +2782,8 @@ Lektra::openFileSplitHelper(const QString &filename, const CallbackFn &callback,
     if (callback)
     {
         connect(newView, &DocumentView::openFileFinished, this,
-                [callback](DocumentView *, Model::FileType) { callback(); },
-                Qt::SingleShotConnection);
+                [this, callback](DocumentView *, Model::FileType)
+        { callback(this); }, Qt::SingleShotConnection);
     }
 
     return newView;
@@ -3348,6 +3312,11 @@ Lektra::handleCurrentTabChanged(int index) noexcept
 {
     QWidget *w = m_tab_widget->widget(index);
 
+#ifdef WITH_LUA
+    if (w)
+        dispatchLuaEvent(DispatchType::OnTabChanged);
+#endif
+
     // Lazy load materialization: if the tab has the "lazy" role, it means it's
     // a placeholder for a file that hasn't been loaded yet. We need to load the
     // file, create a DocumentView for it, and replace the placeholder widget
@@ -3447,7 +3416,7 @@ Lektra::handleTabDropReceived(const TabBar::TabData &data) noexcept
         return;
 
     // Open the file and restore its state
-    OpenFileInNewTab(data.filePath, [this, data]()
+    OpenFileInNewTab(data.filePath, [this, data](Lektra *)
     {
         if (!m_doc)
             return;
@@ -4348,7 +4317,7 @@ Lektra::showStartupWidget() noexcept
     connect(m_startup_widget, &StartupWidget::openFileRequested, this,
             [this](const QString &path)
     {
-        OpenFileInNewTab(path, [this]()
+        OpenFileInNewTab(path, [this](Lektra *)
         {
             int index = m_tab_widget->indexOf(m_startup_widget);
             if (index != -1)
@@ -5612,7 +5581,7 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
         const bool invert  = node["invert_color"].toBool();
 
         auto applyState
-            = [page, zoom, fitMode, invert, callback](DocumentView *doc)
+            = [this, page, zoom, fitMode, invert, callback](DocumentView *doc)
         {
             doc->setFitMode(static_cast<DocumentView::FitMode>(fitMode));
             doc->setZoom(zoom);
@@ -5620,13 +5589,13 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
             if (invert)
                 doc->setInvertColor(true);
             if (callback)
-                callback();
+                callback(this);
         };
 
         if (path.isEmpty())
         {
             if (callback)
-                callback();
+                callback(this);
             return;
         }
 
@@ -5665,7 +5634,7 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
         if (children.isEmpty())
         {
             if (callback)
-                callback();
+                callback(this);
             return;
         }
 
@@ -5704,11 +5673,12 @@ Lektra::restoreSplitNode(DocumentContainer *container, DocumentView *targetView,
             const QJsonObject child = children[i].toObject();
             DocumentView *pane      = panes[i];
 
-            restoreSplitNode(container, pane, child, [remaining, callback]()
+            restoreSplitNode(container, pane, child,
+                             [remaining, callback](Lektra *l)
             {
                 --(*remaining);
                 if (*remaining == 0 && callback)
-                    callback();
+                    callback(l);
             });
         }
     }
@@ -6011,7 +5981,7 @@ Lektra::Show_recent_files_picker() noexcept
 
         connect(m_recent_file_picker, &RecentFilesPicker::fileRequested, this,
                 [this](const QString &file)
-        { OpenFileInNewTab(file, [this]() { m_doc->setFocus(); }); });
+        { OpenFileInNewTab(file, [this](Lektra *) { m_doc->setFocus(); }); });
     }
 
     // Always update the recent files list before launching
@@ -6066,7 +6036,8 @@ Lektra::Reopen_last_closed_file() noexcept
     const int savedPage  = target->page_number;
     const QString &fpath = target->file_path;
 
-    OpenFileInNewTab(fpath, [this, savedPage]() { gotoPage(savedPage); });
+    OpenFileInNewTab(fpath,
+                     [this, savedPage](Lektra *) { gotoPage(savedPage); });
 }
 
 void
@@ -6505,7 +6476,7 @@ Lektra::onIPCDataReady()
             OpenFilesInHSplit(filePaths);
         else if (filePaths.size() == 1)
         {
-            OpenFileInNewTab(filePaths[0], [page, this]()
+            OpenFileInNewTab(filePaths[0], [page, this](Lektra *)
             {
                 if (page > 0)
                     gotoPage(page);
@@ -6523,8 +6494,9 @@ Lektra::onIPCDataReady()
             QStringList parts = c.split(' ', Qt::SkipEmptyParts);
             if (parts.isEmpty())
                 continue;
-            if (auto *command = m_command_manager->find(parts[0]))
-                command->action(parts.mid(1));
+            auto command = m_command_manager->find(parts[0]);
+            if (!command.name.isEmpty())
+                command.action(parts.mid(1));
         }
     }
 
@@ -6587,8 +6559,8 @@ Lektra::OpenFile(const QString &filename, int on_doc_id,
             if (callback)
             {
                 connect(view, &DocumentView::openFileFinished, this,
-                        [callback](DocumentView *, Model::FileType)
-                { callback(); }, Qt::SingleShotConnection);
+                        [this, callback](DocumentView *, Model::FileType)
+                { callback(this); }, Qt::SingleShotConnection);
             }
             return view;
         }
