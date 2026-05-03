@@ -69,6 +69,12 @@ public:
         return m_command_manager.get();
     }
 
+    inline void showMessage(const QString &message,
+                            float duration = 2.0f) noexcept
+    {
+        m_message_bar->showMessage(message, duration);
+    }
+
     DocumentView *VSplit(DocumentView::Id id = -1) noexcept;
     DocumentView *HSplit(DocumentView::Id id = -1) noexcept;
     void OpenConfigFile() noexcept;
