@@ -149,14 +149,14 @@ void
 Lektra::construct() noexcept
 {
     initCommands();
+    initDefaultKeybinds();
+    initDefaultMousebinds();
     initConfig();
 #ifdef WITH_LUA
     initLua();
 #endif
-    initDefaultKeybinds();
-    initDefaultMousebinds();
     initGui();
-    warnShortcutConflicts();
+    // warnShortcutConflicts();
     initDB();
     trimRecentFilesDatabase();
     populateRecentFiles();
@@ -1560,6 +1560,16 @@ Lektra::updateUiEnabledState() noexcept
 }
 
 void
+Lektra::unsetKeybinding(const QString &action) noexcept
+{
+    const auto existing = findChildren<QShortcut *>(action);
+    for (QShortcut *s : existing)
+        delete s;
+
+    m_config.keybinds.remove(action);
+}
+
+void
 Lektra::setupKeybinding(const QString &action, const QStringList &keys) noexcept
 {
     Command command = m_command_manager->find(action);
@@ -1575,7 +1585,30 @@ Lektra::setupKeybinding(const QString &action, const QStringList &keys) noexcept
         if (key.isEmpty())
             continue;
 
-        QShortcut *shortcut = new QShortcut(QKeySequence(key), this);
+        const QKeySequence newSeq(key);
+        const QString newSeqNormalized
+            = newSeq.toString(QKeySequence::PortableText);
+        if (newSeqNormalized.isEmpty())
+            continue;
+
+        const auto allShortcuts = findChildren<QShortcut *>();
+        for (QShortcut *s : allShortcuts)
+        {
+            if (s->objectName() == action)
+                continue;
+
+            const QString existingNormalized
+                = s->key().toString(QKeySequence::PortableText);
+            if (existingNormalized != newSeqNormalized)
+                continue;
+
+            const QString otherAction = s->objectName();
+            delete s;
+            if (m_config.keybinds.value(otherAction) == key)
+                m_config.keybinds.remove(otherAction);
+        }
+
+        QShortcut *shortcut = new QShortcut(newSeq, this);
         shortcut->setObjectName(action);
         connect(shortcut, &QShortcut::activated,
                 [command]() { command.action({}); });
@@ -1632,6 +1665,17 @@ get_mouse_bind_key(const QString &trigger) noexcept
     }
 
     return binding;
+}
+
+void
+Lektra::unsetMousebinding(const QString &action) noexcept
+{
+    Config::MouseBinding m = get_mouse_bind_key(action);
+    m_config.mousebinds.erase(std::remove_if(m_config.mousebinds.begin(),
+                                             m_config.mousebinds.end(),
+                                             [&](const Config::MouseBinding &b)
+    { return b.action == m.action; }),
+                              m_config.mousebinds.end());
 }
 
 void
