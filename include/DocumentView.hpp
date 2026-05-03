@@ -21,6 +21,8 @@ extern "C"
 }
 #endif
 
+#include "DispatchType.hpp"
+
 #include <QFileInfo>
 #include <QFileSystemWatcher>
 #include <QFutureWatcher>
@@ -34,6 +36,10 @@ extern "C"
 #include <QWidget>
 #include <qevent.h>
 #include <set>
+
+#ifdef WITH_LUA
+    #include "LuaCallback.hpp"
+#endif
 
 // Z-values for various overlay items
 #define ZVALUE_PAGE 0
@@ -55,6 +61,7 @@ class DocumentView : public QWidget
 {
     Q_OBJECT
 public:
+    using CallbackFn          = std::function<void(DocumentView *)>;
     using Id                  = int;
     using SelectedAnnotations = std::vector<std::pair<int, Annotation *>>;
 
@@ -277,6 +284,35 @@ public:
         tryReloadLater(0);
     }
 
+    inline bool hasTextSelection() const noexcept
+    {
+        return (!m_selection_start.isNull() && m_selection_start_page >= 0
+                && m_selection_end_page >= 0);
+    }
+
+    inline QString selectionText(bool formatted) const noexcept
+    {
+        return m_model->get_selected_text(m_selection_start_page,
+                                          m_selection_start, m_selection_end,
+                                          formatted);
+    }
+
+#ifdef WITH_LUA
+    inline void addEventListener(DispatchType type, int handle, bool is_once,
+                                 CallbackFn callback) noexcept
+    {
+        m_lua_event_dispatcher[type].push_back(
+            {.ref = handle, .invoker = callback, .is_once = is_once});
+    }
+
+    inline void clearEventListeners(DispatchType type) noexcept
+    {
+        m_lua_event_dispatcher[type].clear();
+    }
+
+    void removeEventListener(DispatchType type, int handle) noexcept;
+#endif
+
 #ifdef WITH_IMAGE
     void startGifPlayback() noexcept;
     void stopGifPlayback() noexcept;
@@ -439,12 +475,6 @@ private:
         return m_page_offsets.empty() ? 0.0 : m_page_offsets.back();
     }
 
-    inline bool has_text_selection() const noexcept
-    {
-        return (!m_selection_start.isNull() && m_selection_start_page >= 0
-                && m_selection_end_page >= 0);
-    }
-
     double pageXOffset(int pageno, double pageW, double sceneW) const noexcept;
     double pageOffset(int pageno) const noexcept;
     double pageStride(int pageno) const noexcept;
@@ -564,6 +594,13 @@ private:
     bool m_thumbnail_mode                    = false;
 #ifdef WITH_SYNCTEX
     synctex_scanner_p m_synctex_scanner = nullptr;
+#endif
+
+#ifdef WITH_LUA
+    std::unordered_map<DispatchType, std::vector<LuaCallback<DocumentView>>>
+        m_lua_event_dispatcher;
+    void dispatchLuaEvent(DispatchType type) noexcept;
+    bool removeLuaEventCallback(DispatchType type, int callbackRef) noexcept;
 #endif
 
     QHash<int, GraphicsImageItem *> m_page_items_hash;
