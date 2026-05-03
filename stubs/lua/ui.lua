@@ -3,13 +3,6 @@
 lektra = lektra or {}
 lektra.ui = {}
 
----@enum MessageType
-local MessageType = {
-    INFO = "info",
-    WARNING = "warning",
-    ERROR = "error"
-}
-
 ---@class PickerOptions
 ---@field flat boolean Whether to show items in a flat list or a tree view, default is false (tree view)
 ---@field columns table List of column names to display in the picker, default is {"Value"}
@@ -17,10 +10,10 @@ local MessageType = {
 ---@field on_cancel function Callback function that is called when the user cancels the picker dialog
 
 --- Shows a message to the user with `QMessageBox`
----@overload fun(arg: {title: string, message: string, type?: MessageType})
+---@overload fun(arg: {title: string, message: string, type?: string})
 ---@param title string
 ---@param message string
----@param type? MessageType
+---@param type? string "info", "warning", "error", default is "info"
 lektra.ui.show_message = function(title , message, type) end
 
 --- Shows an input dialog to the user with `QInputDialog` and returns the input as a string

@@ -12,7 +12,7 @@ lektra.cmd.register = function(name, callback, desc) end
 
 --- Unregisters a command with the given name.
 ---@overload fun(arg: {name: string})
---- @param name string The name of the command to unregister.
+---@param name string The name of the command to unregister.
 lektra.cmd.unregister = function(name) end
 
 --- Executes a command with the given name and arguments.
