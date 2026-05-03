@@ -19,7 +19,7 @@ public:
 
 private:
     void showNext() noexcept;
-    bool m_showing{false};
+    bool m_showing = false;
     QQueue<MessageItem> m_queue;
-    QLabel *m_label{new QLabel()};
+    QLabel *m_label = new QLabel();
 };
