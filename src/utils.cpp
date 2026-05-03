@@ -1,5 +1,14 @@
 #include "utils.hpp"
 
+void
+clean_pdf_text(std::string &s)
+{
+    remove_utf8_junk(s);
+    clean_join_pdf_text(s);
+    normalize_whitespace(s);
+    collapse_spaces(s);
+}
+
 fz_rect
 bound_rects(const std::vector<fz_rect> &rects) noexcept
 {
@@ -418,13 +427,4 @@ clean_join_pdf_text(const std::string &input)
     }
 
     return out;
-}
-
-void
-clean_pdf_text(std::string &s)
-{
-    remove_utf8_junk(s);
-    clean_join_pdf_text(s);
-    normalize_whitespace(s);
-    collapse_spaces(s);
 }
