@@ -2,7 +2,6 @@
 
 #include <QStringList>
 #include <functional>
-#include <vector>
 
 class Lektra;
 
@@ -16,81 +15,67 @@ struct Command
 class CommandManager
 {
 public:
-    inline void reg(Command cmd) noexcept
-    {
-        m_commands.push_back(std::move(cmd));
-    }
+    using Commands = std::unordered_map<
+        QString, std::pair<QString, std::function<void(const QStringList &)>>>;
 
     inline void unreg(const QString &name) noexcept
     {
-        m_commands.erase(std::remove_if(m_commands.begin(), m_commands.end(),
-                                        [&name](const Command &cmd)
-        { return cmd.name == name; }),
-                         m_commands.end());
+        m_commands.erase(name);
     }
 
     inline void
     reg(const QString &name, const QString &description,
         std::function<void(const QStringList &args)> action) noexcept
     {
-        m_commands.push_back({name, description, std::move(action)});
+        m_commands[name] = {description, std::move(action)};
     }
 
     inline void execute(const QString &name,
                         const QStringList &args = {}) const noexcept
     {
-        for (const auto &cmd : m_commands)
-        {
-            if (cmd.name == name)
-            {
-                cmd.action(args);
-                return;
-            }
-        }
+        auto it = m_commands.find(name);
+        if (it != m_commands.end())
+            it->second.second(args);
     }
 
     inline const std::vector<Command> &const_commands() const noexcept
     {
-        return m_commands;
+        static std::vector<Command> cmds;
+        cmds.clear();
+        for (const auto &[name, pair] : m_commands)
+            cmds.push_back({name, pair.first, pair.second});
+        return cmds;
     }
 
     inline const std::vector<Command> commands() const noexcept
     {
-        return m_commands;
+        std::vector<Command> cmds;
+        for (const auto &[name, pair] : m_commands)
+            cmds.push_back({name, pair.first, pair.second});
+        return cmds;
     }
 
     inline const QStringList commandNames() const noexcept
     {
         QStringList names;
-        for (const auto &cmd : m_commands)
-            names.push_back(cmd.name);
+        for (const auto &[name, _] : m_commands)
+            names << name;
         return names;
     }
 
     bool hasCommand(const QString &name) const noexcept
     {
-        for (const auto &cmd : m_commands)
-        {
-            if (cmd.name == name)
-            {
-                return true;
-            }
-        }
-        return false;
+        return m_commands.find(name) != m_commands.end();
     }
 
-    const Command *find(const QString &name) const noexcept
+    const Command find(const QString &name) const noexcept
     {
-        for (const auto &cmd : m_commands)
-        {
-            if (cmd.name == name)
-            {
-                return &cmd;
-            }
-        }
-        return nullptr;
+        auto it = m_commands.find(name);
+        if (it != m_commands.end())
+            return Command{name, it->second.first, it->second.second};
+        return Command{};
     }
 
 private:
-    std::vector<Command> m_commands;
+    Commands m_commands;
 };
