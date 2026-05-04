@@ -4,6 +4,7 @@
 
 ## HIGH PRIORITY
 
+- [ ] Scroll on reaching the end (sane behavior)
 - [ ] Fit mode for rotated images
 - [ ] Export highlight annotations
 - [ ] Allow for command arguments
