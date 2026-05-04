@@ -100,7 +100,8 @@ cmake -S . -B build \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DWITH_IMAGE="$WITH_IMAGE" \
-    -DWITH_SYNCTEX="$WITH_SYNCTEX"
+    -DWITH_SYNCTEX="$WITH_SYNCTEX" \
+    -DWITH_LUA="$WITH_LUA"
 
 cmake --build build
 
