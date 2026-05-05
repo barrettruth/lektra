@@ -159,6 +159,12 @@ Lektra::initLuaEventDispatcher() noexcept
     }, 1);
     lua_setfield(m_L, -2, "once"); // lektra.event.once
 
+    // lektra.event.EventType enum
+    // = 0, 1
+    lua_newtable(m_L);
+
+    lua_setfield(m_L, -2, "EventType");
+
     lua_setfield(m_L, -2, "event"); // lektra.event
                                     //
 }
