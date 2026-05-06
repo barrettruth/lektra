@@ -2,19 +2,8 @@
 lektra = lektra or {}
 lektra.event = {}
 
--- enum of numbers
---    OnAppReady = 0,
-    -- OnReady,
-    -- OnFileOpen,
-    -- OnFileClose,
-    -- OnPageChanged,
-    -- OnZoomChanged,
-    -- OnLinkClicked,
-    -- OnTextSelected,
-    -- OnTabChanged,
-
 ---@enum EventType
-EventType = {
+lektra.event.EventType = {
     OnAppReady = 0,
     OnReady = 1,
     OnFileOpen = 2,
