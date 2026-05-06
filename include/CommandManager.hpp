@@ -30,12 +30,17 @@ public:
         m_commands[name] = {description, std::move(action)};
     }
 
-    inline void execute(const QString &name,
+    inline bool execute(const QString &name,
                         const QStringList &args = {}) const noexcept
     {
         auto it = m_commands.find(name);
         if (it != m_commands.end())
+        {
             it->second.second(args);
+            return true;
+        }
+
+        return false;
     }
 
     inline const std::vector<Command> &const_commands() const noexcept
@@ -74,6 +79,13 @@ public:
         if (it != m_commands.end())
             return Command{name, it->second.first, it->second.second};
         return Command{};
+    }
+
+    void alias(const QString &existingName, const QString &aliasName) noexcept
+    {
+        auto it = m_commands.find(existingName);
+        if (it != m_commands.end())
+            m_commands[aliasName] = it->second;
     }
 
 private:
