@@ -3,6 +3,10 @@
 lektra = lektra or {}
 lektra.cmd = {}
 
+---@class CommandEntry
+---@field name string The name of the command.
+---@field desc? string A description of the command.
+
 --- Registers a command with the given name and callback function.
 ---@overload fun(arg: {name: string, callback: function, desc?: string})
 ---@param name string The name of the command to register.
@@ -16,8 +20,14 @@ lektra.cmd.register = function(name, callback, desc) end
 lektra.cmd.unregister = function(name) end
 
 --- Executes a command with the given name and arguments.
----@overload fun(arg: {name: string, args?: table})
+---@overload fun(arg: {name: string, args?: table}): boolean
 ---@param name string The name of the command to execute.
 ---@param args? table A table of arguments to pass to the command's callback function.
+---@return boolean True if the command was found and executed successfully, false otherwise.
 lektra.cmd.execute = function(name, args) end
 
+--- Lists all registered commands.
+---@return table CommandEntry[] table of all registered commands
+lektra.cmd.list = function() end
+
+lektra.cmd.alias = function(name, target) end

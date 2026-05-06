@@ -13,6 +13,10 @@ lektra.event.EventType = {
     OnLinkClicked = 6,
     OnTextSelected = 7,
     OnTabChanged = 8,
+    OnSearchStarted = 9,
+    OnSearchFinished = 10,
+    OnAnnotationAdded = 11,
+    OnAnnotationRemoved = 12,
 }
 
 --- Registers a callback to be called when the specified event is triggered.
@@ -38,3 +42,8 @@ lektra.event.once = function (event, callback) end
 --- Clears all registered callbacks for the specified event.
 ---@param event EventType The name of the event to clear callbacks for.
 lektra.event.clear = function (event) end
+
+--- Returns the number of registered callbacks for the specified event.
+---@param event EventType The name of the event to count callbacks for.
+---@return integer count The number of registered callbacks for the specified event.
+lektra.event.count = function (event) end
