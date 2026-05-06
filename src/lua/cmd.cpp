@@ -1,13 +1,13 @@
 #include "Lektra.hpp"
 
-namespace
+void
+Lektra::initLuaCmd() noexcept
 {
-static void
-initCmd(lua_State *L, Lektra *lektra) noexcept
-{
+    lua_newtable(m_L);
+
     // lektra.cmd.register(name, callback [, desc])
-    lua_pushlightuserdata(L, lektra);
-    lua_pushcclosure(L, [](lua_State *L) -> int
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
     {
         const char *name = nullptr;
         const char *desc = "";
@@ -80,11 +80,12 @@ initCmd(lua_State *L, Lektra *lektra) noexcept
         });
         return 0;
     }, 1);
-    lua_setfield(L, -2, "register");
+
+    lua_setfield(m_L, -2, "register");
 
     // lektra.cmd.unregister(name)
-    lua_pushlightuserdata(L, lektra);
-    lua_pushcclosure(L, [](lua_State *L) -> int
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
     {
         const char *name = luaL_checkstring(L, 1);
 
@@ -96,11 +97,11 @@ initCmd(lua_State *L, Lektra *lektra) noexcept
         return 0;
     }, 1);
 
-    lua_setfield(L, -2, "unregister");
+    lua_setfield(m_L, -2, "unregister");
 
-    // lektra.cmd.execute(name, [args])
-    lua_pushlightuserdata(L, lektra);
-    lua_pushcclosure(L, [](lua_State *L) -> int
+    // lektra.cmd.execute(name, [args]) -> bool (success)
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
     {
         const char *name = luaL_checkstring(L, 1);
         QStringList args;
@@ -120,21 +121,52 @@ initCmd(lua_State *L, Lektra *lektra) noexcept
         auto *lektra
             = static_cast<Lektra *>(lua_touserdata(L, lua_upvalueindex(1)));
 
-        lektra->commandManager()->execute(name, args);
+        bool state = lektra->commandManager()->execute(name, args);
+
+        lua_pushboolean(L, state);
+
+        return 1;
+    }, 1);
+
+    lua_setfield(m_L, -2, "execute");
+
+    // lektra.cmd.list() -> (CommandEntry){ name=..., desc=...}
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
+    {
+        auto *lektra
+            = static_cast<Lektra *>(lua_touserdata(L, lua_upvalueindex(1)));
+
+        lua_newtable(L);
+        int i = 1;
+        for (const auto &cmd : lektra->commandManager()->const_commands())
+        {
+            lua_newtable(L);
+            lua_pushstring(L, cmd.name.toUtf8().constData());
+            lua_setfield(L, -2, "name");
+            lua_pushstring(L, cmd.description.toUtf8().constData());
+            lua_setfield(L, -2, "desc");
+            lua_rawseti(L, -2, i++);
+        }
+        return 1;
+    }, 1);
+    lua_setfield(m_L, -2, "list");
+
+    // lektra.cmd.alias(name, target)
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
+    {
+        const char *name   = luaL_checkstring(L, 1);
+        const char *target = luaL_checkstring(L, 2);
+
+        auto *lektra
+            = static_cast<Lektra *>(lua_touserdata(L, lua_upvalueindex(1)));
+
+        lektra->commandManager()->alias(name, target);
 
         return 0;
     }, 1);
-
-    lua_setfield(L, -2, "execute");
-}
-} // namespace
-
-void
-Lektra::initLuaCmd() noexcept
-{
-    lua_newtable(m_L);
-
-    initCmd(m_L, this);
+    lua_setfield(m_L, -2, "alias");
 
     lua_setfield(m_L, -2,
                  "cmd"); // lektra.api = the table we just built
