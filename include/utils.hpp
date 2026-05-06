@@ -191,29 +191,6 @@ joinPaths(Args &&...args)
     return QDir::cleanPath(result);
 }
 
-static DispatchType
-stringToDispatchType(const QString &name)
-{
-    static const std::unordered_map<QString, DispatchType> eventMap = {
-        {"OnAppReady", DispatchType::OnAppReady},
-        {"OnReady", DispatchType::OnReady},
-        {"OnFileOpen", DispatchType::OnFileOpen},
-        {"OnFileClose", DispatchType::OnFileClose},
-        {"OnPageChanged", DispatchType::OnPageChanged},
-        {"OnZoomChanged", DispatchType::OnZoomChanged},
-        {"OnLinkClicked", DispatchType::OnLinkClicked},
-        {"OnTabChanged", DispatchType::OnTabChanged},
-        {"OnTextSelected", DispatchType::OnTextSelected},
-        {"OnPageChanged", DispatchType::OnPageChanged},
-    };
-
-    if (!eventMap.contains(name))
-        throw std::invalid_argument(
-            QString("Unknown event name: %1").arg(name).toStdString());
-
-    return eventMap.at(name);
-}
-
 static inline QString
 supportedFormats()
 {
