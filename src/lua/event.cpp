@@ -1,5 +1,5 @@
+#include "DispatchType.hpp"
 #include "Lektra.hpp"
-#include "utils.hpp"
 
 bool
 Lektra::removeLuaEventCallback(DispatchType type, int callbackRef) noexcept
@@ -160,10 +160,50 @@ Lektra::initLuaEventDispatcher() noexcept
     lua_setfield(m_L, -2, "once"); // lektra.event.once
 
     // lektra.event.EventType enum
-    // = 0, 1
     lua_newtable(m_L);
 
+    for (int event = 0; event <= static_cast<int>(DispatchType::COUNT); ++event)
+    {
+        lua_pushinteger(m_L, event);
+        lua_setfield(m_L, -2,
+                     dispatchTypeToString(static_cast<DispatchType>(event))
+                         .toStdString()
+                         .c_str());
+    }
     lua_setfield(m_L, -2, "EventType");
+
+    // lektra.event.count(name) -> int
+    // Returns the number of registered callbacks for a given event type
+    lua_pushlightuserdata(m_L, this);
+    lua_pushcclosure(m_L, [](lua_State *L) -> int
+    {
+        const char *eventName = luaL_checkstring(L, 1);
+
+        auto *self
+            = static_cast<Lektra *>(lua_touserdata(L, lua_upvalueindex(1)));
+
+        DispatchType dtype;
+        try
+        {
+            dtype = stringToDispatchType(eventName);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            luaL_error(L, e.what());
+            return 0;
+        }
+
+        auto it = self->m_lua_event_dispatcher.find(dtype);
+        if (it == self->m_lua_event_dispatcher.end())
+        {
+            lua_pushinteger(L, 0);
+            return 1; // One return value (the count)
+        }
+
+        lua_pushinteger(L, it->second.size());
+        return 1; // One return value (the count)
+    }, 1);
+    lua_setfield(m_L, -2, "count");
 
     lua_setfield(m_L, -2, "event"); // lektra.event
                                     //
