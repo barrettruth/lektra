@@ -2,8 +2,29 @@
 lektra = lektra or {}
 lektra.event = {}
 
+-- enum of numbers
+--    OnAppReady = 0,
+    -- OnReady,
+    -- OnFileOpen,
+    -- OnFileClose,
+    -- OnPageChanged,
+    -- OnZoomChanged,
+    -- OnLinkClicked,
+    -- OnTextSelected,
+    -- OnTabChanged,
+
 ---@enum EventType
----
+EventType = {
+    OnAppReady = 0,
+    OnReady = 1,
+    OnFileOpen = 2,
+    OnFileClose = 3,
+    OnPageChanged = 4,
+    OnZoomChanged = 5,
+    OnLinkClicked = 6,
+    OnTextSelected = 7,
+    OnTabChanged = 8,
+}
 
 --- Registers a callback to be called when the specified event is triggered.
 ---@overload fun(arg: {event: EventType, callback: function})
